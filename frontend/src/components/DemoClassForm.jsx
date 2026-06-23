@@ -61,7 +61,7 @@ export default function DemoClassForm({ examType }) {
 
   return (
     <div
-      className="rounded-3xl p-6 sm:p-8 border border-gray-100"
+      className="rounded-3xl p-6 sm:p-8 border border-gray-100 bg-white"
       style={{ boxShadow: '0 8px 40px rgba(10,61,145,0.1)' }}
     >
       <div className="mb-6">

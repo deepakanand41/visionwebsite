@@ -234,9 +234,10 @@ export function ServiceHero({ badge, title, highlight, subtitle, features, ctaLi
   );
 }
 
-export function FeatureGrid({ items }) {
+export function FeatureGrid({ items, columns = 3 }) {
+  const gridCols = columns === 2 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3';
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className={`grid ${gridCols} gap-6`}>
       {items.map((item, i) => (
         <motion.div
           key={item.title}

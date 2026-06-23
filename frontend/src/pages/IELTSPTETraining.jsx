@@ -54,32 +54,50 @@ const pteBatches = [
   { type: 'Online Batch', duration: '4 Weeks', hours: '2 hrs/day' },
 ];
 
-function IELTSContent() {
+function TrainingSplitLayout({ examType, leftContent, rightBelowForm }) {
   return (
     <AnimatePresence mode="wait">
-      <motion.div
-        key="ielts"
+      <motion.section
+        key={examType}
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -16 }}
         transition={{ duration: 0.3 }}
+        className="py-14"
+        style={{ background: 'linear-gradient(135deg, #f0f4ff 0%, #fff8f0 100%)' }}
       >
-        <section className="py-14 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-10">
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-3">Why Choose Our IELTS Coaching?</h2>
-              <p className="text-gray-500 max-w-2xl mx-auto">Structured program to help you achieve your target band score on the first attempt.</p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.05fr] gap-10 lg:gap-12 items-start">
+            <div className="space-y-10">{leftContent}</div>
+            <div id="demo-class" className="w-full space-y-6">
+              <DemoClassForm examType={examType} />
+              {rightBelowForm}
             </div>
-            <FeatureGrid items={ieltsFeatures} />
           </div>
-        </section>
+        </div>
+      </motion.section>
+    </AnimatePresence>
+  );
+}
 
-        <section className="py-14 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-8 text-center">Four Modules Covered</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+function IELTSContent() {
+  return (
+    <TrainingSplitLayout
+      examType="ielts"
+      leftContent={
+        <>
+          <div>
+            <div className="mb-10">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-3">Why Choose Our IELTS Coaching?</h2>
+              <p className="text-gray-500 max-w-2xl">Structured program to help you achieve your target band score on the first attempt.</p>
+            </div>
+            <FeatureGrid items={ieltsFeatures} columns={2} />
+          </div>
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6">Four Modules Covered</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {ieltsModules.map((m, i) => (
-                <div key={m.name} className="rounded-2xl p-5 border border-gray-100 text-center" style={{ boxShadow: '0 4px 20px rgba(10,61,145,0.06)' }}>
+                <div key={m.name} className="rounded-2xl p-5 border border-gray-100 bg-white text-center" style={{ boxShadow: '0 4px 20px rgba(10,61,145,0.06)' }}>
                   <div className="text-2xl font-black mb-2" style={{ color: i % 2 === 0 ? '#0A3D91' : '#F28C28' }}>0{i + 1}</div>
                   <h3 className="font-bold text-gray-800 mb-1.5">{m.name}</h3>
                   <p className="text-gray-500 text-sm">{m.desc}</p>
@@ -87,56 +105,47 @@ function IELTSContent() {
               ))}
             </div>
           </div>
-        </section>
-
-        <section className="py-14 bg-gray-50">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6 text-center">Available IELTS Batches</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {ieltsBatches.map((b) => (
-                <div key={b.type} className="bg-white rounded-2xl p-5 border border-gray-100 flex justify-between items-center">
-                  <div>
-                    <h3 className="font-bold text-gray-800">{b.type}</h3>
-                    <p className="text-sm text-gray-500">{b.duration} · {b.hours}</p>
-                  </div>
-                  <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: 'rgba(10,61,145,0.08)', color: '#0A3D91' }}>Open</span>
+        </>
+      }
+      rightBelowForm={
+        <div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6">Available IELTS Batches</h2>
+          <div className="grid grid-cols-1 gap-4">
+            {ieltsBatches.map((b) => (
+              <div key={b.type} className="bg-white rounded-2xl p-5 border border-gray-100 flex justify-between items-center">
+                <div>
+                  <h3 className="font-bold text-gray-800">{b.type}</h3>
+                  <p className="text-sm text-gray-500">{b.duration} · {b.hours}</p>
                 </div>
-              ))}
-            </div>
+                <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: 'rgba(10,61,145,0.08)', color: '#0A3D91' }}>Open</span>
+              </div>
+            ))}
           </div>
-        </section>
-      </motion.div>
-    </AnimatePresence>
+        </div>
+      }
+    />
   );
 }
 
 function PTEContent() {
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key="pte"
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -16 }}
-        transition={{ duration: 0.3 }}
-      >
-        <section className="py-14 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-10">
+    <TrainingSplitLayout
+      examType="pte"
+      leftContent={
+        <>
+          <div>
+            <div className="mb-10">
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-3">Why Choose Our PTE Coaching?</h2>
-              <p className="text-gray-500 max-w-2xl mx-auto">Computer-based training with AI scoring — faster results and unbiased evaluation.</p>
+              <p className="text-gray-500 max-w-2xl">Computer-based training with AI scoring — faster results and unbiased evaluation.</p>
             </div>
-            <FeatureGrid items={pteFeatures} />
+            <FeatureGrid items={pteFeatures} columns={2} />
           </div>
-        </section>
-
-        <section className="py-14 bg-white">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-3 text-center">PTE Score Guide</h2>
-            <p className="text-gray-500 text-center mb-8">How PTE scores map to IELTS equivalents</p>
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-3">PTE Score Guide</h2>
+            <p className="text-gray-500 mb-6">How PTE scores map to IELTS equivalents</p>
             <div className="space-y-3">
               {pteScoreGuide.map((s) => (
-                <div key={s.range} className="flex items-center gap-4 bg-gray-50 rounded-xl p-4 border border-gray-100">
+                <div key={s.range} className="flex items-center gap-4 bg-white rounded-xl p-4 border border-gray-100">
                   <div className="w-12 h-12 rounded-xl flex items-center justify-center font-black text-white shrink-0" style={{ background: '#0A3D91' }}>
                     {s.range}
                   </div>
@@ -148,26 +157,25 @@ function PTEContent() {
               ))}
             </div>
           </div>
-        </section>
-
-        <section className="py-14 bg-gray-50">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6 text-center">Available PTE Batches</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {pteBatches.map((b) => (
-                <div key={b.type} className="bg-white rounded-2xl p-5 border border-gray-100 flex justify-between items-center">
-                  <div>
-                    <h3 className="font-bold text-gray-800">{b.type}</h3>
-                    <p className="text-sm text-gray-500">{b.duration} · {b.hours}</p>
-                  </div>
-                  <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: 'rgba(242,140,40,0.1)', color: '#c27020' }}>Open</span>
+        </>
+      }
+      rightBelowForm={
+        <div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6">Available PTE Batches</h2>
+          <div className="grid grid-cols-1 gap-4">
+            {pteBatches.map((b) => (
+              <div key={b.type} className="bg-white rounded-2xl p-5 border border-gray-100 flex justify-between items-center">
+                <div>
+                  <h3 className="font-bold text-gray-800">{b.type}</h3>
+                  <p className="text-sm text-gray-500">{b.duration} · {b.hours}</p>
                 </div>
-              ))}
-            </div>
+                <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: 'rgba(242,140,40,0.1)', color: '#c27020' }}>Open</span>
+              </div>
+            ))}
           </div>
-        </section>
-      </motion.div>
-    </AnimatePresence>
+        </div>
+      }
+    />
   );
 }
 
@@ -212,23 +220,6 @@ export default function IELTSPTETraining() {
 
       {/* Tab Content */}
       {activeTab === 'ielts' ? <IELTSContent /> : <PTEContent />}
-
-      {/* Demo Class Form */}
-      <section className="py-16 bg-white">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeTab}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.25 }}
-            >
-              <DemoClassForm examType={activeTab} />
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      </section>
     </main>
   );
 }

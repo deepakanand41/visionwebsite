@@ -42,11 +42,25 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const linkClass = (highlight) =>
+  const isActive = (path) => location.pathname === path;
+  const isDestinationsActive = location.pathname.startsWith('/study-abroad');
+
+  const linkClass = (highlight, active) =>
     `flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg transition-colors whitespace-nowrap ${
       highlight
-        ? 'font-semibold hover:opacity-90'
-        : 'font-medium text-gray-700 hover:text-blue-700 hover:bg-blue-50'
+        ? `font-semibold ${active ? 'bg-orange-50' : 'hover:opacity-90'}`
+        : active
+          ? 'font-semibold text-[#0A3D91] bg-blue-50'
+          : 'font-medium text-gray-700 hover:text-blue-700 hover:bg-blue-50'
+    }`;
+
+  const mobileLinkClass = (highlight, active) =>
+    `flex items-center gap-2 px-4 py-2.5 text-sm rounded-lg ${
+      highlight
+        ? `font-semibold ${active ? 'bg-orange-50' : ''}`
+        : active
+          ? 'font-semibold text-[#0A3D91] bg-blue-50'
+          : 'font-medium text-gray-700 hover:bg-blue-50'
     }`;
 
   return (
@@ -68,7 +82,11 @@ export default function Navbar() {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setDestOpen(!destOpen)}
-                className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-700 rounded-lg hover:bg-blue-50 transition-colors"
+                className={`flex items-center gap-1 px-3 py-2 text-sm rounded-lg transition-colors ${
+                  isDestinationsActive
+                    ? 'font-semibold text-[#0A3D91] bg-blue-50'
+                    : 'font-medium text-gray-700 hover:text-blue-700 hover:bg-blue-50'
+                }`}
               >
                 Study Destinations
                 <FiChevronDown className={`transition-transform duration-200 ${destOpen ? 'rotate-180' : ''}`} />
@@ -82,33 +100,43 @@ export default function Navbar() {
                     transition={{ duration: 0.15 }}
                     className="absolute top-full left-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden"
                   >
-                    {destinationsList.map((d) => (
+                    {destinationsList.map((d) => {
+                      const destActive = location.pathname === `/study-abroad/${d.slug}`;
+                      return (
                       <Link
                         key={d.slug}
                         to={`/study-abroad/${d.slug}`}
                         onClick={() => setDestOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+                        className={`flex items-center gap-3 px-4 py-3 text-sm transition-colors ${
+                          destActive
+                            ? 'font-semibold text-[#0A3D91] bg-blue-50'
+                            : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700'
+                        }`}
                       >
                         <span className="text-lg">{d.flag}</span>
                         {d.name}
                       </Link>
-                    ))}
+                      );
+                    })}
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
 
-            {navLinks.map((link) => (
+            {navLinks.map((link) => {
+              const active = isActive(link.to);
+              return (
               <Link
                 key={link.label}
                 to={link.to}
-                className={linkClass(link.highlight)}
+                className={linkClass(link.highlight, active)}
                 style={link.highlight ? { color: '#F28C28' } : {}}
               >
                 {link.highlight && <FaHandshake size={13} />}
                 {link.label}
               </Link>
-            ))}
+              );
+            })}
           </nav>
 
           <div className="hidden lg:block">
@@ -140,30 +168,38 @@ export default function Navbar() {
             className="lg:hidden border-t border-gray-100 bg-white overflow-hidden"
           >
             <div className="px-4 py-4 space-y-1">
-              <div className="font-medium text-sm text-gray-500 px-3 py-2">Study Destinations</div>
-              {destinationsList.map((d) => (
+              <div className={`font-medium text-sm px-3 py-2 ${isDestinationsActive ? 'text-[#0A3D91] font-semibold' : 'text-gray-500'}`}>
+                Study Destinations
+              </div>
+              {destinationsList.map((d) => {
+                const destActive = location.pathname === `/study-abroad/${d.slug}`;
+                return (
                 <Link
                   key={d.slug}
                   to={`/study-abroad/${d.slug}`}
-                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 rounded-lg hover:bg-blue-50"
+                  className={`flex items-center gap-3 px-4 py-2.5 text-sm rounded-lg ${
+                    destActive ? 'font-semibold text-[#0A3D91] bg-blue-50' : 'text-gray-700 hover:bg-blue-50'
+                  }`}
                 >
                   <span>{d.flag}</span> {d.name}
                 </Link>
-              ))}
+                );
+              })}
               <div className="border-t border-gray-100 my-2" />
-              {navLinks.map((link) => (
+              {navLinks.map((link) => {
+                const active = isActive(link.to);
+                return (
                 <Link
                   key={link.label}
                   to={link.to}
-                  className={`flex items-center gap-2 px-4 py-2.5 text-sm rounded-lg ${
-                    link.highlight ? 'font-semibold' : 'font-medium text-gray-700 hover:bg-blue-50'
-                  }`}
-                  style={link.highlight ? { color: '#F28C28', background: 'rgba(242,140,40,0.06)' } : {}}
+                  className={mobileLinkClass(link.highlight, active)}
+                  style={link.highlight ? { color: '#F28C28' } : {}}
                 >
                   {link.highlight && <FaHandshake size={14} />}
                   {link.label}
                 </Link>
-              ))}
+                );
+              })}
               <div className="pt-2">
                 <Link
                   to="/contact-us"

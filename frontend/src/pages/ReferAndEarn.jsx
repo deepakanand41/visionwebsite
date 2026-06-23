@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { submitReferral } from '../services/api';
 import {
   FiUser, FiMail, FiPhone, FiMapPin, FiSend, FiLoader,
-  FiCheck, FiChevronRight, FiDollarSign, FiUsers, FiGift, FiAward
+  FiCheck, FiDollarSign, FiUsers, FiGift, FiAward
 } from 'react-icons/fi';
 import {
   FaHandshake, FaUserTie, FaGraduationCap, FaChalkboardTeacher,
@@ -72,16 +72,18 @@ const howItWorks = [
 
 /* ─── Sub-components ─────────────────────────────────────── */
 
-function SectionTitle({ badge, title, highlight, subtitle }) {
+function SectionTitle({ badge, title, highlight, subtitle, align = 'center' }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-60px' });
+  const alignClass = align === 'left' ? 'text-left' : 'text-center';
+  const subtitleClass = align === 'left' ? 'max-w-none' : 'max-w-2xl mx-auto';
   return (
     <motion.div
       ref={ref}
       initial={{ opacity: 0, y: 20 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.5 }}
-      className="text-center mb-12"
+      className={`${alignClass} mb-12`}
     >
       <div
         className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-4"
@@ -104,7 +106,7 @@ function SectionTitle({ badge, title, highlight, subtitle }) {
           </span>
         )}
       </h2>
-      {subtitle && <p className="text-gray-500 text-lg max-w-2xl mx-auto">{subtitle}</p>}
+      {subtitle && <p className={`text-gray-500 text-lg ${subtitleClass}`}>{subtitle}</p>}
     </motion.div>
   );
 }
@@ -267,191 +269,198 @@ export default function ReferAndEarn() {
 
   return (
     <>
-      {/* ── Hero Banner ─────────────────────────────────────── */}
+      {/* ── Left: Hero + How It Works + Benefits + FAQ | Right: Registration ── */}
       <section
-        className="relative pt-28 pb-20 overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, #051e47 0%, #0A3D91 50%, #1a5cb8 100%)' }}
-      >
-        {/* Background pattern */}
-        <div className="absolute inset-0 opacity-10 pointer-events-none">
-          <svg viewBox="0 0 1200 500" className="w-full h-full" preserveAspectRatio="xMidYMid slice">
-            {[...Array(6)].map((_, i) => (
-              <circle key={i} cx={200 * i} cy="250" r="220" fill="none" stroke="white" strokeWidth="0.8" />
-            ))}
-          </svg>
-        </div>
-        <div
-          className="absolute top-10 right-20 w-72 h-72 rounded-full opacity-15 pointer-events-none"
-          style={{ background: 'radial-gradient(circle, #F28C28, transparent)' }}
-        />
-        <div
-          className="absolute bottom-0 left-10 w-48 h-48 rounded-full opacity-10 pointer-events-none"
-          style={{ background: 'radial-gradient(circle, white, transparent)' }}
-        />
-
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <div
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-6"
-              style={{ background: 'rgba(242,140,40,0.2)', color: '#F28C28', border: '1px solid rgba(242,140,40,0.3)' }}
-            >
-              <FaHandshake /> Partner Programme
-            </div>
-
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight mb-6">
-              🤝 Become a{' '}
-              <span style={{ color: '#F28C28' }}>Referral Associate</span>
-            </h1>
-            <p className="text-blue-200 text-xl max-w-3xl mx-auto leading-relaxed mb-8">
-              Join Vision International as a Referral Associate and earn attractive incentives by
-              referring students for Study Abroad, IELTS, PTE, Education Loans, and Visa Services.
-            </p>
-
-            <div className="flex flex-wrap justify-center gap-6">
-              {[
-                { icon: FaRupeeSign, label: 'Earn Per Referral' },
-                { icon: FiUsers, label: 'Unlimited Referrals' },
-                { icon: FiAward, label: 'Official Associate ID' },
-                { icon: FiGift, label: 'Quarterly Bonuses' },
-              ].map(({ icon: Icon, label }) => (
-                <div key={label} className="flex items-center gap-2 text-blue-100">
-                  <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
-                    <Icon style={{ color: '#F28C28' }} />
-                  </div>
-                  <span className="text-sm font-medium">{label}</span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ── How It Works ─────────────────────────────────────── */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <SectionTitle badge="Simple Process" title="How It" highlight="Works" />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {howItWorks.map((item, i) => (
-              <motion.div
-                key={item.step}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1, duration: 0.5 }}
-                className="relative bg-white rounded-2xl p-6 text-center border border-gray-100"
-                style={{ boxShadow: '0 4px 20px rgba(10,61,145,0.07)' }}
-              >
-                {i < howItWorks.length - 1 && (
-                  <div className="hidden lg:block absolute top-10 -right-3 z-10">
-                    <FiChevronRight className="text-gray-300 text-xl" />
-                  </div>
-                )}
-                <div
-                  className="text-3xl font-black mb-3"
-                  style={{ color: i % 2 === 0 ? '#0A3D91' : '#F28C28' }}
-                >
-                  {item.step}
-                </div>
-                <h4 className="font-bold text-gray-800 mb-2">{item.title}</h4>
-                <p className="text-gray-500 text-sm leading-relaxed">{item.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Benefits ─────────────────────────────────────────── */}
-      <section className="py-16 bg-white">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <SectionTitle
-            badge="Why Join Us"
-            title="What You"
-            highlight="Earn & Gain"
-            subtitle="Refer students across our services and get rewarded every time."
-          />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {benefits.map((b, i) => (
-              <motion.div
-                key={b.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1, duration: 0.5 }}
-                whileHover={{ y: -4, boxShadow: '0 16px 40px rgba(10,61,145,0.12)' }}
-                className="rounded-2xl p-6 border border-gray-100 transition-all"
-                style={{ boxShadow: '0 4px 20px rgba(10,61,145,0.06)' }}
-              >
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
-                  style={{ background: i % 2 === 0 ? 'rgba(10,61,145,0.08)' : 'rgba(242,140,40,0.08)' }}
-                >
-                  <b.icon
-                    className="text-xl"
-                    style={{ color: i % 2 === 0 ? '#0A3D91' : '#F28C28' }}
-                  />
-                </div>
-                <h4 className="font-bold text-gray-800 mb-2">{b.title}</h4>
-                <p className="text-gray-500 text-sm leading-relaxed">{b.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Services chips */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="mt-10 text-center"
-          >
-            <p className="text-sm font-semibold text-gray-500 mb-4 uppercase tracking-wider">
-              Earn on referrals for
-            </p>
-            <div className="flex flex-wrap justify-center gap-3">
-              {services.map((s) => (
-                <span
-                  key={s.label}
-                  className="px-4 py-2 rounded-full text-sm font-medium border"
-                  style={{
-                    borderColor: `${s.color}30`,
-                    background: `${s.color}08`,
-                    color: s.color,
-                  }}
-                >
-                  ✓ {s.label}
-                </span>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ── Registration Form ─────────────────────────────────── */}
-      <section
-        id="register"
-        className="py-20"
+        className="pt-28 pb-16"
         style={{ background: 'linear-gradient(135deg, #f0f4ff 0%, #fff8f0 100%)' }}
       >
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <SectionTitle
-            badge="Registration"
-            title="Join as Referral"
-            highlight="Associate"
-            subtitle="Fill in your details and we'll onboard you within 24-48 hours."
-          />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.05fr] gap-10 lg:gap-12 items-start">
+            {/* Left column — sections 1 to 4 */}
+            <div className="space-y-14">
+              {/* Section 1 — Hero */}
+              <div
+                className="relative rounded-3xl overflow-hidden p-8 sm:p-10"
+                style={{ background: 'linear-gradient(135deg, #051e47 0%, #0A3D91 50%, #1a5cb8 100%)' }}
+              >
+                <div
+                  className="absolute top-0 right-0 w-40 h-40 rounded-full opacity-20 pointer-events-none"
+                  style={{ background: 'radial-gradient(circle, #F28C28, transparent)' }}
+                />
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                  className="relative z-10"
+                >
+                  <div
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-5"
+                    style={{ background: 'rgba(242,140,40,0.2)', color: '#F28C28', border: '1px solid rgba(242,140,40,0.3)' }}
+                  >
+                    <FaHandshake /> Partner Programme
+                  </div>
+                  <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight mb-4">
+                    Become a <span style={{ color: '#F28C28' }}>Referral Associate</span>
+                  </h1>
+                  <p className="text-blue-200 text-base sm:text-lg leading-relaxed mb-6">
+                    Join Vision International and earn attractive incentives by referring students for
+                    Study Abroad, IELTS, PTE, Education Loans, and Visa Services.
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {[
+                      { icon: FaRupeeSign, label: 'Earn Per Referral' },
+                      { icon: FiUsers, label: 'Unlimited Referrals' },
+                      { icon: FiAward, label: 'Official Associate ID' },
+                      { icon: FiGift, label: 'Quarterly Bonuses' },
+                    ].map(({ icon: Icon, label }) => (
+                      <div key={label} className="flex items-center gap-2 text-blue-100">
+                        <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
+                          <Icon style={{ color: '#F28C28' }} />
+                        </div>
+                        <span className="text-sm font-medium">{label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="bg-white rounded-3xl overflow-hidden"
-            style={{ boxShadow: '0 12px 60px rgba(10,61,145,0.12)' }}
-          >
+              {/* Section 2 — How It Works */}
+              <div>
+                <SectionTitle badge="Simple Process" title="How It" highlight="Works" align="left" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {howItWorks.map((item, i) => (
+                    <motion.div
+                      key={item.step}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.1, duration: 0.5 }}
+                      className="relative bg-white rounded-2xl p-6 text-center border border-gray-100"
+                      style={{ boxShadow: '0 4px 20px rgba(10,61,145,0.07)' }}
+                    >
+                      <div
+                        className="text-3xl font-black mb-3"
+                        style={{ color: i % 2 === 0 ? '#0A3D91' : '#F28C28' }}
+                      >
+                        {item.step}
+                      </div>
+                      <h4 className="font-bold text-gray-800 mb-2">{item.title}</h4>
+                      <p className="text-gray-500 text-sm leading-relaxed">{item.desc}</p>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Section 3 — Benefits */}
+              <div>
+                <SectionTitle
+                  badge="Why Join Us"
+                  title="What You"
+                  highlight="Earn & Gain"
+                  subtitle="Refer students across our services and get rewarded every time."
+                  align="left"
+                />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {benefits.map((b, i) => (
+                    <motion.div
+                      key={b.title}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.1, duration: 0.5 }}
+                      whileHover={{ y: -4, boxShadow: '0 16px 40px rgba(10,61,145,0.12)' }}
+                      className="rounded-2xl p-6 border border-gray-100 transition-all bg-white"
+                      style={{ boxShadow: '0 4px 20px rgba(10,61,145,0.06)' }}
+                    >
+                      <div
+                        className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
+                        style={{ background: i % 2 === 0 ? 'rgba(10,61,145,0.08)' : 'rgba(242,140,40,0.08)' }}
+                      >
+                        <b.icon
+                          className="text-xl"
+                          style={{ color: i % 2 === 0 ? '#0A3D91' : '#F28C28' }}
+                        />
+                      </div>
+                      <h4 className="font-bold text-gray-800 mb-2">{b.title}</h4>
+                      <p className="text-gray-500 text-sm leading-relaxed">{b.desc}</p>
+                    </motion.div>
+                  ))}
+                </div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5 }}
+                  className="mt-8"
+                >
+                  <p className="text-sm font-semibold text-gray-500 mb-4 uppercase tracking-wider">
+                    Earn on referrals for
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    {services.map((s) => (
+                      <span
+                        key={s.label}
+                        className="px-4 py-2 rounded-full text-sm font-medium border"
+                        style={{
+                          borderColor: `${s.color}30`,
+                          background: `${s.color}08`,
+                          color: s.color,
+                        }}
+                      >
+                        ✓ {s.label}
+                      </span>
+                    ))}
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* Section 4 — FAQ */}
+              <div>
+                <SectionTitle badge="Common Questions" title="Referral Associate" highlight="FAQs" align="left" />
+                <div className="space-y-3">
+                  {[
+                    {
+                      q: 'Is there any registration fee to become a Referral Associate?',
+                      a: 'No. Becoming a Referral Associate with Vision International is completely free. There are no hidden fees or charges.',
+                    },
+                    {
+                      q: 'When and how do I receive my commission?',
+                      a: 'Commissions are processed after a referred student completes enrolment and payment. Payouts are made monthly via bank transfer or UPI.',
+                    },
+                    {
+                      q: 'Is there a limit on how many students I can refer?',
+                      a: 'There is no cap. You can refer as many students as you want — more referrals simply mean higher earnings and potential bonus tier rewards.',
+                    },
+                    {
+                      q: 'Can I track my referrals and commissions?',
+                      a: 'Yes. Once onboarded, you\'ll receive access to a referral dashboard where you can monitor all your referrals, their status, and your earnings in real time.',
+                    },
+                  ].map((item, i) => (
+                    <FAQMini key={i} item={item} />
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Right column — Registration Form (full height, from top) */}
+            <div id="register" className="w-full lg:self-start">
+              <SectionTitle
+                badge="Registration"
+                title="Join as Referral"
+                highlight="Associate"
+                subtitle="Fill in your details and we'll onboard you within 24-48 hours."
+                align="left"
+              />
+
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="bg-white rounded-3xl"
+                style={{ boxShadow: '0 12px 60px rgba(10,61,145,0.12)' }}
+              >
             <AnimatePresence mode="wait">
               {submitted ? (
                 <ThankYou key="thankyou" onReset={handleReset} />
@@ -869,34 +878,7 @@ export default function ReferAndEarn() {
               )}
             </AnimatePresence>
           </motion.div>
-        </div>
-      </section>
-
-      {/* ── FAQ strip ─────────────────────────────────────────── */}
-      <section className="py-16 bg-white">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <SectionTitle badge="Common Questions" title="Referral Associate" highlight="FAQs" />
-          <div className="space-y-3">
-            {[
-              {
-                q: 'Is there any registration fee to become a Referral Associate?',
-                a: 'No. Becoming a Referral Associate with Vision International is completely free. There are no hidden fees or charges.',
-              },
-              {
-                q: 'When and how do I receive my commission?',
-                a: 'Commissions are processed after a referred student completes enrolment and payment. Payouts are made monthly via bank transfer or UPI.',
-              },
-              {
-                q: 'Is there a limit on how many students I can refer?',
-                a: 'There is no cap. You can refer as many students as you want — more referrals simply mean higher earnings and potential bonus tier rewards.',
-              },
-              {
-                q: 'Can I track my referrals and commissions?',
-                a: 'Yes. Once onboarded, you\'ll receive access to a referral dashboard where you can monitor all your referrals, their status, and your earnings in real time.',
-              },
-            ].map((item, i) => (
-              <FAQMini key={i} item={item} />
-            ))}
+            </div>
           </div>
         </div>
       </section>

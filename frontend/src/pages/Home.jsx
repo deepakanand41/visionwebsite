@@ -11,12 +11,12 @@ export default function Home() {
   return (
     <main>
       <Hero />
+      <EnquiryForm />
       <Services />
       <Destinations />
       <WhyChooseUs />
       <Statistics />
       <Testimonials />
-      <EnquiryForm />
       <FAQ />
     </main>
   );
