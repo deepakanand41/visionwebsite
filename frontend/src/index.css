@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #0A3D91;
+  --color-primary-dark: #072d6b;
+  --color-primary-light: #1a5cb8;
+  --color-secondary: #F28C28;
+  --color-secondary-dark: #d4751a;
+  --color-secondary-light: #f5a64e;
+  --font-family-sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
+}
+
+* {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  background-color: #ffffff;
+  color: #1a1a2e;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #0A3D91, #F28C28);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-gradient {
+  background: linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 50%, #fff8f0 100%);
+}
+
+.card-shadow {
+  box-shadow: 0 4px 24px rgba(10, 61, 145, 0.08);
+}
+
+.card-shadow-hover {
+  box-shadow: 0 12px 40px rgba(10, 61, 145, 0.18);
+}
+
+.section-padding {
+  padding: 5rem 0;
+}

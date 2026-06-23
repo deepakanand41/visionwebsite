@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vision Admin Panel</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f0f4ff; color: #1a1a2e; }
+    .header { background: linear-gradient(135deg, #0A3D91, #1a5cb8); color: white; padding: 1.25rem 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .header h1 { font-size: 1.25rem; }
+    .header span { font-size: 0.8rem; opacity: 0.8; }
+    .tabs { display: flex; gap: 0.5rem; padding: 1rem 2rem; background: white; border-bottom: 1px solid #e5e7eb; flex-wrap: wrap; }
+    .tab { padding: 0.6rem 1.25rem; border-radius: 999px; border: 2px solid #e5e7eb; background: white; cursor: pointer; font-size: 0.875rem; font-weight: 600; color: #4b5563; transition: all 0.2s; }
+    .tab.active { background: #0A3D91; color: white; border-color: #0A3D91; }
+    .tab .count { background: rgba(255,255,255,0.2); padding: 0.1rem 0.5rem; border-radius: 999px; font-size: 0.75rem; margin-left: 0.35rem; }
+    .tab.active .count { background: rgba(255,255,255,0.25); }
+    .content { padding: 1.5rem 2rem; max-width: 1500px; margin: 0 auto; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .filters { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem; align-items: center; background: white; padding: 1rem; border-radius: 12px; border: 1px solid #e5e7eb; }
+    .filters input, .filters select { padding: 0.55rem 0.85rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 0.85rem; min-width: 180px; }
+    .filters input { flex: 1; min-width: 220px; }
+    .card { background: white; border-radius: 12px; border: 1px solid #e5e7eb; overflow-x: auto; box-shadow: 0 2px 12px rgba(10,61,145,0.06); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.78rem; min-width: 900px; }
+    th { background: #f8faff; padding: 0.7rem 0.85rem; text-align: left; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb; white-space: nowrap; position: sticky; top: 0; }
+    td { padding: 0.7rem 0.85rem; border-bottom: 1px solid #f3f4f6; vertical-align: top; }
+    tr:hover td { background: #f8faff; }
+    .badge { display: inline-block; padding: 0.2rem 0.55rem; border-radius: 999px; font-size: 0.68rem; font-weight: 700; text-transform: capitalize; white-space: nowrap; }
+    .status-pending { background: #fef3c7; color: #92400e; }
+    .status-contacted { background: #dbeafe; color: #1e40af; }
+    .status-in_progress { background: #e0e7ff; color: #3730a3; }
+    .status-completed { background: #d1fae5; color: #065f46; }
+    .status-cancelled { background: #f3f4f6; color: #4b5563; }
+    .status-rejected { background: #fee2e2; color: #991b1b; }
+    .status-approved { background: #cffafe; color: #0e7490; }
+    .status-onboarded { background: #dcfce7; color: #166534; }
+    .badge-ielts { background: #dbeafe; color: #1d4ed8; }
+    .badge-pte { background: #ffedd5; color: #c2410c; }
+    .badge-active { background: #d1fae5; color: #065f46; }
+    .badge-inactive { background: #fee2e2; color: #991b1b; }
+    .btn { padding: 0.4rem 0.75rem; border-radius: 8px; border: none; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; white-space: nowrap; }
+    .btn-primary { background: #0A3D91; color: white; }
+    .btn-danger { background: #ef4444; color: white; }
+    .btn-secondary { background: #f3f4f6; color: #374151; }
+    .btn-sm { padding: 0.3rem 0.55rem; font-size: 0.7rem; }
+    .btn:hover { opacity: 0.92; }
+    .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.75rem; }
+    .toolbar h2 { font-size: 1rem; color: #0A3D91; }
+    .empty { text-align: center; padding: 3rem; color: #9ca3af; }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: white; border-radius: 16px; padding: 1.5rem; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; }
+    .modal h3 { margin-bottom: 1rem; color: #0A3D91; }
+    .form-group { margin-bottom: 0.85rem; }
+    .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: #374151; margin-bottom: 0.3rem; }
+    .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.55rem 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 0.875rem; }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .form-actions { display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1rem; }
+    .toast { position: fixed; bottom: 1.5rem; right: 1.5rem; padding: 0.85rem 1.25rem; border-radius: 10px; color: white; font-size: 0.875rem; font-weight: 500; z-index: 200; }
+    .toast.success { background: #059669; }
+    .toast.error { background: #dc2626; }
+    .notes-preview { font-size: 0.72rem; color: #6b7280; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .stat-pills { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+    .stat-pill { padding: 0.3rem 0.7rem; border-radius: 999px; font-size: 0.72rem; font-weight: 600; background: #f3f4f6; color: #374151; cursor: pointer; border: 1px solid transparent; }
+    .stat-pill:hover, .stat-pill.active { border-color: #0A3D91; background: #eff6ff; color: #0A3D91; }
+    .actions { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <h1>🎓 Vision Admin Panel</h1>
+      <span>Manage submissions, statuses & testimonials</span>
+    </div>
+    <button class="btn btn-secondary" onclick="loadAll()">↻ Refresh All</button>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="enquiries">Enquiries <span class="count" id="count-enquiries">0</span></button>
+    <button class="tab" data-tab="demo">Demo Classes <span class="count" id="count-demo">0</span></button>
+    <button class="tab" data-tab="referrals">Referrals <span class="count" id="count-referrals">0</span></button>
+    <button class="tab" data-tab="testimonials">Testimonials <span class="count" id="count-testimonials">0</span></button>
+  </div>
+
+  <div class="content">
+    <div id="panel-enquiries" class="panel active"></div>
+    <div id="panel-demo" class="panel"></div>
+    <div id="panel-referrals" class="panel"></div>
+    <div id="panel-testimonials" class="panel"></div>
+  </div>
+
+  <!-- Status Update Modal -->
+  <div class="modal-overlay" id="status-modal">
+    <div class="modal">
+      <h3>Update Status</h3>
+      <form id="status-form">
+        <input type="hidden" id="s-type" />
+        <input type="hidden" id="s-id" />
+        <div class="form-group">
+          <label>Status *</label>
+          <select id="s-status" required></select>
+        </div>
+        <div class="form-group">
+          <label>Admin Notes</label>
+          <textarea id="s-notes" placeholder="Add notes about follow-up, call summary, etc."></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeStatusModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Status</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Testimonial Modal -->
+  <div class="modal-overlay" id="testimonial-modal">
+    <div class="modal">
+      <h3 id="t-modal-title">Add Testimonial</h3>
+      <form id="testimonial-form">
+        <input type="hidden" id="t-id" />
+        <div class="form-row">
+          <div class="form-group"><label>Name *</label><input id="t-name" required /></div>
+          <div class="form-group"><label>Initials *</label><input id="t-initial" required maxlength="5" /></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Destination *</label><input id="t-destination" required /></div>
+          <div class="form-group"><label>Course *</label><input id="t-course" required /></div>
+        </div>
+        <div class="form-group"><label>University *</label><input id="t-university" required /></div>
+        <div class="form-group"><label>Review *</label><textarea id="t-review" required></textarea></div>
+        <div class="form-row">
+          <div class="form-group"><label>Rating</label><select id="t-rating"><option value="5">5</option><option value="4">4</option><option value="3">3</option></select></div>
+          <div class="form-group"><label>Avatar Color</label><input id="t-color" type="color" value="#fde9d1" /></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Highlight</label><input id="t-highlight" /></div>
+          <div class="form-group"><label>Sort Order</label><input id="t-sort" type="number" value="0" /></div>
+        </div>
+        <div class="form-group"><label>Status</label><select id="t-active"><option value="true">Active</option><option value="false">Inactive</option></select></div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeTestimonialModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const SECRET = window.location.pathname.replace('/admin/', '');
+    const headers = { 'X-Admin-Secret': SECRET, 'Content-Type': 'application/json' };
+
+    let cache = { enquiries: [], demo: [], referrals: [], testimonials: [] };
+    let statusOptions = { general: [], referral: [] };
+    const filters = {
+      enquiries: { search: '', status: '' },
+      demo: { search: '', status: '', exam_type: '' },
+      referrals: { search: '', status: '' },
+      testimonials: { search: '', is_active: '' },
+    };
+
+    async function api(path, opts = {}) {
+      const res = await fetch('/api/admin' + path, { ...opts, headers: { ...headers, ...opts.headers } });
+      if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.detail || res.statusText); }
+      return res.status === 204 ? null : res.json();
+    }
+
+    function toast(msg, type = 'success') {
+      const el = document.createElement('div');
+      el.className = `toast ${type}`;
+      el.textContent = msg;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 3500);
+    }
+
+    function fmtDate(d) { return d ? new Date(d).toLocaleString('en-IN') : '-'; }
+
+    function statusBadge(s) {
+      const label = (s || 'pending').replace(/_/g, ' ');
+      return `<span class="badge status-${s || 'pending'}">${label}</span>`;
+    }
+
+    function countByStatus(data) {
+      const counts = {};
+      data.forEach(r => { counts[r.status || 'pending'] = (counts[r.status || 'pending'] || 0) + 1; });
+      return counts;
+    }
+
+    function renderStatPills(data, tabKey) {
+      const counts = countByStatus(data);
+      const total = data.length;
+      let html = `<span class="stat-pill ${!filters[tabKey].status ? 'active' : ''}" onclick="setFilter('${tabKey}','status','')">All (${total})</span>`;
+      Object.entries(counts).forEach(([st, n]) => {
+        const active = filters[tabKey].status === st ? 'active' : '';
+        html += `<span class="stat-pill ${active}" onclick="setFilter('${tabKey}','status','${st}')">${st.replace(/_/g,' ')} (${n})</span>`;
+      });
+      return `<div class="stat-pills">${html}</div>`;
+    }
+
+    function filterBar(tabKey, extra = '') {
+      const f = filters[tabKey];
+      return `<div class="filters">
+        <input type="search" placeholder="🔍 Search name, email, phone..." value="${f.search}"
+          oninput="setFilter('${tabKey}','search',this.value)" />
+        <select onchange="setFilter('${tabKey}','status',this.value)">
+          <option value="">All Statuses</option>
+          ${(tabKey === 'referrals' ? statusOptions.referral : statusOptions.general).map(s =>
+            `<option value="${s}" ${f.status===s?'selected':''}>${s.replace(/_/g,' ')}</option>`
+          ).join('')}
+        </select>
+        ${extra}
+        <button class="btn btn-secondary btn-sm" onclick="clearFilters('${tabKey}')">Clear</button>
+      </div>`;
+    }
+
+    function setFilter(tab, field, value) {
+      filters[tab][field] = value;
+      renderTab(tab);
+    }
+
+    function clearFilters(tab) {
+      Object.keys(filters[tab]).forEach(k => filters[tab][k] = '');
+      renderTab(tab);
+    }
+
+    function openStatusModal(type, id, currentStatus, currentNotes) {
+      document.getElementById('s-type').value = type;
+      document.getElementById('s-id').value = id;
+      const opts = type === 'referrals' ? statusOptions.referral : statusOptions.general;
+      document.getElementById('s-status').innerHTML = opts.map(s =>
+        `<option value="${s}" ${s===currentStatus?'selected':''}>${s.replace(/_/g,' ')}</option>`
+      ).join('');
+      document.getElementById('s-notes').value = currentNotes || '';
+      document.getElementById('status-modal').classList.add('open');
+    }
+
+    function closeStatusModal() { document.getElementById('status-modal').classList.remove('open'); }
+
+    document.getElementById('status-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const type = document.getElementById('s-type').value;
+      const id = document.getElementById('s-id').value;
+      const payload = {
+        status: document.getElementById('s-status').value,
+        admin_notes: document.getElementById('s-notes').value || null,
+      };
+      const paths = { enquiries: 'enquiries', demo: 'demo-classes', referrals: 'referrals' };
+      try {
+        await api(`/${paths[type]}/${id}`, { method: 'PATCH', body: JSON.stringify(payload) });
+        toast('Status updated');
+        closeStatusModal();
+        await loadAll();
+      } catch (err) { toast(err.message, 'error'); }
+    });
+
+    function applyClientFilter(data, tabKey) {
+      const f = filters[tabKey];
+      return data.filter(r => {
+        if (f.status && r.status !== f.status) return false;
+        if (tabKey === 'demo' && f.exam_type && r.exam_type !== f.exam_type) return false;
+        if (tabKey === 'testimonials' && f.is_active !== '' && String(r.is_active) !== f.is_active) return false;
+        if (f.search) {
+          const hay = JSON.stringify(r).toLowerCase();
+          if (!hay.includes(f.search.toLowerCase())) return false;
+        }
+        return true;
+      });
+    }
+
+    function renderEnquiries() {
+      const data = applyClientFilter(cache.enquiries, 'enquiries');
+      document.getElementById('count-enquiries').textContent = cache.enquiries.length;
+      const panel = document.getElementById('panel-enquiries');
+      if (!data.length) { panel.innerHTML = filterBar('enquiries') + renderStatPills(cache.enquiries,'enquiries') + '<div class="empty">No enquiries found</div>'; return; }
+      const rows = data.map(e => `<tr>
+        <td>${e.id}</td>
+        <td><strong>${e.first_name} ${e.last_name}</strong><br/><small>${e.email}</small></td>
+        <td>${e.phone}</td><td>${e.destination}</td><td>${e.study_level}</td>
+        <td>${e.intake}</td><td>${e.counselling_mode}</td>
+        <td>${statusBadge(e.status)}</td>
+        <td><span class="notes-preview" title="${e.admin_notes||''}">${e.admin_notes || '-'}</span></td>
+        <td>${fmtDate(e.created_at)}</td>
+        <td class="actions"><button class="btn btn-primary btn-sm" onclick="openStatusModal('enquiries',${e.id},'${e.status}','${(e.admin_notes||'').replace(/'/g,"\\'")}')">Update</button></td>
+      </tr>`).join('');
+      panel.innerHTML = filterBar('enquiries') + renderStatPills(cache.enquiries,'enquiries') + `<div class="card"><table><thead><tr>
+        <th>ID</th><th>Name / Email</th><th>Phone</th><th>Destination</th><th>Level</th>
+        <th>Intake</th><th>Mode</th><th>Status</th><th>Notes</th><th>Submitted</th><th>Action</th>
+      </tr></thead><tbody>${rows}</tbody></table></div>`;
+    }
+
+    function renderDemo() {
+      const data = applyClientFilter(cache.demo, 'demo');
+      document.getElementById('count-demo').textContent = cache.demo.length;
+      const panel = document.getElementById('panel-demo');
+      const examFilter = `<select onchange="setFilter('demo','exam_type',this.value)">
+        <option value="">All Exams</option>
+        <option value="ielts" ${filters.demo.exam_type==='ielts'?'selected':''}>IELTS</option>
+        <option value="pte" ${filters.demo.exam_type==='pte'?'selected':''}>PTE</option>
+      </select>`;
+      if (!data.length) { panel.innerHTML = filterBar('demo', examFilter) + renderStatPills(cache.demo,'demo') + '<div class="empty">No demo bookings found</div>'; return; }
+      const rows = data.map(d => `<tr>
+        <td>${d.id}</td><td><span class="badge badge-${d.exam_type}">${d.exam_type.toUpperCase()}</span></td>
+        <td><strong>${d.full_name}</strong><br/><small>${d.email}</small></td>
+        <td>${d.phone}</td><td>${d.target_score}</td><td>${d.batch}</td>
+        <td>${d.mode}</td><td>${d.demo_date}</td>
+        <td>${statusBadge(d.status)}</td>
+        <td><span class="notes-preview" title="${d.admin_notes||''}">${d.admin_notes || '-'}</span></td>
+        <td>${fmtDate(d.created_at)}</td>
+        <td class="actions"><button class="btn btn-primary btn-sm" onclick="openStatusModal('demo',${d.id},'${d.status}','${(d.admin_notes||'').replace(/'/g,"\\'")}')">Update</button></td>
+      </tr>`).join('');
+      panel.innerHTML = filterBar('demo', examFilter) + renderStatPills(cache.demo,'demo') + `<div class="card"><table><thead><tr>
+        <th>ID</th><th>Exam</th><th>Name / Email</th><th>Phone</th><th>Target</th>
+        <th>Batch</th><th>Mode</th><th>Demo Date</th><th>Status</th><th>Notes</th><th>Submitted</th><th>Action</th>
+      </tr></thead><tbody>${rows}</tbody></table></div>`;
+    }
+
+    function renderReferrals() {
+      const data = applyClientFilter(cache.referrals, 'referrals');
+      document.getElementById('count-referrals').textContent = cache.referrals.length;
+      const panel = document.getElementById('panel-referrals');
+      if (!data.length) { panel.innerHTML = filterBar('referrals') + renderStatPills(cache.referrals,'referrals') + '<div class="empty">No referrals found</div>'; return; }
+      const rows = data.map(r => `<tr>
+        <td>${r.id}</td><td><strong>${r.full_name}</strong><br/><small>${r.email}</small></td>
+        <td>${r.mobile}</td><td>${r.city}, ${r.state}</td><td>${r.country}</td>
+        <td>${r.occupation}</td><td>${(r.referral_methods||[]).join(', ')}</td>
+        <td>${r.monthly_referrals}</td>
+        <td>${statusBadge(r.status)}</td>
+        <td><span class="notes-preview" title="${r.admin_notes||''}">${r.admin_notes || '-'}</span></td>
+        <td>${fmtDate(r.created_at)}</td>
+        <td class="actions"><button class="btn btn-primary btn-sm" onclick="openStatusModal('referrals',${r.id},'${r.status}','${(r.admin_notes||'').replace(/'/g,"\\'")}')">Update</button></td>
+      </tr>`).join('');
+      panel.innerHTML = filterBar('referrals') + renderStatPills(cache.referrals,'referrals') + `<div class="card"><table><thead><tr>
+        <th>ID</th><th>Name / Email</th><th>Mobile</th><th>Location</th><th>Country</th>
+        <th>Occupation</th><th>Methods</th><th>Monthly Ref.</th><th>Status</th><th>Notes</th><th>Submitted</th><th>Action</th>
+      </tr></thead><tbody>${rows}</tbody></table></div>`;
+    }
+
+    function renderTestimonials() {
+      const data = applyClientFilter(cache.testimonials, 'testimonials');
+      document.getElementById('count-testimonials').textContent = cache.testimonials.length;
+      const panel = document.getElementById('panel-testimonials');
+      const activeFilter = `<select onchange="setFilter('testimonials','is_active',this.value)">
+        <option value="">All</option>
+        <option value="true" ${filters.testimonials.is_active==='true'?'selected':''}>Active</option>
+        <option value="false" ${filters.testimonials.is_active==='false'?'selected':''}>Inactive</option>
+      </select>`;
+      const toolbar = `<div class="toolbar"><h2>Testimonials (${data.length})</h2>
+        <button class="btn btn-primary" onclick="openTestimonialModal()">+ Add</button></div>`;
+      if (!data.length) { panel.innerHTML = toolbar + filterBar('testimonials', activeFilter) + '<div class="empty">No testimonials found</div>'; return; }
+      const rows = data.map(t => `<tr>
+        <td>${t.id}</td><td>${t.name}</td><td>${t.destination}</td><td>${t.university}</td>
+        <td>${t.course}</td><td>${'★'.repeat(t.rating)}</td>
+        <td><span class="badge ${t.is_active?'badge-active':'badge-inactive'}">${t.is_active?'Active':'Inactive'}</span></td>
+        <td>${t.sort_order}</td>
+        <td class="actions">
+          <button class="btn btn-secondary btn-sm" onclick="editTestimonial(${t.id})">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteTestimonial(${t.id})">Delete</button>
+        </td>
+      </tr>`).join('');
+      panel.innerHTML = toolbar + filterBar('testimonials', activeFilter) + `<div class="card"><table><thead><tr>
+        <th>ID</th><th>Name</th><th>Destination</th><th>University</th><th>Course</th>
+        <th>Rating</th><th>Status</th><th>Order</th><th>Actions</th>
+      </tr></thead><tbody>${rows}</tbody></table></div>`;
+    }
+
+    function renderTab(tab) {
+      if (tab === 'enquiries') renderEnquiries();
+      else if (tab === 'demo') renderDemo();
+      else if (tab === 'referrals') renderReferrals();
+      else renderTestimonials();
+    }
+
+    async function loadAll() {
+      try {
+        const [statuses, enquiries, demo, referrals, testimonials] = await Promise.all([
+          api('/statuses'), api('/enquiries'), api('/demo-classes'), api('/referrals'), api('/testimonials')
+        ]);
+        statusOptions = statuses;
+        cache = { enquiries, demo, referrals, testimonials };
+        renderEnquiries(); renderDemo(); renderReferrals(); renderTestimonials();
+      } catch (e) { toast('Failed to load: ' + e.message, 'error'); }
+    }
+
+    // Tabs
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+      });
+    });
+
+    // Testimonial CRUD
+    function openTestimonialModal(data = null) {
+      document.getElementById('t-modal-title').textContent = data ? 'Edit Testimonial' : 'Add Testimonial';
+      document.getElementById('t-id').value = data?.id || '';
+      document.getElementById('t-name').value = data?.name || '';
+      document.getElementById('t-initial').value = data?.initial || '';
+      document.getElementById('t-destination').value = data?.destination || '';
+      document.getElementById('t-course').value = data?.course || '';
+      document.getElementById('t-university').value = data?.university || '';
+      document.getElementById('t-review').value = data?.review || '';
+      document.getElementById('t-rating').value = data?.rating || 5;
+      document.getElementById('t-color').value = data?.avatar_color || '#fde9d1';
+      document.getElementById('t-highlight').value = data?.highlight || '';
+      document.getElementById('t-sort').value = data?.sort_order || 0;
+      document.getElementById('t-active').value = data?.is_active !== false ? 'true' : 'false';
+      document.getElementById('testimonial-modal').classList.add('open');
+    }
+    function closeTestimonialModal() { document.getElementById('testimonial-modal').classList.remove('open'); }
+    function editTestimonial(id) { const t = cache.testimonials.find(x => x.id === id); if (t) openTestimonialModal(t); }
+
+    document.getElementById('testimonial-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('t-id').value;
+      const payload = {
+        name: document.getElementById('t-name').value,
+        initial: document.getElementById('t-initial').value,
+        destination: document.getElementById('t-destination').value,
+        course: document.getElementById('t-course').value,
+        university: document.getElementById('t-university').value,
+        review: document.getElementById('t-review').value,
+        rating: parseInt(document.getElementById('t-rating').value),
+        avatar_color: document.getElementById('t-color').value,
+        highlight: document.getElementById('t-highlight').value || null,
+        sort_order: parseInt(document.getElementById('t-sort').value) || 0,
+        is_active: document.getElementById('t-active').value === 'true',
+      };
+      try {
+        if (id) await api('/testimonials/' + id, { method: 'PUT', body: JSON.stringify(payload) });
+        else await api('/testimonials', { method: 'POST', body: JSON.stringify(payload) });
+        toast(id ? 'Updated' : 'Created');
+        closeTestimonialModal();
+        loadAll();
+      } catch (err) { toast(err.message, 'error'); }
+    });
+
+    async function deleteTestimonial(id) {
+      if (!confirm('Delete this testimonial?')) return;
+      try { await api('/testimonials/' + id, { method: 'DELETE' }); toast('Deleted'); loadAll(); }
+      catch (err) { toast(err.message, 'error'); }
+    }
+
+    loadAll();
+  </script>
+</body>
+</html>

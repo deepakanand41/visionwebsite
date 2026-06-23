@@ -1,0 +1,23 @@
+import Hero from '../components/Hero';
+import Services from '../components/Services';
+import Destinations from '../components/Destinations';
+import WhyChooseUs from '../components/WhyChooseUs';
+import Testimonials from '../components/Testimonials';
+import Statistics from '../components/Statistics';
+import EnquiryForm from '../components/EnquiryForm';
+import FAQ from '../components/FAQ';
+
+export default function Home() {
+  return (
+    <main>
+      <Hero />
+      <Services />
+      <Destinations />
+      <WhyChooseUs />
+      <Statistics />
+      <Testimonials />
+      <EnquiryForm />
+      <FAQ />
+    </main>
+  );
+}
