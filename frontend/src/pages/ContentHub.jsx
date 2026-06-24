@@ -4,6 +4,7 @@ import { FiArrowLeft, FiCalendar, FiUser } from 'react-icons/fi';
 import { fetchNews, fetchNewsArticle, fetchBlog, fetchBlogPost } from '../services/api';
 import { ContentCard, ContentListHero, formatPostDate, renderBody } from '../components/ContentPages';
 import { HOME_THEME as T } from '../utils/constants';
+import { resolveMediaUrl } from '../utils/mediaUrl';
 
 function ContentList({ type }) {
   const isBlog = type === 'blog';
@@ -21,6 +22,7 @@ function ContentList({ type }) {
 
   const featured = posts.find((p) => p.is_featured);
   const rest = posts.filter((p) => p.id !== featured?.id);
+  const featuredCoverSrc = featured ? resolveMediaUrl(featured.cover_image_url, { streaming: false }) : null;
 
   return (
     <main>
@@ -51,8 +53,8 @@ function ContentList({ type }) {
                 >
                   <div className="grid md:grid-cols-2">
                     <div className="h-56 md:h-auto min-h-[220px] bg-gray-100">
-                      {featured.cover_image_url ? (
-                        <img src={featured.cover_image_url} alt="" className="w-full h-full object-cover" />
+                      {featuredCoverSrc ? (
+                        <img src={featuredCoverSrc} alt="" className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-white font-bold" style={{ background: T.gradientRed }}>
                           Featured
@@ -110,6 +112,8 @@ function ContentDetail({ type }) {
     );
   }
 
+  const coverSrc = resolveMediaUrl(post?.cover_image_url, { streaming: false });
+
   return (
     <main>
       <section className="pt-32 lg:pt-36 pb-10 bg-white border-b border-gray-100">
@@ -130,9 +134,9 @@ function ContentDetail({ type }) {
         </div>
       </section>
 
-      {post.cover_image_url && (
+      {coverSrc && (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 -mt-2 mb-10">
-          <img src={post.cover_image_url} alt="" className="w-full rounded-2xl shadow-lg max-h-[420px] object-cover" />
+          <img src={coverSrc} alt="" className="w-full rounded-2xl shadow-lg max-h-[420px] object-cover" />
         </div>
       )}
 

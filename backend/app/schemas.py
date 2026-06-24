@@ -271,6 +271,7 @@ class OfferCreate(BaseModel):
     offer_type: str = Field(..., pattern="^(laptop|scholarship|test_prep|visa|gadget|financial|other)$")
     badge_text: Optional[str] = Field(None, max_length=50)
     image_url: Optional[str] = Field(None, max_length=500)
+    media_type: Optional[str] = Field(None, max_length=10)
     terms: Optional[str] = None
     cta_label: str = Field(default="Claim Offer", max_length=80)
     cta_link: str = Field(default="/contact-us", max_length=300)
@@ -287,6 +288,7 @@ class OfferUpdate(BaseModel):
     offer_type: Optional[str] = Field(None, pattern="^(laptop|scholarship|test_prep|visa|gadget|financial|other)$")
     badge_text: Optional[str] = Field(None, max_length=50)
     image_url: Optional[str] = Field(None, max_length=500)
+    media_type: Optional[str] = Field(None, max_length=10)
     terms: Optional[str] = None
     cta_label: Optional[str] = Field(None, max_length=80)
     cta_link: Optional[str] = Field(None, max_length=300)
@@ -304,6 +306,7 @@ class OfferResponse(BaseModel):
     offer_type: str
     badge_text: Optional[str]
     image_url: Optional[str]
+    media_type: Optional[str] = None
     terms: Optional[str]
     cta_label: str
     cta_link: str
@@ -325,6 +328,7 @@ class OfferPublicResponse(BaseModel):
     offer_type: str
     badge_text: Optional[str]
     image_url: Optional[str]
+    media_type: Optional[str] = None
     terms: Optional[str]
     cta_label: str
     cta_link: str

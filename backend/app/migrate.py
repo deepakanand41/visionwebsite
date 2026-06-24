@@ -15,6 +15,7 @@ MIGRATIONS = [
     ("referral_applications", "status_updated_at", "TIMESTAMP WITH TIME ZONE"),
     ("testimonials", "media_type", "VARCHAR(10)"),
     ("testimonials", "media_url", "VARCHAR(500)"),
+    ("offers", "media_type", "VARCHAR(10)"),
 ]
 
 

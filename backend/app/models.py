@@ -152,6 +152,7 @@ class Offer(Base):
     offer_type: Mapped[str] = mapped_column(String(50), index=True)
     badge_text: Mapped[str | None] = mapped_column(String(50), nullable=True)
     image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    media_type: Mapped[str | None] = mapped_column(String(10), nullable=True)  # image | video
     terms: Mapped[str | None] = mapped_column(Text, nullable=True)
     cta_label: Mapped[str] = mapped_column(String(80), default="Claim Offer")
     cta_link: Mapped[str] = mapped_column(String(300), default="/contact-us")

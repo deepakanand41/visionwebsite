@@ -4,8 +4,15 @@ import { motion } from 'framer-motion';
 import { FiArrowRight, FiGift, FiTag } from 'react-icons/fi';
 import { FaLaptop, FaGraduationCap, FaPassport, FaMoneyBillWave } from 'react-icons/fa';
 import { fetchOffers } from '../services/api';
-import { resolveMediaUrl } from '../utils/mediaUrl';
 import { HOME_THEME as T } from '../utils/constants';
+import StoryMedia from '../components/StoryMedia';
+
+function offerMediaType(offer) {
+  if (offer.media_type) return offer.media_type;
+  if (!offer.image_url) return null;
+  if (/\.(mp4|webm|mov)(\?|$)/i.test(offer.image_url)) return 'video';
+  return 'image';
+}
 
 const OFFER_TYPES = [
   { id: 'all', label: 'All Offers' },
@@ -31,7 +38,9 @@ const TYPE_META = {
 function OfferCard({ offer }) {
   const meta = TYPE_META[offer.offer_type] || TYPE_META.other;
   const Icon = meta.icon;
-  const imageSrc = resolveMediaUrl(offer.image_url, { streaming: false });
+  const mediaType = offerMediaType(offer);
+  const hasMedia = offer.image_url && mediaType;
+  const isVideo = mediaType === 'video';
 
   return (
     <motion.article
@@ -41,17 +50,19 @@ function OfferCard({ offer }) {
       className="group flex flex-col bg-white rounded-3xl border border-gray-100 overflow-hidden h-full"
       style={{ boxShadow: '0 4px 24px rgba(165,0,0,0.07)' }}
     >
-      <div className="relative h-48 bg-gray-100 overflow-hidden">
-        {imageSrc ? (
-          <img
-            src={imageSrc}
+      <div className={`relative overflow-hidden ${hasMedia && !isVideo ? 'h-48 bg-gray-100' : ''}`}>
+        {hasMedia ? (
+          <StoryMedia
+            mediaType={mediaType}
+            mediaUrl={offer.image_url}
+            variant={isVideo ? 'reel' : 'default'}
+            className={isVideo ? '' : 'h-48 w-full'}
             alt={offer.title}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            loading="lazy"
+            showBadge={false}
           />
         ) : (
           <div
-            className="w-full h-full flex flex-col items-center justify-center gap-2 text-white"
+            className="w-full h-48 flex flex-col items-center justify-center gap-2 text-white"
             style={{ background: `linear-gradient(135deg, ${meta.color}, #111111)` }}
           >
             <Icon size={40} />
@@ -60,14 +71,14 @@ function OfferCard({ offer }) {
         )}
         {offer.badge_text && (
           <span
-            className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-black text-white shadow-lg"
+            className="absolute top-3 left-3 z-10 px-3 py-1 rounded-full text-xs font-black text-white shadow-lg"
             style={{ background: T.red }}
           >
             {offer.badge_text}
           </span>
         )}
         {offer.is_featured && (
-          <span className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-white/95 text-gray-800">
+          <span className="absolute top-3 right-3 z-10 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-white/95 text-gray-800">
             Featured
           </span>
         )}

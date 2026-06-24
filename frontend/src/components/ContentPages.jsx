@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { FiArrowRight, FiCalendar, FiUser } from 'react-icons/fi';
 import { HOME_THEME as T } from '../utils/constants';
+import { resolveMediaUrl } from '../utils/mediaUrl';
 
 export function formatPostDate(dateStr) {
   if (!dateStr) return '';
@@ -12,6 +13,7 @@ export function formatPostDate(dateStr) {
 }
 
 export function ContentCard({ post, basePath }) {
+  const coverSrc = resolveMediaUrl(post.cover_image_url, { streaming: false });
   return (
     <Link
       to={`${basePath}/${post.slug}`}
@@ -19,9 +21,9 @@ export function ContentCard({ post, basePath }) {
       style={{ boxShadow: '0 4px 20px rgba(165,0,0,0.06)' }}
     >
       <div className="relative h-44 bg-gray-100 overflow-hidden">
-        {post.cover_image_url ? (
+        {coverSrc ? (
           <img
-            src={post.cover_image_url}
+            src={coverSrc}
             alt=""
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             loading="lazy"

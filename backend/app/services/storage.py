@@ -12,7 +12,8 @@ ALLOWED_MEDIA_TYPES = ALLOWED_IMAGE_TYPES | ALLOWED_VIDEO_TYPES
 
 TESTIMONIAL_PREFIX = "testimonials"
 OFFER_PREFIX = "offers"
-MEDIA_PREFIXES = (TESTIMONIAL_PREFIX, OFFER_PREFIX)
+CONTENT_PREFIX = "content"
+MEDIA_PREFIXES = (TESTIMONIAL_PREFIX, OFFER_PREFIX, CONTENT_PREFIX)
 
 
 def _use_s3() -> bool:
@@ -116,12 +117,30 @@ class StorageService:
 
         return media_type, self.public_url(key)
 
-    def upload_offer_image(self, file: UploadFile, content: bytes) -> str:
+    def upload_offer_media(self, file: UploadFile, content: bytes) -> tuple[str, str]:
         media_type = _validate_file(file, content)
-        if media_type != "image":
-            raise HTTPException(status_code=400, detail="Offer image must be JPEG, PNG, WebP, or GIF (max 10MB).")
         ext = _extension(file.filename, media_type)
         key = f"{OFFER_PREFIX}/{uuid.uuid4().hex}{ext}"
+
+        if _use_s3():
+            self._upload_s3(key, content, file.content_type)
+        else:
+            self._upload_local(key, content)
+
+        return media_type, self.public_url(key)
+
+    def upload_offer_image(self, file: UploadFile, content: bytes) -> str:
+        media_type, media_url = self.upload_offer_media(file, content)
+        if media_type != "image":
+            raise HTTPException(status_code=400, detail="Offer image must be JPEG, PNG, WebP, or GIF (max 10MB).")
+        return media_url
+
+    def upload_content_image(self, file: UploadFile, content: bytes) -> str:
+        media_type = _validate_file(file, content)
+        if media_type != "image":
+            raise HTTPException(status_code=400, detail="Cover image must be JPEG, PNG, WebP, or GIF (max 10MB).")
+        ext = _extension(file.filename, media_type)
+        key = f"{CONTENT_PREFIX}/{uuid.uuid4().hex}{ext}"
 
         if _use_s3():
             self._upload_s3(key, content, file.content_type)

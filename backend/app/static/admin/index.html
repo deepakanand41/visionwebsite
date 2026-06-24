@@ -181,7 +181,13 @@
         <div class="form-group"><label>Body *</label><textarea id="c-body" rows="10" required placeholder="Use **bold** for headings. Separate paragraphs with blank lines."></textarea></div>
         <div class="form-row">
           <div class="form-group"><label>Author</label><input id="c-author" value="Vision Team" /></div>
-          <div class="form-group"><label>Cover image URL</label><input id="c-cover" placeholder="https:// or /images/..." /></div>
+        </div>
+        <div class="form-group">
+          <label>Cover Image (max 10MB)</label>
+          <input id="c-cover-file" type="file" accept="image/jpeg,image/png,image/webp,image/gif" />
+          <div id="c-cover-preview" style="margin-top:0.75rem;display:none;"></div>
+          <button type="button" id="c-cover-remove" class="btn btn-danger btn-sm" style="margin-top:0.5rem;display:none;" onclick="removeContentImage()">Remove image</button>
+          <input type="hidden" id="c-cover" />
         </div>
         <div class="form-row">
           <div class="form-group"><label>Published</label><select id="c-published"><option value="true">Yes</option><option value="false">Draft</option></select></div>
@@ -232,10 +238,11 @@
         </div>
         <div class="form-group"><label>Featured</label><select id="o-featured"><option value="false">No</option><option value="true">Yes</option></select></div>
         <div class="form-group">
-          <label>Offer Image (max 10MB)</label>
-          <input id="o-image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" />
+          <label>Photo (max 10MB) or Video (max 40MB)</label>
+          <input id="o-image" type="file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime" />
+          <p style="font-size:0.75rem;color:#6b7280;margin-top:0.35rem;">JPEG, PNG, WebP, GIF, MP4, or WebM.</p>
           <div id="o-image-preview" style="margin-top:0.75rem;display:none;"></div>
-          <button type="button" id="o-image-remove" class="btn btn-danger btn-sm" style="margin-top:0.5rem;display:none;" onclick="removeOfferImage()">Remove image</button>
+          <button type="button" id="o-image-remove" class="btn btn-danger btn-sm" style="margin-top:0.5rem;display:none;" onclick="removeOfferImage()">Remove media</button>
         </div>
         <div class="form-actions">
           <button type="button" class="btn btn-secondary" onclick="closeOfferModal()">Cancel</button>
@@ -525,8 +532,11 @@
         panel.innerHTML = toolbar + filterBar(type, pubFilter) + '<div class="empty">No posts found</div>';
         return;
       }
-      const rows = data.map(p => `<tr>
+      const rows = data.map(p => {
+        const img = p.cover_image_url ? `<img class="media-thumb" src="${contentImageSrc(p.cover_image_url)}" alt="" />` : '—';
+        return `<tr>
         <td>${p.id}</td>
+        <td>${img}</td>
         <td><strong>${p.title}</strong><br/><small style="color:#6b7280">/${type}/${p.slug}</small></td>
         <td>${p.category || '—'}</td>
         <td>${p.author}</td>
@@ -537,9 +547,10 @@
           <button class="btn btn-secondary btn-sm" onclick="editContent('${type}',${p.id})">Edit</button>
           <button class="btn btn-danger btn-sm" onclick="deleteContent(${p.id})">Delete</button>
         </td>
-      </tr>`).join('');
+      </tr>`;
+      }).join('');
       panel.innerHTML = toolbar + filterBar(type, pubFilter) + `<div class="card"><table><thead><tr>
-        <th>ID</th><th>Title</th><th>Category</th><th>Author</th><th>Status</th><th>Featured</th><th>Date</th><th>Actions</th>
+        <th>ID</th><th>Image</th><th>Title</th><th>Category</th><th>Author</th><th>Status</th><th>Featured</th><th>Date</th><th>Actions</th>
       </tr></thead><tbody>${rows}</tbody></table></div>`;
     }
 
@@ -704,7 +715,32 @@
       catch (err) { toast(err.message, 'error'); }
     }
 
+    let pendingContentImageRemove = false;
+
+    function contentImageSrc(url) {
+      if (!url) return '';
+      const match = url.match(/(?:testimonials|offers|content)\/[a-f0-9]+\.[a-z0-9]+$/i);
+      if (match) return '/api/media/' + match[0];
+      return url.startsWith('http') ? url : url;
+    }
+
+    function renderContentImagePreview(data) {
+      const preview = document.getElementById('c-cover-preview');
+      const removeBtn = document.getElementById('c-cover-remove');
+      if (!data?.cover_image_url) {
+        preview.style.display = 'none';
+        preview.innerHTML = '';
+        removeBtn.style.display = 'none';
+        return;
+      }
+      preview.style.display = 'block';
+      removeBtn.style.display = 'inline-block';
+      preview.innerHTML = `<img src="${contentImageSrc(data.cover_image_url)}" alt="Preview" style="width:100%;max-height:180px;object-fit:cover;border-radius:8px;" />`;
+    }
+
     function openContentModal(type, data = null) {
+      pendingContentImageRemove = false;
+      document.getElementById('c-cover-file').value = '';
       document.getElementById('content-modal-title').textContent = data ? 'Edit Post' : (type === 'news' ? 'Add Article' : 'Add Blog Post');
       document.getElementById('c-id').value = data?.id || '';
       document.getElementById('c-type').value = type;
@@ -717,6 +753,7 @@
       document.getElementById('c-cover').value = data?.cover_image_url || '';
       document.getElementById('c-published').value = data?.is_published !== false ? 'true' : 'false';
       document.getElementById('c-featured').value = data?.is_featured ? 'true' : 'false';
+      renderContentImagePreview(data);
       document.getElementById('content-modal').classList.add('open');
     }
     function closeContentModal() { document.getElementById('content-modal').classList.remove('open'); }
@@ -725,10 +762,47 @@
       if (post) openContentModal(type, post);
     }
 
+    document.getElementById('c-cover-file').addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      pendingContentImageRemove = false;
+      if (!file) return;
+      if (file.size > 10 * 1024 * 1024) { toast('Image must be smaller than 10MB', 'error'); e.target.value = ''; return; }
+      const url = URL.createObjectURL(file);
+      const preview = document.getElementById('c-cover-preview');
+      preview.style.display = 'block';
+      document.getElementById('c-cover-remove').style.display = 'inline-block';
+      preview.innerHTML = `<img src="${url}" alt="Preview" style="width:100%;max-height:180px;object-fit:cover;border-radius:8px;" />`;
+    });
+
+    function removeContentImage() {
+      pendingContentImageRemove = true;
+      document.getElementById('c-cover-file').value = '';
+      document.getElementById('c-cover').value = '';
+      document.getElementById('c-cover-preview').style.display = 'none';
+      document.getElementById('c-cover-preview').innerHTML = '';
+      document.getElementById('c-cover-remove').style.display = 'none';
+    }
+
+    async function uploadContentImage(postId, file) {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await fetch('/api/admin/content/' + postId + '/image', {
+        method: 'POST',
+        headers: { 'X-Admin-Secret': SECRET },
+        body: fd,
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || res.statusText);
+      }
+      return res.json();
+    }
+
     document.getElementById('content-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const id = document.getElementById('c-id').value;
       const type = document.getElementById('c-type').value;
+      const imageFile = document.getElementById('c-cover-file').files?.[0];
       const payload = {
         content_type: type,
         title: document.getElementById('c-title').value,
@@ -742,11 +816,19 @@
         is_featured: document.getElementById('c-featured').value === 'true',
       };
       try {
+        let postId = id;
         if (id) {
           const { content_type, ...update } = payload;
           await api('/content/' + id, { method: 'PUT', body: JSON.stringify(update) });
         } else {
-          await api('/content', { method: 'POST', body: JSON.stringify(payload) });
+          const created = await api('/content', { method: 'POST', body: JSON.stringify(payload) });
+          postId = created.id;
+        }
+        if (pendingContentImageRemove && postId) {
+          await api('/content/' + postId + '/image', { method: 'DELETE' });
+        }
+        if (imageFile && postId) {
+          await uploadContentImage(postId, imageFile);
         }
         toast(id ? 'Updated' : 'Created');
         closeContentModal();
@@ -765,7 +847,7 @@
 
     function offerImageSrc(url) {
       if (!url) return '';
-      const match = url.match(/(?:testimonials|offers)\/[a-f0-9]+\.[a-z0-9]+$/i);
+      const match = url.match(/(?:testimonials|offers|content)\/[a-f0-9]+\.[a-z0-9]+$/i);
       if (match) return '/api/media/' + match[0];
       return url.startsWith('http') ? url : url;
     }
@@ -779,9 +861,14 @@
         removeBtn.style.display = 'none';
         return;
       }
+      const src = offerImageSrc(data.image_url);
       preview.style.display = 'block';
       removeBtn.style.display = 'inline-block';
-      preview.innerHTML = `<img src="${offerImageSrc(data.image_url)}" alt="Preview" style="width:100%;max-height:180px;object-fit:cover;border-radius:8px;" />`;
+      if (data.media_type === 'video') {
+        preview.innerHTML = `<video src="${src}" controls style="width:100%;max-height:180px;border-radius:8px;background:#111;"></video>`;
+      } else {
+        preview.innerHTML = `<img src="${src}" alt="Preview" style="width:100%;max-height:180px;object-fit:cover;border-radius:8px;" />`;
+      }
     }
 
     function renderOffers() {
@@ -804,10 +891,14 @@
         return;
       }
       const rows = data.map(o => {
-        const img = o.image_url ? `<img class="media-thumb" src="${offerImageSrc(o.image_url)}" alt="" />` : '—';
+        const mediaCell = o.image_url
+          ? (o.media_type === 'video'
+            ? `<span class="media-badge">video</span>`
+            : `<img class="media-thumb" src="${offerImageSrc(o.image_url)}" alt="" />`)
+          : '—';
         return `<tr>
           <td>${o.id}</td>
-          <td>${img}</td>
+          <td>${mediaCell}</td>
           <td><strong>${o.title}</strong><br/><small>${OFFER_TYPE_LABELS[o.offer_type] || o.offer_type}</small></td>
           <td>${o.badge_text || '—'}</td>
           <td><span class="badge ${o.is_active?'badge-active':'badge-inactive'}">${o.is_active?'Active':'Inactive'}</span></td>
@@ -851,12 +942,20 @@
       const file = e.target.files?.[0];
       pendingOfferImageRemove = false;
       if (!file) return;
-      if (file.size > 10 * 1024 * 1024) { toast('Image must be smaller than 10MB', 'error'); e.target.value = ''; return; }
+      const isVideo = file.type.startsWith('video/');
+      const maxBytes = isVideo ? 40 * 1024 * 1024 : 10 * 1024 * 1024;
+      if (file.size > maxBytes) {
+        toast(isVideo ? 'Video must be smaller than 40MB' : 'Image must be smaller than 10MB', 'error');
+        e.target.value = '';
+        return;
+      }
       const url = URL.createObjectURL(file);
       const preview = document.getElementById('o-image-preview');
       preview.style.display = 'block';
       document.getElementById('o-image-remove').style.display = 'inline-block';
-      preview.innerHTML = `<img src="${url}" alt="Preview" style="width:100%;max-height:180px;object-fit:cover;border-radius:8px;" />`;
+      preview.innerHTML = isVideo
+        ? `<video src="${url}" controls style="width:100%;max-height:180px;border-radius:8px;background:#111;"></video>`
+        : `<img src="${url}" alt="Preview" style="width:100%;max-height:180px;object-fit:cover;border-radius:8px;" />`;
     });
 
     function removeOfferImage() {

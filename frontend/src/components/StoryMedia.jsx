@@ -6,20 +6,21 @@ export default function StoryMedia({
   className = 'aspect-video',
   alt = 'Student success story',
   variant = 'default',
+  showBadge = true,
 }) {
   const src = resolveMediaUrl(mediaUrl);
   if (!src || !mediaType) return null;
 
   const isReel = variant === 'reel' && mediaType === 'video';
 
-  const badge = (
+  const badge = showBadge ? (
     <span
       className="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide text-white backdrop-blur-sm"
       style={{ background: 'rgba(165,0,0,0.85)' }}
     >
       {isReel ? 'Reel' : mediaType === 'video' ? 'Video' : 'Photo'}
     </span>
-  );
+  ) : null;
 
   if (mediaType === 'video') {
     const video = (

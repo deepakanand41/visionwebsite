@@ -433,9 +433,46 @@ def delete_content(post_id: int, db: Session = Depends(get_db)):
     post = db.query(ContentPost).filter(ContentPost.id == post_id).first()
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
+    storage_service.delete_media(post.cover_image_url)
     db.delete(post)
     db.commit()
     return MessageResponse(message="Post deleted successfully")
+
+
+@router.post("/content/{post_id}/image", response_model=ImageUploadResponse)
+async def upload_content_image(
+    post_id: int,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+):
+    post = db.query(ContentPost).filter(ContentPost.id == post_id).first()
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+
+    content = await file.read()
+    image_url = storage_service.upload_content_image(file, content)
+
+    if post.cover_image_url:
+        storage_service.delete_media(post.cover_image_url)
+
+    post.cover_image_url = image_url
+    db.commit()
+
+    return ImageUploadResponse(image_url=image_url, message="Image uploaded successfully")
+
+
+@router.delete("/content/{post_id}/image", response_model=MessageResponse)
+def delete_content_image(post_id: int, db: Session = Depends(get_db)):
+    post = db.query(ContentPost).filter(ContentPost.id == post_id).first()
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    if not post.cover_image_url:
+        raise HTTPException(status_code=404, detail="No cover image on this post")
+
+    storage_service.delete_media(post.cover_image_url)
+    post.cover_image_url = None
+    db.commit()
+    return MessageResponse(message="Cover image removed successfully")
 
 
 # ─── Offers CRUD ─────────────────────────────────────────────────────────────────
@@ -528,7 +565,7 @@ def delete_offer(offer_id: int, db: Session = Depends(get_db)):
     return MessageResponse(message="Offer deleted successfully")
 
 
-@router.post("/offers/{offer_id}/image", response_model=ImageUploadResponse)
+@router.post("/offers/{offer_id}/image", response_model=MediaUploadResponse)
 async def upload_offer_image(
     offer_id: int,
     file: UploadFile = File(...),
@@ -539,15 +576,20 @@ async def upload_offer_image(
         raise HTTPException(status_code=404, detail="Offer not found")
 
     content = await file.read()
-    image_url = storage_service.upload_offer_image(file, content)
+    media_type, media_url = storage_service.upload_offer_media(file, content)
 
     if offer.image_url:
         storage_service.delete_media(offer.image_url)
 
-    offer.image_url = image_url
+    offer.media_type = media_type
+    offer.image_url = media_url
     db.commit()
 
-    return ImageUploadResponse(image_url=image_url, message="Image uploaded successfully")
+    return MediaUploadResponse(
+        media_type=media_type,
+        media_url=media_url,
+        message="Media uploaded successfully",
+    )
 
 
 @router.delete("/offers/{offer_id}/image", response_model=MessageResponse)
@@ -556,9 +598,10 @@ def delete_offer_image(offer_id: int, db: Session = Depends(get_db)):
     if not offer:
         raise HTTPException(status_code=404, detail="Offer not found")
     if not offer.image_url:
-        raise HTTPException(status_code=404, detail="No image on this offer")
+        raise HTTPException(status_code=404, detail="No media on this offer")
 
     storage_service.delete_media(offer.image_url)
     offer.image_url = None
+    offer.media_type = None
     db.commit()
     return MessageResponse(message="Image removed successfully")
