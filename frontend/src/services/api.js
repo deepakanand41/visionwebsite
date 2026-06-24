@@ -71,4 +71,30 @@ export const fetchTestimonials = async () => {
   return response.data;
 };
 
+export const fetchNews = async () => {
+  const response = await api.get('/api/news');
+  return response.data;
+};
+
+export const fetchNewsArticle = async (slug) => {
+  const response = await api.get(`/api/news/${slug}`);
+  return response.data;
+};
+
+export const fetchBlog = async () => {
+  const response = await api.get('/api/blog');
+  return response.data;
+};
+
+export const fetchBlogPost = async (slug) => {
+  const response = await api.get(`/api/blog/${slug}`);
+  return response.data;
+};
+
+export const fetchOffers = async (offerType = null) => {
+  const params = offerType ? { offer_type: offerType } : {};
+  const response = await api.get('/api/offers', { params });
+  return response.data;
+};
+
 export default api;

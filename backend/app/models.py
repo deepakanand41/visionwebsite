@@ -121,3 +121,43 @@ class Testimonial(Base):
     sort_order: Mapped[int] = mapped_column(Integer, default=0)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
+
+
+class ContentPost(Base):
+    __tablename__ = "content_posts"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    content_type: Mapped[str] = mapped_column(String(20), index=True)  # news | blog
+    title: Mapped[str] = mapped_column(String(250))
+    slug: Mapped[str] = mapped_column(String(280), unique=True, index=True)
+    excerpt: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    body: Mapped[str] = mapped_column(Text)
+    cover_image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    author: Mapped[str] = mapped_column(String(120), default="Vision Team")
+    category: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    is_published: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
+    is_featured: Mapped[bool] = mapped_column(Boolean, default=False)
+    published_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
+
+
+class Offer(Base):
+    __tablename__ = "offers"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    title: Mapped[str] = mapped_column(String(200))
+    slug: Mapped[str] = mapped_column(String(220), unique=True, index=True)
+    description: Mapped[str] = mapped_column(Text)
+    offer_type: Mapped[str] = mapped_column(String(50), index=True)
+    badge_text: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    terms: Mapped[str | None] = mapped_column(Text, nullable=True)
+    cta_label: Mapped[str] = mapped_column(String(80), default="Claim Offer")
+    cta_link: Mapped[str] = mapped_column(String(300), default="/contact-us")
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, index=True)
+    is_featured: Mapped[bool] = mapped_column(Boolean, default=False)
+    sort_order: Mapped[int] = mapped_column(Integer, default=0)
+    valid_until: Mapped[str | None] = mapped_column(String(30), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)

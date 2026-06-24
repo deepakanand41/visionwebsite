@@ -7,7 +7,7 @@ from fastapi.responses import Response, StreamingResponse
 
 from app.config import settings
 from app.services.storage import (
-    TESTIMONIAL_PREFIX,
+    MEDIA_PREFIXES,
     _local_root,
     _use_s3,
     storage_service,
@@ -19,7 +19,9 @@ RANGE_RE = re.compile(r"bytes=(\d*)-(\d*)")
 
 def safe_media_key(key: str) -> str:
     normalized = key.strip().lstrip("/").replace("\\", "/")
-    if ".." in normalized.split("/") or not normalized.startswith(f"{TESTIMONIAL_PREFIX}/"):
+    if ".." in normalized.split("/"):
+        raise HTTPException(status_code=404, detail="Media not found")
+    if not any(normalized.startswith(f"{prefix}/") for prefix in MEDIA_PREFIXES):
         raise HTTPException(status_code=404, detail="Media not found")
     return normalized
 

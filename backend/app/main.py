@@ -10,11 +10,15 @@ from app.services.storage import storage_service
 from app.database import Base, engine
 from app.migrate import run_migrations
 from app.seed import seed_testimonials
-from app.routers import enquiry, demo_class, referral, testimonials, admin, education_loan, media
+from app.seed_content import seed_content
+from app.seed_offers import seed_offers
+from app.routers import enquiry, demo_class, referral, testimonials, admin, education_loan, media, content, offers
 
 Base.metadata.create_all(bind=engine)
 run_migrations()
 seed_testimonials()
+seed_content()
+seed_offers()
 
 app = FastAPI(
     title="Vision Overseas Education API",
@@ -35,6 +39,8 @@ app.include_router(demo_class.router)
 app.include_router(referral.router)
 app.include_router(education_loan.router)
 app.include_router(testimonials.router)
+app.include_router(content.router)
+app.include_router(offers.router)
 app.include_router(admin.router)
 app.include_router(media.router)
 

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
-import { FiMenu, FiX, FiChevronDown, FiChevronRight } from 'react-icons/fi';
+import { FiMenu, FiX, FiChevronDown, FiChevronRight, FiUser } from 'react-icons/fi';
 import {
   mainDestinations,
   europeDestinations,
@@ -10,9 +10,16 @@ import {
 import Logo from './Logo';
 
 const navLinks = [
+  { label: 'Offers', to: '/offers' },
   { label: 'Education Loans', to: '/education-loans' },
   { label: 'Refer & Earn', to: '/refer-and-earn' },
   { label: 'Success Stories', to: '/success-stories' },
+];
+
+const topBarLinks = [
+  { label: 'News & Articles', to: '/news' },
+  { label: 'Blog', to: '/blog' },
+  { label: 'Offers', to: '/offers' },
   { label: 'Contact Us', to: '/contact-us' },
 ];
 
@@ -215,139 +222,185 @@ export default function Navbar() {
         : 'font-medium text-gray-700 hover:bg-red-50'
     }`;
 
+  const isTopLinkActive = (path) =>
+    location.pathname === path
+    || (path === '/news' && location.pathname.startsWith('/news'))
+    || (path === '/blog' && location.pathname.startsWith('/blog'))
+    || (path === '/offers' && location.pathname.startsWith('/offers'));
+
   return (
     <motion.header
       initial={{ y: -80 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? 'bg-white shadow-lg' : 'bg-white/95 backdrop-blur-sm'
+      className={`fixed top-0 left-0 right-0 z-50 bg-white transition-shadow duration-300 ${
+        scrolled ? 'shadow-lg' : 'border-b border-gray-100'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-18 py-3">
-          <Link to="/" className="flex items-center shrink-0">
-            <Logo className="h-12 sm:h-[3.6rem] w-auto" />
+      {/* Desktop: logo spans both rows; dark bg only on top-tab row */}
+      <div className="hidden lg:block max-w-7xl mx-auto">
+        <div className="grid grid-cols-[minmax(200px,240px)_1fr]">
+          <Link
+            to="/"
+            className="row-span-2 flex items-center justify-center px-5 py-4 bg-white border-r border-gray-100"
+          >
+            <Logo className="h-[5.25rem] w-auto max-w-[210px]" />
           </Link>
 
-          <nav className="hidden lg:flex items-center gap-1">
-            <div className="relative" ref={dropdownRef}>
-              <button
-                onClick={() => setDestOpen(!destOpen)}
-                className={`flex items-center gap-1 px-3 py-2 text-sm rounded-lg transition-colors ${
-                  isDestinationsActive
-                    ? 'font-semibold text-[#A50000] bg-red-50'
-                    : 'font-medium text-gray-700 hover:text-red-800 hover:bg-red-50'
+          <div className="flex items-center justify-end h-10 px-6 bg-white border-b border-gray-100">
+            <div
+              className="inline-flex items-center gap-1 h-full px-4 text-white text-xs"
+              style={{ background: '#111111' }}
+            >
+              {topBarLinks.map((link, i) => (
+                <span key={link.to} className="flex items-center">
+                  {i > 0 && <span className="mx-2 text-white/25">|</span>}
+                  <Link
+                    to={link.to}
+                    className={`px-2 py-1 rounded transition-colors hover:text-white ${
+                      isTopLinkActive(link.to) ? 'text-white font-semibold' : 'text-white/75'
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                </span>
+              ))}
+              <span className="mx-2 text-white/25">|</span>
+              <Link
+                to="/sign-in"
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-colors ${
+                  isActive('/sign-in')
+                    ? 'border-white/40 bg-white/10 text-white font-semibold'
+                    : 'border-white/20 text-white/90 hover:bg-white/10'
                 }`}
               >
-                Study Destinations
-                <FiChevronDown className={`transition-transform duration-200 ${destOpen ? 'rotate-180' : ''}`} />
-              </button>
-              <AnimatePresence>
-                {destOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 8, scale: 0.97 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 8, scale: 0.97 }}
-                    transition={{ duration: 0.15 }}
-                    className="absolute top-full left-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-visible z-50"
-                  >
-                    {mainDestinations.map((d) => (
-                      <DestLink
-                        key={d.slug}
-                        dest={d}
-                        active={location.pathname === destPath(d.slug)}
-                        onClick={closeDestDropdown}
-                      />
-                    ))}
-
-                    <DestGroupFlyout
-                      label="Europe"
-                      open={europeOpen}
-                      onOpen={openEuropeMenu}
-                      onClose={closeEuropeMenu}
-                      active={isEuropeActive}
-                      items={europeDestinations}
-                      pathname={location.pathname}
-                      onNavigate={closeDestDropdown}
-                    />
-
-                    <DestGroupFlyout
-                      label="Other Destinations"
-                      open={otherOpen}
-                      onOpen={openOtherMenu}
-                      onClose={closeOtherMenu}
-                      active={isOtherActive}
-                      items={otherDestinations}
-                      pathname={location.pathname}
-                      onNavigate={closeDestDropdown}
-                    />
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                <FiUser size={14} />
+                Sign in
+              </Link>
             </div>
+          </div>
 
-            <div className="relative" ref={testPrepRef}>
-              <button
-                onClick={() => setTestPrepOpen(!testPrepOpen)}
-                className={`flex items-center gap-1 px-3 py-2 text-sm rounded-lg transition-colors ${
-                  isTestPrepActive
-                    ? 'font-semibold text-[#A50000] bg-red-50'
-                    : 'font-medium text-gray-700 hover:text-red-800 hover:bg-red-50'
-                }`}
-              >
-                Test Preparation
-                <FiChevronDown className={`transition-transform duration-200 ${testPrepOpen ? 'rotate-180' : ''}`} />
-              </button>
-              <AnimatePresence>
-                {testPrepOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 8, scale: 0.97 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 8, scale: 0.97 }}
-                    transition={{ duration: 0.15 }}
-                    className="absolute top-full left-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50"
-                  >
-                    {testPrepLinks.map((link) => (
-                      <TestPrepMenuItem
-                        key={link.to || link.href}
-                        link={link}
-                        pathname={location.pathname}
-                        onClick={() => setTestPrepOpen(false)}
-                      />
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            {navLinks.map((link) => {
-              const active = isActive(link.to);
-              return (
-                <Link
-                  key={link.label}
-                  to={link.to}
-                  className={linkClass(active)}
+          <div className="flex items-center justify-between gap-3 px-4 py-3 bg-white min-h-[4.25rem]">
+            <nav className="flex items-center gap-1 flex-1 min-w-0">
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setDestOpen(!destOpen)}
+                  className={`flex items-center gap-1 px-3 py-2 text-sm rounded-lg transition-colors ${
+                    isDestinationsActive
+                      ? 'font-semibold text-[#A50000] bg-red-50'
+                      : 'font-medium text-gray-700 hover:text-red-800 hover:bg-red-50'
+                  }`}
                 >
-                  {link.label}
-                </Link>
-              );
-            })}
-          </nav>
+                  Study Destinations
+                  <FiChevronDown className={`transition-transform duration-200 ${destOpen ? 'rotate-180' : ''}`} />
+                </button>
+                <AnimatePresence>
+                  {destOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8, scale: 0.97 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.97 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute top-full left-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-visible z-50"
+                    >
+                      {mainDestinations.map((d) => (
+                        <DestLink
+                          key={d.slug}
+                          dest={d}
+                          active={location.pathname === destPath(d.slug)}
+                          onClick={closeDestDropdown}
+                        />
+                      ))}
+                      <DestGroupFlyout
+                        label="Europe"
+                        open={europeOpen}
+                        onOpen={openEuropeMenu}
+                        onClose={closeEuropeMenu}
+                        active={isEuropeActive}
+                        items={europeDestinations}
+                        pathname={location.pathname}
+                        onNavigate={closeDestDropdown}
+                      />
+                      <DestGroupFlyout
+                        label="Other Destinations"
+                        open={otherOpen}
+                        onOpen={openOtherMenu}
+                        onClose={closeOtherMenu}
+                        active={isOtherActive}
+                        items={otherDestinations}
+                        pathname={location.pathname}
+                        onNavigate={closeDestDropdown}
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
 
-          <div className="hidden lg:block">
+              <div className="relative" ref={testPrepRef}>
+                <button
+                  onClick={() => setTestPrepOpen(!testPrepOpen)}
+                  className={`flex items-center gap-1 px-3 py-2 text-sm rounded-lg transition-colors ${
+                    isTestPrepActive
+                      ? 'font-semibold text-[#A50000] bg-red-50'
+                      : 'font-medium text-gray-700 hover:text-red-800 hover:bg-red-50'
+                  }`}
+                >
+                  Test Preparation
+                  <FiChevronDown className={`transition-transform duration-200 ${testPrepOpen ? 'rotate-180' : ''}`} />
+                </button>
+                <AnimatePresence>
+                  {testPrepOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8, scale: 0.97 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.97 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute top-full left-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50"
+                    >
+                      {testPrepLinks.map((link) => (
+                        <TestPrepMenuItem
+                          key={link.to || link.href}
+                          link={link}
+                          pathname={location.pathname}
+                          onClick={() => setTestPrepOpen(false)}
+                        />
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {navLinks.map((link) => {
+                const active = isActive(link.to);
+                return (
+                  <Link key={link.label} to={link.to} className={linkClass(active)}>
+                    {link.label}
+                  </Link>
+                );
+              })}
+            </nav>
+
             <Link
               to="/contact-us"
-              className="px-5 py-2.5 text-sm font-semibold text-white rounded-xl transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5"
+              className="shrink-0 px-5 py-2.5 text-sm font-semibold text-white rounded-xl transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5"
               style={{ background: 'linear-gradient(135deg, #A50000, #7A0000)' }}
             >
               Book Free Counselling
             </Link>
           </div>
+        </div>
+      </div>
 
+      {/* Mobile header */}
+      <div className="lg:hidden bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between py-3">
+          <Link to="/" className="flex items-center shrink-0">
+            <Logo className="h-14 w-auto" />
+          </Link>
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="lg:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100"
+            className="p-2 rounded-lg text-gray-700 hover:bg-gray-100"
+            aria-label="Toggle menu"
           >
             {mobileOpen ? <FiX size={22} /> : <FiMenu size={22} />}
           </button>
@@ -364,6 +417,26 @@ export default function Navbar() {
             className="lg:hidden border-t border-gray-100 bg-white overflow-hidden"
           >
             <div className="px-4 py-4 space-y-1">
+              <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-3 py-2">Quick Links</div>
+              {topBarLinks.map((link) => (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  onClick={() => setMobileOpen(false)}
+                  className={mobileLinkClass(isTopLinkActive(link.to))}
+                >
+                  {link.label}
+                </Link>
+              ))}
+              <Link
+                to="/sign-in"
+                onClick={() => setMobileOpen(false)}
+                className={`${mobileLinkClass(isActive('/sign-in'))} gap-2`}
+              >
+                <FiUser size={16} /> Sign in
+              </Link>
+
+              <div className="border-t border-gray-100 my-2" />
               <div
                 className={`font-medium text-sm px-3 py-2 ${
                   isDestinationsActive ? 'text-[#A50000] font-semibold' : 'text-gray-500'

@@ -6,6 +6,9 @@ import { COMPANY } from '../utils/constants';
 const footerLinks = {
   Company: [
     { label: 'About Us', to: '/' },
+    { label: 'News & Articles', to: '/news' },
+    { label: 'Blog', to: '/blog' },
+    { label: 'Offers', to: '/offers' },
     { label: 'Success Stories', to: '/success-stories' },
     { label: 'Refer & Earn', to: '/refer-and-earn' },
     { label: 'Contact Us', to: '/contact-us' },

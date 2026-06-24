@@ -51,6 +51,7 @@
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; padding: 1rem; }
     .modal-overlay.open { display: flex; }
     .modal { background: white; border-radius: 16px; padding: 1.5rem; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; }
+    .modal.modal-lg { max-width: 680px; }
     .modal h3 { margin-bottom: 1rem; color: #0A3D91; }
     .form-group { margin-bottom: 0.85rem; }
     .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: #374151; margin-bottom: 0.3rem; }
@@ -74,7 +75,7 @@
   <div class="header">
     <div>
       <h1>🎓 Vision Admin Panel</h1>
-      <span>Manage submissions, statuses & testimonials</span>
+      <span>Manage submissions, content, testimonials & more</span>
     </div>
     <button class="btn btn-secondary" onclick="loadAll()">↻ Refresh All</button>
   </div>
@@ -85,6 +86,9 @@
     <button class="tab" data-tab="loans">Education Loans <span class="count" id="count-loans">0</span></button>
     <button class="tab" data-tab="referrals">Referrals <span class="count" id="count-referrals">0</span></button>
     <button class="tab" data-tab="testimonials">Testimonials <span class="count" id="count-testimonials">0</span></button>
+    <button class="tab" data-tab="news">News <span class="count" id="count-news">0</span></button>
+    <button class="tab" data-tab="blog">Blog <span class="count" id="count-blog">0</span></button>
+    <button class="tab" data-tab="offers">Offers <span class="count" id="count-offers">0</span></button>
   </div>
 
   <div class="content">
@@ -93,6 +97,9 @@
     <div id="panel-loans" class="panel"></div>
     <div id="panel-referrals" class="panel"></div>
     <div id="panel-testimonials" class="panel"></div>
+    <div id="panel-news" class="panel"></div>
+    <div id="panel-blog" class="panel"></div>
+    <div id="panel-offers" class="panel"></div>
   </div>
 
   <!-- Status Update Modal -->
@@ -158,11 +165,91 @@
     </div>
   </div>
 
+  <!-- Content (News / Blog) Modal -->
+  <div class="modal-overlay" id="content-modal">
+    <div class="modal modal-lg">
+      <h3 id="content-modal-title">Add Post</h3>
+      <form id="content-form">
+        <input type="hidden" id="c-id" />
+        <input type="hidden" id="c-type" />
+        <div class="form-group"><label>Title *</label><input id="c-title" required /></div>
+        <div class="form-row">
+          <div class="form-group"><label>Slug (optional)</label><input id="c-slug" placeholder="auto-from-title" /></div>
+          <div class="form-group"><label>Category</label><input id="c-category" placeholder="Visa Updates, Guides..." /></div>
+        </div>
+        <div class="form-group"><label>Excerpt</label><textarea id="c-excerpt" rows="2" placeholder="Short summary for listing cards"></textarea></div>
+        <div class="form-group"><label>Body *</label><textarea id="c-body" rows="10" required placeholder="Use **bold** for headings. Separate paragraphs with blank lines."></textarea></div>
+        <div class="form-row">
+          <div class="form-group"><label>Author</label><input id="c-author" value="Vision Team" /></div>
+          <div class="form-group"><label>Cover image URL</label><input id="c-cover" placeholder="https:// or /images/..." /></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Published</label><select id="c-published"><option value="true">Yes</option><option value="false">Draft</option></select></div>
+          <div class="form-group"><label>Featured</label><select id="c-featured"><option value="false">No</option><option value="true">Yes</option></select></div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeContentModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Offer Modal -->
+  <div class="modal-overlay" id="offer-modal">
+    <div class="modal modal-lg">
+      <h3 id="offer-modal-title">Add Offer</h3>
+      <form id="offer-form">
+        <input type="hidden" id="o-id" />
+        <div class="form-group"><label>Title *</label><input id="o-title" required placeholder="Free Laptop for Students" /></div>
+        <div class="form-row">
+          <div class="form-group"><label>Slug (optional)</label><input id="o-slug" placeholder="auto-from-title" /></div>
+          <div class="form-group"><label>Offer Type *</label>
+            <select id="o-type" required>
+              <option value="laptop">Laptop</option>
+              <option value="scholarship">Scholarship</option>
+              <option value="test_prep">Test Prep</option>
+              <option value="visa">Visa</option>
+              <option value="gadget">Gadget</option>
+              <option value="financial">Financial / Loan</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group"><label>Description *</label><textarea id="o-description" rows="4" required></textarea></div>
+        <div class="form-row">
+          <div class="form-group"><label>Badge Text</label><input id="o-badge" placeholder="FREE, SAVE, LIMITED..." /></div>
+          <div class="form-group"><label>Valid Until</label><input id="o-valid" placeholder="31 Dec 2026" /></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>CTA Label</label><input id="o-cta-label" value="Claim Offer" /></div>
+          <div class="form-group"><label>CTA Link</label><input id="o-cta-link" value="/contact-us" /></div>
+        </div>
+        <div class="form-group"><label>Terms &amp; Conditions</label><textarea id="o-terms" rows="2" placeholder="Eligibility and conditions..."></textarea></div>
+        <div class="form-row">
+          <div class="form-group"><label>Sort Order</label><input id="o-sort" type="number" value="0" /></div>
+          <div class="form-group"><label>Status</label><select id="o-active"><option value="true">Active</option><option value="false">Inactive</option></select></div>
+        </div>
+        <div class="form-group"><label>Featured</label><select id="o-featured"><option value="false">No</option><option value="true">Yes</option></select></div>
+        <div class="form-group">
+          <label>Offer Image (max 10MB)</label>
+          <input id="o-image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" />
+          <div id="o-image-preview" style="margin-top:0.75rem;display:none;"></div>
+          <button type="button" id="o-image-remove" class="btn btn-danger btn-sm" style="margin-top:0.5rem;display:none;" onclick="removeOfferImage()">Remove image</button>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeOfferModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
     const SECRET = window.location.pathname.replace('/admin/', '');
     const headers = { 'X-Admin-Secret': SECRET, 'Content-Type': 'application/json' };
 
-    let cache = { enquiries: [], demo: [], loans: [], referrals: [], testimonials: [] };
+    let cache = { enquiries: [], demo: [], loans: [], referrals: [], testimonials: [], news: [], blog: [], offers: [] };
     let statusOptions = { general: [], referral: [] };
     const filters = {
       enquiries: { search: '', status: '' },
@@ -170,6 +257,9 @@
       loans: { search: '', status: '' },
       referrals: { search: '', status: '' },
       testimonials: { search: '', is_active: '' },
+      news: { search: '', is_published: '' },
+      blog: { search: '', is_published: '' },
+      offers: { search: '', offer_type: '', is_active: '' },
     };
 
     async function api(path, opts = {}) {
@@ -272,6 +362,9 @@
         if (f.status && r.status !== f.status) return false;
         if (tabKey === 'demo' && f.exam_type && r.exam_type !== f.exam_type) return false;
         if (tabKey === 'testimonials' && f.is_active !== '' && String(r.is_active) !== f.is_active) return false;
+        if ((tabKey === 'news' || tabKey === 'blog') && f.is_published !== '' && String(r.is_published) !== f.is_published) return false;
+        if (tabKey === 'offers' && f.offer_type && r.offer_type !== f.offer_type) return false;
+        if (tabKey === 'offers' && f.is_active !== '' && String(r.is_active) !== f.is_active) return false;
         if (f.search) {
           const hay = JSON.stringify(r).toLowerCase();
           if (!hay.includes(f.search.toLowerCase())) return false;
@@ -410,17 +503,56 @@
       else if (tab === 'demo') renderDemo();
       else if (tab === 'loans') renderLoans();
       else if (tab === 'referrals') renderReferrals();
+      else if (tab === 'news') renderContent('news');
+      else if (tab === 'blog') renderContent('blog');
+      else if (tab === 'offers') renderOffers();
       else renderTestimonials();
+    }
+
+    function renderContent(type) {
+      const data = applyClientFilter(cache[type], type);
+      document.getElementById('count-' + type).textContent = cache[type].length;
+      const panel = document.getElementById('panel-' + type);
+      const label = type === 'news' ? 'News & Articles' : 'Blog Posts';
+      const pubFilter = `<select onchange="setFilter('${type}','is_published',this.value)">
+        <option value="">All</option>
+        <option value="true" ${filters[type].is_published==='true'?'selected':''}>Published</option>
+        <option value="false" ${filters[type].is_published==='false'?'selected':''}>Draft</option>
+      </select>`;
+      const toolbar = `<div class="toolbar"><h2>${label} (${data.length})</h2>
+        <button class="btn btn-primary" onclick="openContentModal('${type}')">+ Add ${type === 'news' ? 'Article' : 'Post'}</button></div>`;
+      if (!data.length) {
+        panel.innerHTML = toolbar + filterBar(type, pubFilter) + '<div class="empty">No posts found</div>';
+        return;
+      }
+      const rows = data.map(p => `<tr>
+        <td>${p.id}</td>
+        <td><strong>${p.title}</strong><br/><small style="color:#6b7280">/${type}/${p.slug}</small></td>
+        <td>${p.category || '—'}</td>
+        <td>${p.author}</td>
+        <td><span class="badge ${p.is_published?'badge-active':'badge-inactive'}">${p.is_published?'Published':'Draft'}</span></td>
+        <td>${p.is_featured ? '★' : '—'}</td>
+        <td>${fmtDate(p.published_at || p.created_at)}</td>
+        <td class="actions">
+          <button class="btn btn-secondary btn-sm" onclick="editContent('${type}',${p.id})">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteContent(${p.id})">Delete</button>
+        </td>
+      </tr>`).join('');
+      panel.innerHTML = toolbar + filterBar(type, pubFilter) + `<div class="card"><table><thead><tr>
+        <th>ID</th><th>Title</th><th>Category</th><th>Author</th><th>Status</th><th>Featured</th><th>Date</th><th>Actions</th>
+      </tr></thead><tbody>${rows}</tbody></table></div>`;
     }
 
     async function loadAll() {
       try {
-        const [statuses, enquiries, demo, loans, referrals, testimonials] = await Promise.all([
-          api('/statuses'), api('/enquiries'), api('/demo-classes'), api('/education-loans'), api('/referrals'), api('/testimonials')
+        const [statuses, enquiries, demo, loans, referrals, testimonials, news, blog, offers] = await Promise.all([
+          api('/statuses'), api('/enquiries'), api('/demo-classes'), api('/education-loans'), api('/referrals'), api('/testimonials'),
+          api('/content?content_type=news'), api('/content?content_type=blog'), api('/offers')
         ]);
         statusOptions = statuses;
-        cache = { enquiries, demo, loans, referrals, testimonials };
+        cache = { enquiries, demo, loans, referrals, testimonials, news, blog, offers };
         renderEnquiries(); renderDemo(); renderLoans(); renderReferrals(); renderTestimonials();
+        renderContent('news'); renderContent('blog'); renderOffers();
       } catch (e) { toast('Failed to load: ' + e.message, 'error'); }
     }
 
@@ -569,6 +701,228 @@
     async function deleteTestimonial(id) {
       if (!confirm('Delete this testimonial?')) return;
       try { await api('/testimonials/' + id, { method: 'DELETE' }); toast('Deleted'); loadAll(); }
+      catch (err) { toast(err.message, 'error'); }
+    }
+
+    function openContentModal(type, data = null) {
+      document.getElementById('content-modal-title').textContent = data ? 'Edit Post' : (type === 'news' ? 'Add Article' : 'Add Blog Post');
+      document.getElementById('c-id').value = data?.id || '';
+      document.getElementById('c-type').value = type;
+      document.getElementById('c-title').value = data?.title || '';
+      document.getElementById('c-slug').value = data?.slug || '';
+      document.getElementById('c-category').value = data?.category || '';
+      document.getElementById('c-excerpt').value = data?.excerpt || '';
+      document.getElementById('c-body').value = data?.body || '';
+      document.getElementById('c-author').value = data?.author || 'Vision Team';
+      document.getElementById('c-cover').value = data?.cover_image_url || '';
+      document.getElementById('c-published').value = data?.is_published !== false ? 'true' : 'false';
+      document.getElementById('c-featured').value = data?.is_featured ? 'true' : 'false';
+      document.getElementById('content-modal').classList.add('open');
+    }
+    function closeContentModal() { document.getElementById('content-modal').classList.remove('open'); }
+    function editContent(type, id) {
+      const post = cache[type].find(x => x.id === id);
+      if (post) openContentModal(type, post);
+    }
+
+    document.getElementById('content-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('c-id').value;
+      const type = document.getElementById('c-type').value;
+      const payload = {
+        content_type: type,
+        title: document.getElementById('c-title').value,
+        slug: document.getElementById('c-slug').value || null,
+        category: document.getElementById('c-category').value || null,
+        excerpt: document.getElementById('c-excerpt').value || null,
+        body: document.getElementById('c-body').value,
+        author: document.getElementById('c-author').value || 'Vision Team',
+        cover_image_url: document.getElementById('c-cover').value || null,
+        is_published: document.getElementById('c-published').value === 'true',
+        is_featured: document.getElementById('c-featured').value === 'true',
+      };
+      try {
+        if (id) {
+          const { content_type, ...update } = payload;
+          await api('/content/' + id, { method: 'PUT', body: JSON.stringify(update) });
+        } else {
+          await api('/content', { method: 'POST', body: JSON.stringify(payload) });
+        }
+        toast(id ? 'Updated' : 'Created');
+        closeContentModal();
+        loadAll();
+      } catch (err) { toast(err.message, 'error'); }
+    });
+
+    async function deleteContent(id) {
+      if (!confirm('Delete this post?')) return;
+      try { await api('/content/' + id, { method: 'DELETE' }); toast('Deleted'); loadAll(); }
+      catch (err) { toast(err.message, 'error'); }
+    }
+
+    const OFFER_TYPE_LABELS = { laptop: 'Laptop', scholarship: 'Scholarship', test_prep: 'Test Prep', visa: 'Visa', gadget: 'Gadget', financial: 'Financial', other: 'Other' };
+    let pendingOfferImageRemove = false;
+
+    function offerImageSrc(url) {
+      if (!url) return '';
+      const match = url.match(/(?:testimonials|offers)\/[a-f0-9]+\.[a-z0-9]+$/i);
+      if (match) return '/api/media/' + match[0];
+      return url.startsWith('http') ? url : url;
+    }
+
+    function renderOfferImagePreview(data) {
+      const preview = document.getElementById('o-image-preview');
+      const removeBtn = document.getElementById('o-image-remove');
+      if (!data?.image_url) {
+        preview.style.display = 'none';
+        preview.innerHTML = '';
+        removeBtn.style.display = 'none';
+        return;
+      }
+      preview.style.display = 'block';
+      removeBtn.style.display = 'inline-block';
+      preview.innerHTML = `<img src="${offerImageSrc(data.image_url)}" alt="Preview" style="width:100%;max-height:180px;object-fit:cover;border-radius:8px;" />`;
+    }
+
+    function renderOffers() {
+      const data = applyClientFilter(cache.offers, 'offers');
+      document.getElementById('count-offers').textContent = cache.offers.length;
+      const panel = document.getElementById('panel-offers');
+      const typeFilter = `<select onchange="setFilter('offers','offer_type',this.value)">
+        <option value="">All Types</option>
+        ${Object.entries(OFFER_TYPE_LABELS).map(([k,v]) => `<option value="${k}" ${filters.offers.offer_type===k?'selected':''}>${v}</option>`).join('')}
+      </select>`;
+      const activeFilter = `<select onchange="setFilter('offers','is_active',this.value)">
+        <option value="">All</option>
+        <option value="true" ${filters.offers.is_active==='true'?'selected':''}>Active</option>
+        <option value="false" ${filters.offers.is_active==='false'?'selected':''}>Inactive</option>
+      </select>`;
+      const toolbar = `<div class="toolbar"><h2>Student Offers (${data.length})</h2>
+        <button class="btn btn-primary" onclick="openOfferModal()">+ Add Offer</button></div>`;
+      if (!data.length) {
+        panel.innerHTML = toolbar + filterBar('offers', typeFilter + activeFilter) + '<div class="empty">No offers found</div>';
+        return;
+      }
+      const rows = data.map(o => {
+        const img = o.image_url ? `<img class="media-thumb" src="${offerImageSrc(o.image_url)}" alt="" />` : '—';
+        return `<tr>
+          <td>${o.id}</td>
+          <td>${img}</td>
+          <td><strong>${o.title}</strong><br/><small>${OFFER_TYPE_LABELS[o.offer_type] || o.offer_type}</small></td>
+          <td>${o.badge_text || '—'}</td>
+          <td><span class="badge ${o.is_active?'badge-active':'badge-inactive'}">${o.is_active?'Active':'Inactive'}</span></td>
+          <td>${o.is_featured ? '★' : '—'}</td>
+          <td>${o.sort_order}</td>
+          <td class="actions">
+            <button class="btn btn-secondary btn-sm" onclick="editOffer(${o.id})">Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteOffer(${o.id})">Delete</button>
+          </td>
+        </tr>`;
+      }).join('');
+      panel.innerHTML = toolbar + filterBar('offers', typeFilter + activeFilter) + `<div class="card"><table><thead><tr>
+        <th>ID</th><th>Image</th><th>Title</th><th>Badge</th><th>Status</th><th>Featured</th><th>Order</th><th>Actions</th>
+      </tr></thead><tbody>${rows}</tbody></table></div>`;
+    }
+
+    function openOfferModal(data = null) {
+      pendingOfferImageRemove = false;
+      document.getElementById('o-image').value = '';
+      document.getElementById('offer-modal-title').textContent = data ? 'Edit Offer' : 'Add Offer';
+      document.getElementById('o-id').value = data?.id || '';
+      document.getElementById('o-title').value = data?.title || '';
+      document.getElementById('o-slug').value = data?.slug || '';
+      document.getElementById('o-type').value = data?.offer_type || 'laptop';
+      document.getElementById('o-description').value = data?.description || '';
+      document.getElementById('o-badge').value = data?.badge_text || '';
+      document.getElementById('o-valid').value = data?.valid_until || '';
+      document.getElementById('o-cta-label').value = data?.cta_label || 'Claim Offer';
+      document.getElementById('o-cta-link').value = data?.cta_link || '/contact-us';
+      document.getElementById('o-terms').value = data?.terms || '';
+      document.getElementById('o-sort').value = data?.sort_order || 0;
+      document.getElementById('o-active').value = data?.is_active !== false ? 'true' : 'false';
+      document.getElementById('o-featured').value = data?.is_featured ? 'true' : 'false';
+      renderOfferImagePreview(data);
+      document.getElementById('offer-modal').classList.add('open');
+    }
+    function closeOfferModal() { document.getElementById('offer-modal').classList.remove('open'); }
+    function editOffer(id) { const o = cache.offers.find(x => x.id === id); if (o) openOfferModal(o); }
+
+    document.getElementById('o-image').addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      pendingOfferImageRemove = false;
+      if (!file) return;
+      if (file.size > 10 * 1024 * 1024) { toast('Image must be smaller than 10MB', 'error'); e.target.value = ''; return; }
+      const url = URL.createObjectURL(file);
+      const preview = document.getElementById('o-image-preview');
+      preview.style.display = 'block';
+      document.getElementById('o-image-remove').style.display = 'inline-block';
+      preview.innerHTML = `<img src="${url}" alt="Preview" style="width:100%;max-height:180px;object-fit:cover;border-radius:8px;" />`;
+    });
+
+    function removeOfferImage() {
+      pendingOfferImageRemove = true;
+      document.getElementById('o-image').value = '';
+      document.getElementById('o-image-preview').style.display = 'none';
+      document.getElementById('o-image-preview').innerHTML = '';
+      document.getElementById('o-image-remove').style.display = 'none';
+    }
+
+    async function uploadOfferImage(offerId, file) {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await fetch('/api/admin/offers/' + offerId + '/image', {
+        method: 'POST',
+        headers: { 'X-Admin-Secret': SECRET },
+        body: fd,
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || res.statusText);
+      }
+      return res.json();
+    }
+
+    document.getElementById('offer-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('o-id').value;
+      const imageFile = document.getElementById('o-image').files?.[0];
+      const payload = {
+        title: document.getElementById('o-title').value,
+        slug: document.getElementById('o-slug').value || null,
+        offer_type: document.getElementById('o-type').value,
+        description: document.getElementById('o-description').value,
+        badge_text: document.getElementById('o-badge').value || null,
+        valid_until: document.getElementById('o-valid').value || null,
+        cta_label: document.getElementById('o-cta-label').value || 'Claim Offer',
+        cta_link: document.getElementById('o-cta-link').value || '/contact-us',
+        terms: document.getElementById('o-terms').value || null,
+        sort_order: parseInt(document.getElementById('o-sort').value) || 0,
+        is_active: document.getElementById('o-active').value === 'true',
+        is_featured: document.getElementById('o-featured').value === 'true',
+      };
+      try {
+        let offerId = id;
+        if (id) {
+          await api('/offers/' + id, { method: 'PUT', body: JSON.stringify(payload) });
+        } else {
+          const created = await api('/offers', { method: 'POST', body: JSON.stringify(payload) });
+          offerId = created.id;
+        }
+        if (pendingOfferImageRemove && offerId) {
+          await api('/offers/' + offerId + '/image', { method: 'DELETE' });
+        }
+        if (imageFile && offerId) {
+          await uploadOfferImage(offerId, imageFile);
+        }
+        toast(id ? 'Updated' : 'Created');
+        closeOfferModal();
+        loadAll();
+      } catch (err) { toast(err.message, 'error'); }
+    });
+
+    async function deleteOffer(id) {
+      if (!confirm('Delete this offer?')) return;
+      try { await api('/offers/' + id, { method: 'DELETE' }); toast('Deleted'); loadAll(); }
       catch (err) { toast(err.message, 'error'); }
     }
 

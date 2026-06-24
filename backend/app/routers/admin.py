@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from app.auth import verify_admin_secret
 from app.constants import ALL_STATUSES, SUBMISSION_STATUSES
 from app.database import get_db
-from app.models import Enquiry, DemoClassBooking, ReferralApplication, EducationLoanRequest, Testimonial
+from app.models import Enquiry, DemoClassBooking, ReferralApplication, EducationLoanRequest, Testimonial, ContentPost, Offer
 from app.schemas import (
     EnquiryResponse,
     DemoClassResponse,
@@ -19,8 +19,16 @@ from app.schemas import (
     StatusUpdate,
     MessageResponse,
     MediaUploadResponse,
+    ContentPostCreate,
+    ContentPostUpdate,
+    ContentPostResponse,
+    OfferCreate,
+    OfferUpdate,
+    OfferResponse,
+    ImageUploadResponse,
 )
 from app.services.storage import storage_service
+from app.utils.slugify import slugify
 
 router = APIRouter(
     prefix="/api/admin",
@@ -334,3 +342,223 @@ def delete_testimonial_media(testimonial_id: int, db: Session = Depends(get_db))
     testimonial.media_url = None
     db.commit()
     return MessageResponse(message="Media removed successfully")
+
+
+# ─── News & Blog CRUD ──────────────────────────────────────────────────────────
+
+def _unique_slug(db: Session, base_slug: str, exclude_id: int | None = None) -> str:
+    slug = base_slug
+    counter = 1
+    while True:
+        query = db.query(ContentPost).filter(ContentPost.slug == slug)
+        if exclude_id:
+            query = query.filter(ContentPost.id != exclude_id)
+        if not query.first():
+            return slug
+        slug = f"{base_slug}-{counter}"
+        counter += 1
+
+
+def _apply_publish_state(post: ContentPost) -> None:
+    if post.is_published and not post.published_at:
+        post.published_at = datetime.now(timezone.utc)
+
+
+@router.get("/content", response_model=list[ContentPostResponse])
+def admin_list_content(
+    content_type: str = Query(..., pattern="^(news|blog)$"),
+    search: str | None = Query(None),
+    is_published: bool | None = Query(None),
+    db: Session = Depends(get_db),
+):
+    query = db.query(ContentPost).filter(ContentPost.content_type == content_type)
+    if is_published is not None:
+        query = query.filter(ContentPost.is_published == is_published)
+    if search:
+        term = f"%{search.lower()}%"
+        query = query.filter(
+            or_(
+                ContentPost.title.ilike(term),
+                ContentPost.excerpt.ilike(term),
+                ContentPost.category.ilike(term),
+            )
+        )
+    return query.order_by(ContentPost.published_at.desc().nullslast(), ContentPost.id.desc()).all()
+
+
+@router.post("/content", response_model=ContentPostResponse, status_code=201)
+def create_content(payload: ContentPostCreate, db: Session = Depends(get_db)):
+    base_slug = slugify(payload.slug or payload.title)
+    if not base_slug:
+        raise HTTPException(status_code=400, detail="Invalid title for slug")
+
+    post = ContentPost(
+        **payload.model_dump(exclude={"slug"}),
+        slug=_unique_slug(db, base_slug),
+    )
+    _apply_publish_state(post)
+    db.add(post)
+    db.commit()
+    db.refresh(post)
+    return post
+
+
+@router.put("/content/{post_id}", response_model=ContentPostResponse)
+def update_content(
+    post_id: int,
+    payload: ContentPostUpdate,
+    db: Session = Depends(get_db),
+):
+    post = db.query(ContentPost).filter(ContentPost.id == post_id).first()
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+
+    data = payload.model_dump(exclude_unset=True)
+    if "slug" in data and data["slug"]:
+        data["slug"] = _unique_slug(db, slugify(data["slug"]), exclude_id=post_id)
+    elif "title" in data and data["title"]:
+        data["slug"] = _unique_slug(db, slugify(data["title"]), exclude_id=post_id)
+
+    for field, value in data.items():
+        setattr(post, field, value)
+
+    _apply_publish_state(post)
+    db.commit()
+    db.refresh(post)
+    return post
+
+
+@router.delete("/content/{post_id}", response_model=MessageResponse)
+def delete_content(post_id: int, db: Session = Depends(get_db)):
+    post = db.query(ContentPost).filter(ContentPost.id == post_id).first()
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    db.delete(post)
+    db.commit()
+    return MessageResponse(message="Post deleted successfully")
+
+
+# ─── Offers CRUD ─────────────────────────────────────────────────────────────────
+
+def _unique_offer_slug(db: Session, base_slug: str, exclude_id: int | None = None) -> str:
+    slug = base_slug
+    counter = 1
+    while True:
+        query = db.query(Offer).filter(Offer.slug == slug)
+        if exclude_id:
+            query = query.filter(Offer.id != exclude_id)
+        if not query.first():
+            return slug
+        slug = f"{base_slug}-{counter}"
+        counter += 1
+
+
+@router.get("/offers", response_model=list[OfferResponse])
+def admin_list_offers(
+    search: str | None = Query(None),
+    offer_type: str | None = Query(None),
+    is_active: bool | None = Query(None),
+    db: Session = Depends(get_db),
+):
+    query = db.query(Offer)
+    if offer_type:
+        query = query.filter(Offer.offer_type == offer_type)
+    if is_active is not None:
+        query = query.filter(Offer.is_active == is_active)
+    if search:
+        term = f"%{search.lower()}%"
+        query = query.filter(
+            or_(
+                Offer.title.ilike(term),
+                Offer.description.ilike(term),
+                Offer.badge_text.ilike(term),
+            )
+        )
+    return query.order_by(Offer.sort_order.asc(), Offer.id.desc()).all()
+
+
+@router.post("/offers", response_model=OfferResponse, status_code=201)
+def create_offer(payload: OfferCreate, db: Session = Depends(get_db)):
+    base_slug = slugify(payload.slug or payload.title)
+    if not base_slug:
+        raise HTTPException(status_code=400, detail="Invalid title for slug")
+
+    offer = Offer(
+        **payload.model_dump(exclude={"slug"}),
+        slug=_unique_offer_slug(db, base_slug),
+    )
+    db.add(offer)
+    db.commit()
+    db.refresh(offer)
+    return offer
+
+
+@router.put("/offers/{offer_id}", response_model=OfferResponse)
+def update_offer(
+    offer_id: int,
+    payload: OfferUpdate,
+    db: Session = Depends(get_db),
+):
+    offer = db.query(Offer).filter(Offer.id == offer_id).first()
+    if not offer:
+        raise HTTPException(status_code=404, detail="Offer not found")
+
+    data = payload.model_dump(exclude_unset=True)
+    if "slug" in data and data["slug"]:
+        data["slug"] = _unique_offer_slug(db, slugify(data["slug"]), exclude_id=offer_id)
+    elif "title" in data and data["title"]:
+        data["slug"] = _unique_offer_slug(db, slugify(data["title"]), exclude_id=offer_id)
+
+    for field, value in data.items():
+        setattr(offer, field, value)
+
+    db.commit()
+    db.refresh(offer)
+    return offer
+
+
+@router.delete("/offers/{offer_id}", response_model=MessageResponse)
+def delete_offer(offer_id: int, db: Session = Depends(get_db)):
+    offer = db.query(Offer).filter(Offer.id == offer_id).first()
+    if not offer:
+        raise HTTPException(status_code=404, detail="Offer not found")
+    storage_service.delete_media(offer.image_url)
+    db.delete(offer)
+    db.commit()
+    return MessageResponse(message="Offer deleted successfully")
+
+
+@router.post("/offers/{offer_id}/image", response_model=ImageUploadResponse)
+async def upload_offer_image(
+    offer_id: int,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+):
+    offer = db.query(Offer).filter(Offer.id == offer_id).first()
+    if not offer:
+        raise HTTPException(status_code=404, detail="Offer not found")
+
+    content = await file.read()
+    image_url = storage_service.upload_offer_image(file, content)
+
+    if offer.image_url:
+        storage_service.delete_media(offer.image_url)
+
+    offer.image_url = image_url
+    db.commit()
+
+    return ImageUploadResponse(image_url=image_url, message="Image uploaded successfully")
+
+
+@router.delete("/offers/{offer_id}/image", response_model=MessageResponse)
+def delete_offer_image(offer_id: int, db: Session = Depends(get_db)):
+    offer = db.query(Offer).filter(Offer.id == offer_id).first()
+    if not offer:
+        raise HTTPException(status_code=404, detail="Offer not found")
+    if not offer.image_url:
+        raise HTTPException(status_code=404, detail="No image on this offer")
+
+    storage_service.delete_media(offer.image_url)
+    offer.image_url = None
+    db.commit()
+    return MessageResponse(message="Image removed successfully")

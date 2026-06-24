@@ -9,6 +9,12 @@ const IELTSPTETraining = lazy(() => import('./pages/IELTSPTETraining'));
 const EducationLoans = lazy(() => import('./pages/EducationLoans'));
 const SuccessStories = lazy(() => import('./pages/SuccessStories'));
 const ContactUs = lazy(() => import('./pages/ContactUs'));
+const SignIn = lazy(() => import('./pages/SignIn'));
+const NewsListPage = lazy(() => import('./pages/ContentHub').then((m) => ({ default: m.NewsListPage })));
+const NewsDetailPage = lazy(() => import('./pages/ContentHub').then((m) => ({ default: m.NewsDetailPage })));
+const BlogListPage = lazy(() => import('./pages/ContentHub').then((m) => ({ default: m.BlogListPage })));
+const BlogDetailPage = lazy(() => import('./pages/ContentHub').then((m) => ({ default: m.BlogDetailPage })));
+const Offers = lazy(() => import('./pages/Offers'));
 
 function PageLoader() {
   return (
@@ -35,6 +41,12 @@ export default function App() {
             <Route path="/education-loans" element={<EducationLoans />} />
             <Route path="/refer-and-earn" element={<ReferAndEarn />} />
             <Route path="/success-stories" element={<SuccessStories />} />
+            <Route path="/news" element={<NewsListPage />} />
+            <Route path="/news/:slug" element={<NewsDetailPage />} />
+            <Route path="/blog" element={<BlogListPage />} />
+            <Route path="/blog/:slug" element={<BlogDetailPage />} />
+            <Route path="/offers" element={<Offers />} />
+            <Route path="/sign-in" element={<SignIn />} />
             <Route path="/contact-us" element={<ContactUs />} />
           </Routes>
         </Suspense>

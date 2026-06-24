@@ -196,6 +196,150 @@ class MessageResponse(BaseModel):
     message: str
 
 
+# ─── News & Blog ───────────────────────────────────────────────────────────────
+
+class ContentPostCreate(BaseModel):
+    content_type: str = Field(..., pattern="^(news|blog)$")
+    title: str = Field(..., min_length=3, max_length=250)
+    slug: Optional[str] = Field(None, max_length=280)
+    excerpt: Optional[str] = Field(None, max_length=500)
+    body: str = Field(..., min_length=10)
+    cover_image_url: Optional[str] = Field(None, max_length=500)
+    author: str = Field(default="Vision Team", max_length=120)
+    category: Optional[str] = Field(None, max_length=100)
+    is_published: bool = False
+    is_featured: bool = False
+
+
+class ContentPostUpdate(BaseModel):
+    title: Optional[str] = Field(None, min_length=3, max_length=250)
+    slug: Optional[str] = Field(None, max_length=280)
+    excerpt: Optional[str] = Field(None, max_length=500)
+    body: Optional[str] = Field(None, min_length=10)
+    cover_image_url: Optional[str] = Field(None, max_length=500)
+    author: Optional[str] = Field(None, max_length=120)
+    category: Optional[str] = Field(None, max_length=100)
+    is_published: Optional[bool] = None
+    is_featured: Optional[bool] = None
+
+
+class ContentPostResponse(BaseModel):
+    id: int
+    content_type: str
+    title: str
+    slug: str
+    excerpt: Optional[str]
+    body: str
+    cover_image_url: Optional[str]
+    author: str
+    category: Optional[str]
+    is_published: bool
+    is_featured: bool
+    published_at: Optional[datetime]
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class ContentPostPublicResponse(BaseModel):
+    id: int
+    content_type: str
+    title: str
+    slug: str
+    excerpt: Optional[str]
+    body: str
+    cover_image_url: Optional[str]
+    author: str
+    category: Optional[str]
+    is_featured: bool
+    published_at: Optional[datetime]
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+# ─── Offers ────────────────────────────────────────────────────────────────────
+
+OFFER_TYPES = ("laptop", "scholarship", "test_prep", "visa", "gadget", "financial", "other")
+
+
+class OfferCreate(BaseModel):
+    title: str = Field(..., min_length=3, max_length=200)
+    slug: Optional[str] = Field(None, max_length=220)
+    description: str = Field(..., min_length=10)
+    offer_type: str = Field(..., pattern="^(laptop|scholarship|test_prep|visa|gadget|financial|other)$")
+    badge_text: Optional[str] = Field(None, max_length=50)
+    image_url: Optional[str] = Field(None, max_length=500)
+    terms: Optional[str] = None
+    cta_label: str = Field(default="Claim Offer", max_length=80)
+    cta_link: str = Field(default="/contact-us", max_length=300)
+    is_active: bool = True
+    is_featured: bool = False
+    sort_order: int = 0
+    valid_until: Optional[str] = Field(None, max_length=30)
+
+
+class OfferUpdate(BaseModel):
+    title: Optional[str] = Field(None, min_length=3, max_length=200)
+    slug: Optional[str] = Field(None, max_length=220)
+    description: Optional[str] = Field(None, min_length=10)
+    offer_type: Optional[str] = Field(None, pattern="^(laptop|scholarship|test_prep|visa|gadget|financial|other)$")
+    badge_text: Optional[str] = Field(None, max_length=50)
+    image_url: Optional[str] = Field(None, max_length=500)
+    terms: Optional[str] = None
+    cta_label: Optional[str] = Field(None, max_length=80)
+    cta_link: Optional[str] = Field(None, max_length=300)
+    is_active: Optional[bool] = None
+    is_featured: Optional[bool] = None
+    sort_order: Optional[int] = None
+    valid_until: Optional[str] = Field(None, max_length=30)
+
+
+class OfferResponse(BaseModel):
+    id: int
+    title: str
+    slug: str
+    description: str
+    offer_type: str
+    badge_text: Optional[str]
+    image_url: Optional[str]
+    terms: Optional[str]
+    cta_label: str
+    cta_link: str
+    is_active: bool
+    is_featured: bool
+    sort_order: int
+    valid_until: Optional[str]
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class OfferPublicResponse(BaseModel):
+    id: int
+    title: str
+    slug: str
+    description: str
+    offer_type: str
+    badge_text: Optional[str]
+    image_url: Optional[str]
+    terms: Optional[str]
+    cta_label: str
+    cta_link: str
+    is_featured: bool
+    sort_order: int
+    valid_until: Optional[str]
+
+    model_config = {"from_attributes": True}
+
+
+class ImageUploadResponse(BaseModel):
+    image_url: str
+    message: str
+
+
 # ─── Education Loan ────────────────────────────────────────────────────────────
 
 class EducationLoanCreate(BaseModel):

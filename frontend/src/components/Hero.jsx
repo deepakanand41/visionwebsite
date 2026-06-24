@@ -24,7 +24,7 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="relative min-h-screen flex items-center overflow-hidden pt-20 text-white"
+      className="relative min-h-screen flex items-center overflow-hidden pt-32 text-white"
       style={{ background: T.gradientHero }}
     >
       <div
