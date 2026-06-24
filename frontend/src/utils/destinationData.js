@@ -1,26 +1,26 @@
 export const mainDestinations = [
-  { slug: 'canada', name: 'Canada', flag: '🇨🇦' },
-  { slug: 'australia', name: 'Australia', flag: '🇦🇺' },
-  { slug: 'united-kingdom', name: 'United Kingdom', flag: '🇬🇧' },
-  { slug: 'united-states', name: 'United States', flag: '🇺🇸' },
-  { slug: 'new-zealand', name: 'New Zealand', flag: '🇳🇿' },
+  { slug: 'canada', name: 'Canada', flag: '🇨🇦', flagCode: 'ca' },
+  { slug: 'australia', name: 'Australia', flag: '🇦🇺', flagCode: 'au' },
+  { slug: 'united-kingdom', name: 'United Kingdom', flag: '🇬🇧', flagCode: 'gb' },
+  { slug: 'united-states', name: 'United States', flag: '🇺🇸', flagCode: 'us' },
+  { slug: 'new-zealand', name: 'New Zealand', flag: '🇳🇿', flagCode: 'nz' },
 ];
 
 export const europeDestinations = [
-  { slug: 'france', name: 'France', flag: '🇫🇷' },
-  { slug: 'germany', name: 'Germany', flag: '🇩🇪' },
-  { slug: 'denmark', name: 'Denmark', flag: '🇩🇰' },
-  { slug: 'sweden', name: 'Sweden', flag: '🇸🇪' },
-  { slug: 'finland', name: 'Finland', flag: '🇫🇮' },
-  { slug: 'latvia', name: 'Latvia', flag: '🇱🇻' },
-  { slug: 'lithuania', name: 'Lithuania', flag: '🇱🇹' },
+  { slug: 'france', name: 'France', flag: '🇫🇷', flagCode: 'fr' },
+  { slug: 'germany', name: 'Germany', flag: '🇩🇪', flagCode: 'de' },
+  { slug: 'denmark', name: 'Denmark', flag: '🇩🇰', flagCode: 'dk' },
+  { slug: 'sweden', name: 'Sweden', flag: '🇸🇪', flagCode: 'se' },
+  { slug: 'finland', name: 'Finland', flag: '🇫🇮', flagCode: 'fi' },
+  { slug: 'latvia', name: 'Latvia', flag: '🇱🇻', flagCode: 'lv' },
+  { slug: 'lithuania', name: 'Lithuania', flag: '🇱🇹', flagCode: 'lt' },
 ];
 
 export const otherDestinations = [
-  { slug: 'singapore', name: 'Singapore', flag: '🇸🇬' },
-  { slug: 'cyprus', name: 'Cyprus', flag: '🇨🇾' },
-  { slug: 'malta', name: 'Malta', flag: '🇲🇹' },
-  { slug: 'mauritius', name: 'Mauritius', flag: '🇲🇺' },
+  { slug: 'singapore', name: 'Singapore', flag: '🇸🇬', flagCode: 'sg' },
+  { slug: 'cyprus', name: 'Cyprus', flag: '🇨🇾', flagCode: 'cy' },
+  { slug: 'malta', name: 'Malta', flag: '🇲🇹', flagCode: 'mt' },
+  { slug: 'mauritius', name: 'Mauritius', flag: '🇲🇺', flagCode: 'mu' },
 ];
 
 /** @deprecated Use mainDestinations, europeDestinations, or otherDestinations */

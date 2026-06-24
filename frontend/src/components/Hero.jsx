@@ -127,6 +127,16 @@ export default function Hero() {
           >
             <div className="relative w-full max-w-lg mx-auto">
               <div
+                className="absolute top-4 left-4 sm:top-5 sm:left-5 w-32 h-24 sm:w-36 sm:h-28 rounded-2xl overflow-hidden shadow-xl border-2 border-white hidden sm:block z-30"
+              >
+                <img
+                  src="/images/campus-students.png"
+                  alt="Students on university campus"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
+              <div
                 className="relative rounded-3xl overflow-hidden shadow-2xl border-4"
                 style={{ borderColor: T.red }}
               >
@@ -136,29 +146,19 @@ export default function Hero() {
                   className="w-full h-[420px] object-cover"
                 />
                 <div
-                  className="absolute inset-0"
-                  style={{ background: 'linear-gradient(to top, rgba(17,17,17,0.85) 0%, transparent 50%)' }}
+                  className="absolute inset-0 z-10 pointer-events-none"
+                  style={{ background: 'linear-gradient(to top, rgba(17,17,17,0.9) 0%, rgba(17,17,17,0.35) 45%, transparent 70%)' }}
                 />
-                <div className="absolute bottom-0 left-0 right-0 p-6">
+                <div className="absolute bottom-0 left-0 right-0 p-6 z-20">
                   <p className="text-white font-bold text-lg">Dream. Explore. Achieve.</p>
                   <p className="text-gray-300 text-sm mt-1">Study at top universities worldwide</p>
                 </div>
               </div>
 
-              <div
-                className="absolute -bottom-6 -left-6 w-40 h-32 rounded-2xl overflow-hidden shadow-xl border-2 border-white hidden sm:block"
-              >
-                <img
-                  src="/images/campus-students.png"
-                  alt="Students on university campus"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-
               <motion.div
                 animate={{ y: [0, -8, 0] }}
                 transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
-                className="absolute -right-4 top-8 bg-white rounded-2xl shadow-xl px-4 py-3 flex items-center gap-3"
+                className="absolute -right-4 top-8 bg-white rounded-2xl shadow-xl px-4 py-3 flex items-center gap-3 z-20"
               >
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: T.redSoft }}>
                   <FaUserGraduate style={{ color: T.red }} />
@@ -172,7 +172,7 @@ export default function Hero() {
               <motion.div
                 animate={{ y: [0, 8, 0] }}
                 transition={{ repeat: Infinity, duration: 3.5, ease: 'easeInOut' }}
-                className="absolute -right-2 bottom-16 bg-white rounded-2xl shadow-xl px-4 py-3 flex items-center gap-3"
+                className="absolute -right-2 bottom-20 bg-white rounded-2xl shadow-xl px-4 py-3 flex items-center gap-3 z-20"
               >
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: T.redSoft }}>
                   <FaCheckCircle style={{ color: T.red }} />

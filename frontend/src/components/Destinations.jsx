@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { FiArrowRight } from 'react-icons/fi';
@@ -144,9 +144,14 @@ const cardVariants = {
   }),
 };
 
+function flagImageUrl(flagCode) {
+  return `https://flagcdn.com/w640/${flagCode}.png`;
+}
+
 function DestCard({ dest, index }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-50px' });
+  const [flagError, setFlagError] = useState(false);
 
   return (
     <motion.div
@@ -159,30 +164,38 @@ function DestCard({ dest, index }) {
       className="group bg-white rounded-3xl overflow-hidden border border-gray-100 transition-all duration-300 cursor-pointer"
       style={{ boxShadow: '0 4px 20px rgba(165,0,0,0.07)' }}
     >
-      <div
-        className={`relative h-40 bg-gradient-to-br ${dest.gradient} flex items-center justify-center overflow-hidden`}
-      >
-        <div className="absolute inset-0 opacity-10">
-          <svg viewBox="0 0 300 160" className="w-full h-full">
-            <circle cx="250" cy="20" r="80" fill="white" />
-            <circle cx="30" cy="130" r="60" fill="white" />
-          </svg>
-        </div>
-        <span className="text-7xl relative z-10 drop-shadow-lg">{dest.flag}</span>
-        <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 px-3 flex-wrap">
+      <div className="relative h-36 shrink-0 overflow-hidden bg-gray-100">
+        {dest.flagCode && !flagError ? (
+          <img
+            src={flagImageUrl(dest.flagCode)}
+            alt={`${dest.name} flag`}
+            loading="lazy"
+            onError={() => setFlagError(true)}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div
+            className={`w-full h-full bg-gradient-to-br ${dest.gradient} flex items-center justify-center`}
+          >
+            <span className="text-6xl drop-shadow-lg">{dest.flag}</span>
+          </div>
+        )}
+      </div>
+
+      <div className="relative z-10 p-5 bg-white">
+        <h3 className="font-bold text-xl text-gray-800 mb-2">{dest.name}</h3>
+
+        <div className="flex flex-wrap gap-1.5 mb-3">
           {dest.highlights.map((h) => (
             <span
               key={h}
-              className="px-2 py-0.5 rounded-full text-xs font-medium bg-white/25 text-white backdrop-blur-sm"
+              className="px-2 py-0.5 rounded-full text-xs font-medium"
+              style={{ background: T.redSoft, color: T.red }}
             >
               {h}
             </span>
           ))}
         </div>
-      </div>
-
-      <div className="p-5">
-        <h3 className="font-bold text-xl text-gray-800 mb-1">{dest.name}</h3>
         <p className="text-xs font-semibold mb-2" style={{ color: dest.color }}>
           {dest.tagline}
         </p>
