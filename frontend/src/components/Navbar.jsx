@@ -19,7 +19,6 @@ const navLinks = [
 const topBarLinks = [
   { label: 'News & Articles', to: '/news' },
   { label: 'Blog', to: '/blog' },
-  { label: 'Offers', to: '/offers' },
   { label: 'Contact Us', to: '/contact-us' },
 ];
 
@@ -225,8 +224,7 @@ export default function Navbar() {
   const isTopLinkActive = (path) =>
     location.pathname === path
     || (path === '/news' && location.pathname.startsWith('/news'))
-    || (path === '/blog' && location.pathname.startsWith('/blog'))
-    || (path === '/offers' && location.pathname.startsWith('/offers'));
+    || (path === '/blog' && location.pathname.startsWith('/blog'));
 
   return (
     <motion.header
@@ -234,7 +232,7 @@ export default function Navbar() {
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
       className={`fixed top-0 left-0 right-0 z-50 bg-white transition-shadow duration-300 ${
-        scrolled ? 'shadow-lg' : 'border-b border-gray-100'
+        scrolled ? 'shadow-lg' : ''
       }`}
     >
       {/* Desktop: logo spans both rows; dark bg only on top-tab row */}
@@ -242,12 +240,12 @@ export default function Navbar() {
         <div className="grid grid-cols-[minmax(200px,240px)_1fr]">
           <Link
             to="/"
-            className="row-span-2 flex items-center justify-center px-5 py-4 bg-white border-r border-gray-100"
+            className="row-span-2 flex items-center justify-center px-5 py-4 bg-white"
           >
             <Logo className="h-[5.25rem] w-auto max-w-[210px]" />
           </Link>
 
-          <div className="flex items-center justify-end h-10 px-6 bg-white border-b border-gray-100">
+          <div className="flex items-center justify-end h-10 px-6 bg-white">
             <div
               className="inline-flex items-center gap-1 h-full px-4 text-white text-xs"
               style={{ background: '#111111' }}
@@ -280,7 +278,7 @@ export default function Navbar() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between gap-3 px-4 py-3 bg-white min-h-[4.25rem]">
+          <div className="flex items-center justify-between gap-3 px-4 pt-4 pb-3 bg-white min-h-[4.25rem]">
             <nav className="flex items-center gap-1 flex-1 min-w-0">
               <div className="relative" ref={dropdownRef}>
                 <button

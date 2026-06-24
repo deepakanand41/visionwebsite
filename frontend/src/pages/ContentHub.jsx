@@ -112,7 +112,7 @@ function ContentDetail({ type }) {
 
   return (
     <main>
-      <section className="pt-32 pb-10 bg-white border-b border-gray-100">
+      <section className="pt-32 lg:pt-36 pb-10 bg-white border-b border-gray-100">
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <Link to={listPath} className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-[#A50000] mb-6">
             <FiArrowLeft /> Back to {listLabel}

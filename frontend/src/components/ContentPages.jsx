@@ -67,7 +67,7 @@ export function ContentCard({ post, basePath }) {
 
 export function ContentListHero({ badge, title, highlight, subtitle }) {
   return (
-    <section className="pt-32 pb-12 text-white" style={{ background: T.gradientHero }}>
+    <section className="pt-32 lg:pt-36 pb-12 text-white" style={{ background: T.gradientHero }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <div
           className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-4 border border-white/15"

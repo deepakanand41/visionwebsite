@@ -81,7 +81,7 @@ export function PageHero({
   enquiryCountry,
 }) {
   return (
-    <section className="pt-28 pb-12 bg-white">
+    <section className="pt-28 lg:pt-36 pb-12 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
           <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}>
@@ -158,9 +158,9 @@ export function PageHero({
 
 export function TabNavigation({ tabs, activeTab, onTabClick }) {
   return (
-    <div className="sticky top-[72px] z-40 bg-white border-b border-gray-200 shadow-sm">
+    <div className="sticky top-[5rem] lg:top-[7.75rem] z-40 bg-white shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex gap-1 overflow-x-auto scrollbar-hide py-0">
+        <div className="flex gap-1 overflow-x-auto scrollbar-hide py-1">
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -230,7 +230,7 @@ export function PromoBanner() {
 
 export function ContentSection({ section, accentColor }) {
   return (
-    <section id={section.id} className="py-12 border-b border-gray-100 scroll-mt-36">
+    <section id={section.id} className="py-12 border-b border-gray-100 scroll-mt-44 lg:scroll-mt-48">
       <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">{section.title}</h2>
       <div className="w-16 h-1 rounded-full mb-6" style={{ background: accentColor || '#A50000' }} />
       {section.highlight && (
@@ -263,7 +263,7 @@ export function ContentSection({ section, accentColor }) {
 export function ServiceHero({ badge, title, highlight, subtitle, features, ctaLink = '/contact-us' }) {
   return (
     <section
-      className="pt-28 pb-16 relative overflow-hidden"
+      className="pt-28 lg:pt-36 pb-16 relative overflow-hidden"
       style={{ background: 'linear-gradient(135deg, #111111 0%, #1a1a1a 40%, #7A0000 100%)' }}
     >
       <div className="absolute inset-0 opacity-10 pointer-events-none">

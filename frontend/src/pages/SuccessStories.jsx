@@ -34,7 +34,7 @@ export default function SuccessStories() {
 
   if (loading) {
     return (
-      <main className="min-h-screen flex items-center justify-center text-gray-500 pt-28">
+      <main className="min-h-screen flex items-center justify-center text-gray-500 pt-28 lg:pt-36">
         Loading success stories...
       </main>
     );

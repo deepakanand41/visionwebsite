@@ -271,7 +271,7 @@ export default function ReferAndEarn() {
     <>
       {/* ── Left: Hero + How It Works + Benefits + FAQ | Right: Registration ── */}
       <section
-        className="pt-28 pb-16"
+        className="pt-28 lg:pt-36 pb-16"
         style={{ background: 'linear-gradient(135deg, #fff5f5 0%, #ffffff 100%)' }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -5,7 +5,7 @@ import { HOME_THEME as T } from '../utils/constants';
 export default function SignIn() {
   return (
     <main>
-      <section className="pt-32 pb-16 min-h-[70vh] flex items-center" style={{ background: T.gradientLight }}>
+      <section className="pt-32 lg:pt-36 pb-16 min-h-[70vh] flex items-center" style={{ background: T.gradientLight }}>
         <div className="max-w-md mx-auto px-4 w-full">
           <div
             className="bg-white rounded-3xl border border-gray-100 p-8 text-center"
