@@ -3,8 +3,10 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
+from app.services.storage import storage_service
 from app.database import Base, engine
 from app.migrate import run_migrations
 from app.seed import seed_testimonials
@@ -40,7 +42,13 @@ STATIC_DIR = Path(__file__).parent / "static" / "admin"
 
 @app.get("/api/health")
 def health_check():
-    return {"status": "ok", "service": "vision-fastapi-backend"}
+    return {
+        "status": "ok",
+        "service": "vision-fastapi-backend",
+        "storage_backend": storage_service.backend_name(),
+        "upload_max_image_mb": settings.upload_max_bytes // (1024 * 1024),
+        "upload_max_video_mb": settings.upload_max_video_bytes // (1024 * 1024),
+    }
 
 
 @app.get("/admin/{secret_key}", response_class=HTMLResponse)
@@ -61,3 +69,8 @@ def admin_static(filename: str):
     if not file_path.exists():
         raise HTTPException(status_code=404)
     return FileResponse(file_path)
+
+
+UPLOAD_DIR = Path(__file__).resolve().parents[1] / settings.local_upload_dir
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")

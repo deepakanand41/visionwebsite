@@ -3,6 +3,7 @@ import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { FaQuoteLeft } from 'react-icons/fa';
 import { useTestimonials } from '../hooks/useTestimonials';
+import StoryMedia from './StoryMedia';
 import { HOME_THEME as T } from '../utils/constants';
 
 function StarRating({ rating }) {
@@ -92,16 +93,22 @@ export default function Testimonials() {
           {/* Desktop: 3 cards */}
           <div className="hidden md:grid md:grid-cols-3 gap-6">
             <AnimatePresence mode="popLayout">
-              {visibleTestimonials.map((t, idx) => (
+              {visibleTestimonials.map((t, idx) => {
+                const hasMedia = t.mediaUrl && t.mediaType;
+                return (
                 <motion.div
-                  key={`${t.name}-${current}-${idx}`}
+                  key={`${t.id || t.name}-${current}-${idx}`}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.4, delay: idx * 0.1 }}
-                  className="bg-white rounded-2xl p-6 border border-gray-100 flex flex-col"
+                  className={`bg-white rounded-2xl border border-gray-100 flex flex-col overflow-hidden ${hasMedia ? '' : 'p-6'}`}
                   style={{ boxShadow: '0 4px 20px rgba(165,0,0,0.07)' }}
                 >
+                  {hasMedia && (
+                    <StoryMedia mediaType={t.mediaType} mediaUrl={t.mediaUrl} className="aspect-video w-full" />
+                  )}
+                  <div className={hasMedia ? 'p-6 flex flex-col flex-1' : 'flex flex-col flex-1'}>
                   <FaQuoteLeft className="text-2xl mb-4" style={{ color: 'rgba(165,0,0,0.15)' }} />
                   <p className="text-gray-600 text-sm leading-relaxed flex-1 mb-5">"{t.review}"</p>
                   <div>
@@ -120,8 +127,9 @@ export default function Testimonials() {
                       </div>
                     </div>
                   </div>
+                  </div>
                 </motion.div>
-              ))}
+              );})}
             </AnimatePresence>
           </div>
 
@@ -134,9 +142,17 @@ export default function Testimonials() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -direction * 40 }}
                 transition={{ duration: 0.35 }}
-                className="bg-white rounded-2xl p-6 border border-gray-100"
+                className={`bg-white rounded-2xl border border-gray-100 overflow-hidden ${testimonials[current].mediaUrl ? '' : 'p-6'}`}
                 style={{ boxShadow: '0 4px 20px rgba(165,0,0,0.07)' }}
               >
+                {testimonials[current].mediaUrl && testimonials[current].mediaType && (
+                  <StoryMedia
+                    mediaType={testimonials[current].mediaType}
+                    mediaUrl={testimonials[current].mediaUrl}
+                    className="aspect-video w-full"
+                  />
+                )}
+                <div className={testimonials[current].mediaUrl ? 'p-6' : ''}>
                 <FaQuoteLeft className="text-2xl mb-4" style={{ color: 'rgba(165,0,0,0.15)' }} />
                 <p className="text-gray-600 text-sm leading-relaxed mb-5">"{testimonials[current].review}"</p>
                 <StarRating rating={testimonials[current].rating} />
@@ -152,6 +168,7 @@ export default function Testimonials() {
                     <div className="text-xs text-gray-500">{testimonials[current].course} · {testimonials[current].destination}</div>
                     <div className="text-xs font-medium mt-0.5" style={{ color: T.red }}>{testimonials[current].university}</div>
                   </div>
+                </div>
                 </div>
               </motion.div>
             </AnimatePresence>

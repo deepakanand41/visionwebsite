@@ -13,6 +13,8 @@ MIGRATIONS = [
     ("referral_applications", "status", "VARCHAR(30) NOT NULL DEFAULT 'pending'"),
     ("referral_applications", "admin_notes", "TEXT"),
     ("referral_applications", "status_updated_at", "TIMESTAMP WITH TIME ZONE"),
+    ("testimonials", "media_type", "VARCHAR(10)"),
+    ("testimonials", "media_url", "VARCHAR(500)"),
 ]
 
 

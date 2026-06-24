@@ -145,6 +145,8 @@ class TestimonialCreate(BaseModel):
     highlight: Optional[str] = None
     is_active: bool = True
     sort_order: int = 0
+    media_type: Optional[str] = None
+    media_url: Optional[str] = None
 
 
 class TestimonialUpdate(BaseModel):
@@ -159,6 +161,8 @@ class TestimonialUpdate(BaseModel):
     highlight: Optional[str] = None
     is_active: Optional[bool] = None
     sort_order: Optional[int] = None
+    media_type: Optional[str] = None
+    media_url: Optional[str] = None
 
 
 class TestimonialResponse(BaseModel):
@@ -172,12 +176,20 @@ class TestimonialResponse(BaseModel):
     avatar_color: str
     initial: str
     highlight: Optional[str]
+    media_type: Optional[str] = None
+    media_url: Optional[str] = None
     is_active: bool
     sort_order: int
     created_at: datetime
     updated_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class MediaUploadResponse(BaseModel):
+    media_type: str
+    media_url: str
+    message: str
 
 
 class MessageResponse(BaseModel):

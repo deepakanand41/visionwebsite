@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
@@ -18,7 +18,9 @@ from app.schemas import (
     TestimonialResponse,
     StatusUpdate,
     MessageResponse,
+    MediaUploadResponse,
 )
+from app.services.storage import storage_service
 
 router = APIRouter(
     prefix="/api/admin",
@@ -285,6 +287,50 @@ def delete_testimonial(testimonial_id: int, db: Session = Depends(get_db)):
     if not testimonial:
         raise HTTPException(status_code=404, detail="Testimonial not found")
 
+    storage_service.delete_media(testimonial.media_url)
     db.delete(testimonial)
     db.commit()
     return MessageResponse(message="Testimonial deleted successfully")
+
+
+@router.post("/testimonials/{testimonial_id}/media", response_model=MediaUploadResponse)
+async def upload_testimonial_media(
+    testimonial_id: int,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+):
+    testimonial = db.query(Testimonial).filter(Testimonial.id == testimonial_id).first()
+    if not testimonial:
+        raise HTTPException(status_code=404, detail="Testimonial not found")
+
+    content = await file.read()
+    media_type, media_url = storage_service.upload_testimonial_media(file, content)
+
+    if testimonial.media_url:
+        storage_service.delete_media(testimonial.media_url)
+
+    testimonial.media_type = media_type
+    testimonial.media_url = media_url
+    db.commit()
+    db.refresh(testimonial)
+
+    return MediaUploadResponse(
+        media_type=media_type,
+        media_url=media_url,
+        message="Media uploaded successfully",
+    )
+
+
+@router.delete("/testimonials/{testimonial_id}/media", response_model=MessageResponse)
+def delete_testimonial_media(testimonial_id: int, db: Session = Depends(get_db)):
+    testimonial = db.query(Testimonial).filter(Testimonial.id == testimonial_id).first()
+    if not testimonial:
+        raise HTTPException(status_code=404, detail="Testimonial not found")
+    if not testimonial.media_url:
+        raise HTTPException(status_code=404, detail="No media on this testimonial")
+
+    storage_service.delete_media(testimonial.media_url)
+    testimonial.media_type = None
+    testimonial.media_url = None
+    db.commit()
+    return MessageResponse(message="Media removed successfully")

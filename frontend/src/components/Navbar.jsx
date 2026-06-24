@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
 import { FiMenu, FiX, FiChevronDown, FiChevronRight } from 'react-icons/fi';
-import { FaHandshake } from 'react-icons/fa';
 import {
   mainDestinations,
   europeDestinations,
@@ -12,7 +11,7 @@ import Logo from './Logo';
 
 const navLinks = [
   { label: 'Education Loans', to: '/education-loans' },
-  { label: 'Refer & Earn', to: '/refer-and-earn', highlight: true },
+  { label: 'Refer & Earn', to: '/refer-and-earn' },
   { label: 'Success Stories', to: '/success-stories' },
   { label: 'Contact Us', to: '/contact-us' },
 ];
@@ -202,22 +201,18 @@ export default function Navbar() {
   const closeEuropeMenu = () => setEuropeOpen(false);
   const closeOtherMenu = () => setOtherOpen(false);
 
-  const linkClass = (highlight, active) =>
+  const linkClass = (active) =>
     `flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg transition-colors whitespace-nowrap ${
-      highlight
-        ? `font-semibold ${active ? 'bg-red-50' : 'hover:opacity-90'}`
-        : active
-          ? 'font-semibold text-[#A50000] bg-red-50'
-          : 'font-medium text-gray-700 hover:text-red-800 hover:bg-red-50'
+      active
+        ? 'font-semibold text-[#A50000] bg-red-50'
+        : 'font-medium text-gray-700 hover:text-red-800 hover:bg-red-50'
     }`;
 
-  const mobileLinkClass = (highlight, active) =>
+  const mobileLinkClass = (active) =>
     `flex items-center gap-2 px-4 py-2.5 text-sm rounded-lg ${
-      highlight
-        ? `font-semibold ${active ? 'bg-red-50' : ''}`
-        : active
-          ? 'font-semibold text-[#A50000] bg-red-50'
-          : 'font-medium text-gray-700 hover:bg-red-50'
+      active
+        ? 'font-semibold text-[#A50000] bg-red-50'
+        : 'font-medium text-gray-700 hover:bg-red-50'
     }`;
 
   return (
@@ -332,10 +327,8 @@ export default function Navbar() {
                 <Link
                   key={link.label}
                   to={link.to}
-                  className={linkClass(link.highlight, active)}
-                  style={link.highlight ? { color: '#A50000' } : {}}
+                  className={linkClass(active)}
                 >
-                  {link.highlight && <FaHandshake size={13} />}
                   {link.label}
                 </Link>
               );
@@ -474,10 +467,8 @@ export default function Navbar() {
                   <Link
                     key={link.label}
                     to={link.to}
-                    className={mobileLinkClass(link.highlight, active)}
-                    style={link.highlight ? { color: '#A50000' } : {}}
+                    className={mobileLinkClass(active)}
                   >
-                    {link.highlight && <FaHandshake size={14} />}
                     {link.label}
                   </Link>
                 );

@@ -66,6 +66,8 @@
     .stat-pill { padding: 0.3rem 0.7rem; border-radius: 999px; font-size: 0.72rem; font-weight: 600; background: #f3f4f6; color: #374151; cursor: pointer; border: 1px solid transparent; }
     .stat-pill:hover, .stat-pill.active { border-color: #0A3D91; background: #eff6ff; color: #0A3D91; }
     .actions { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+    .media-thumb { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; border: 1px solid #e5e7eb; }
+    .media-badge { display: inline-block; padding: 0.15rem 0.45rem; border-radius: 6px; font-size: 0.65rem; font-weight: 700; background: #eff6ff; color: #1d4ed8; text-transform: uppercase; }
   </style>
 </head>
 <body>
@@ -141,6 +143,13 @@
           <div class="form-group"><label>Sort Order</label><input id="t-sort" type="number" value="0" /></div>
         </div>
         <div class="form-group"><label>Status</label><select id="t-active"><option value="true">Active</option><option value="false">Inactive</option></select></div>
+        <div class="form-group">
+          <label>Photo (max 10MB) or Video (max 40MB)</label>
+          <input id="t-media" type="file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime" />
+          <p style="font-size:0.75rem;color:#6b7280;margin-top:0.35rem;">JPEG, PNG, WebP, GIF, MP4, or WebM. Stored on S3 in production (EC2) or locally in development.</p>
+          <div id="t-media-preview" style="margin-top:0.75rem;display:none;"></div>
+          <button type="button" id="t-media-remove" class="btn btn-danger btn-sm" style="margin-top:0.5rem;display:none;" onclick="removeTestimonialMedia()">Remove media</button>
+        </div>
         <div class="form-actions">
           <button type="button" class="btn btn-secondary" onclick="closeTestimonialModal()">Cancel</button>
           <button type="submit" class="btn btn-primary">Save</button>
@@ -373,18 +382,25 @@
       const toolbar = `<div class="toolbar"><h2>Testimonials (${data.length})</h2>
         <button class="btn btn-primary" onclick="openTestimonialModal()">+ Add</button></div>`;
       if (!data.length) { panel.innerHTML = toolbar + filterBar('testimonials', activeFilter) + '<div class="empty">No testimonials found</div>'; return; }
-      const rows = data.map(t => `<tr>
+      const rows = data.map(t => {
+        const mediaCell = t.media_url
+          ? (t.media_type === 'video'
+            ? `<span class="media-badge">${t.media_type}</span>`
+            : `<img class="media-thumb" src="${mediaSrc(t.media_url)}" alt="" />`)
+          : '<span style="color:#9ca3af">—</span>';
+        return `<tr>
         <td>${t.id}</td><td>${t.name}</td><td>${t.destination}</td><td>${t.university}</td>
-        <td>${t.course}</td><td>${'★'.repeat(t.rating)}</td>
+        <td>${t.course}</td><td>${mediaCell}</td><td>${'★'.repeat(t.rating)}</td>
         <td><span class="badge ${t.is_active?'badge-active':'badge-inactive'}">${t.is_active?'Active':'Inactive'}</span></td>
         <td>${t.sort_order}</td>
         <td class="actions">
           <button class="btn btn-secondary btn-sm" onclick="editTestimonial(${t.id})">Edit</button>
           <button class="btn btn-danger btn-sm" onclick="deleteTestimonial(${t.id})">Delete</button>
         </td>
-      </tr>`).join('');
+      </tr>`;
+      }).join('');
       panel.innerHTML = toolbar + filterBar('testimonials', activeFilter) + `<div class="card"><table><thead><tr>
-        <th>ID</th><th>Name</th><th>Destination</th><th>University</th><th>Course</th>
+        <th>ID</th><th>Name</th><th>Destination</th><th>University</th><th>Course</th><th>Media</th>
         <th>Rating</th><th>Status</th><th>Order</th><th>Actions</th>
       </tr></thead><tbody>${rows}</tbody></table></div>`;
     }
@@ -419,7 +435,35 @@
     });
 
     // Testimonial CRUD
+    let pendingMediaRemove = false;
+
+    function mediaSrc(url) {
+      if (!url) return '';
+      return url.startsWith('http') ? url : url;
+    }
+
+    function renderTestimonialMediaPreview(data) {
+      const preview = document.getElementById('t-media-preview');
+      const removeBtn = document.getElementById('t-media-remove');
+      if (!data?.media_url) {
+        preview.style.display = 'none';
+        preview.innerHTML = '';
+        removeBtn.style.display = 'none';
+        return;
+      }
+      const src = mediaSrc(data.media_url);
+      preview.style.display = 'block';
+      removeBtn.style.display = 'inline-block';
+      if (data.media_type === 'video') {
+        preview.innerHTML = `<video src="${src}" controls style="width:100%;max-height:180px;border-radius:8px;background:#111;"></video>`;
+      } else {
+        preview.innerHTML = `<img src="${src}" alt="Preview" style="width:100%;max-height:180px;object-fit:cover;border-radius:8px;" />`;
+      }
+    }
+
     function openTestimonialModal(data = null) {
+      pendingMediaRemove = false;
+      document.getElementById('t-media').value = '';
       document.getElementById('t-modal-title').textContent = data ? 'Edit Testimonial' : 'Add Testimonial';
       document.getElementById('t-id').value = data?.id || '';
       document.getElementById('t-name').value = data?.name || '';
@@ -433,14 +477,59 @@
       document.getElementById('t-highlight').value = data?.highlight || '';
       document.getElementById('t-sort').value = data?.sort_order || 0;
       document.getElementById('t-active').value = data?.is_active !== false ? 'true' : 'false';
+      renderTestimonialMediaPreview(data);
       document.getElementById('testimonial-modal').classList.add('open');
     }
     function closeTestimonialModal() { document.getElementById('testimonial-modal').classList.remove('open'); }
     function editTestimonial(id) { const t = cache.testimonials.find(x => x.id === id); if (t) openTestimonialModal(t); }
 
+    document.getElementById('t-media').addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      pendingMediaRemove = false;
+      if (!file) return;
+      const isVideo = file.type.startsWith('video/');
+      const maxBytes = isVideo ? 40 * 1024 * 1024 : 10 * 1024 * 1024;
+      if (file.size > maxBytes) {
+        toast(isVideo ? 'Video must be smaller than 40MB' : 'Image must be smaller than 10MB', 'error');
+        e.target.value = '';
+        return;
+      }
+      const url = URL.createObjectURL(file);
+      const preview = document.getElementById('t-media-preview');
+      preview.style.display = 'block';
+      document.getElementById('t-media-remove').style.display = 'inline-block';
+      preview.innerHTML = isVideo
+        ? `<video src="${url}" controls style="width:100%;max-height:180px;border-radius:8px;background:#111;"></video>`
+        : `<img src="${url}" alt="Preview" style="width:100%;max-height:180px;object-fit:cover;border-radius:8px;" />`;
+    });
+
+    function removeTestimonialMedia() {
+      pendingMediaRemove = true;
+      document.getElementById('t-media').value = '';
+      document.getElementById('t-media-preview').style.display = 'none';
+      document.getElementById('t-media-preview').innerHTML = '';
+      document.getElementById('t-media-remove').style.display = 'none';
+    }
+
+    async function uploadTestimonialMedia(testimonialId, file) {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await fetch('/api/admin/testimonials/' + testimonialId + '/media', {
+        method: 'POST',
+        headers: { 'X-Admin-Secret': SECRET },
+        body: fd,
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || res.statusText);
+      }
+      return res.json();
+    }
+
     document.getElementById('testimonial-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const id = document.getElementById('t-id').value;
+      const mediaFile = document.getElementById('t-media').files?.[0];
       const payload = {
         name: document.getElementById('t-name').value,
         initial: document.getElementById('t-initial').value,
@@ -455,8 +544,19 @@
         is_active: document.getElementById('t-active').value === 'true',
       };
       try {
-        if (id) await api('/testimonials/' + id, { method: 'PUT', body: JSON.stringify(payload) });
-        else await api('/testimonials', { method: 'POST', body: JSON.stringify(payload) });
+        let testimonialId = id;
+        if (id) {
+          await api('/testimonials/' + id, { method: 'PUT', body: JSON.stringify(payload) });
+        } else {
+          const created = await api('/testimonials', { method: 'POST', body: JSON.stringify(payload) });
+          testimonialId = created.id;
+        }
+        if (pendingMediaRemove && testimonialId) {
+          await api('/testimonials/' + testimonialId + '/media', { method: 'DELETE' });
+        }
+        if (mediaFile && testimonialId) {
+          await uploadTestimonialMedia(testimonialId, mediaFile);
+        }
         toast(id ? 'Updated' : 'Created');
         closeTestimonialModal();
         loadAll();

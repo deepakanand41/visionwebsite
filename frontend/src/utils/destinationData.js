@@ -8,6 +8,7 @@ export const mainDestinations = [
 
 export const europeDestinations = [
   { slug: 'france', name: 'France', flag: '🇫🇷' },
+  { slug: 'germany', name: 'Germany', flag: '🇩🇪' },
   { slug: 'denmark', name: 'Denmark', flag: '🇩🇰' },
   { slug: 'sweden', name: 'Sweden', flag: '🇸🇪' },
   { slug: 'finland', name: 'Finland', flag: '🇫🇮' },

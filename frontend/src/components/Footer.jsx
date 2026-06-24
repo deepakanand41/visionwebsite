@@ -105,7 +105,7 @@ export default function Footer() {
       <div className="border-t border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-gray-300">
-            © {new Date().getFullYear()} Vision International Education & Visa Services. All rights reserved.
+            © {new Date().getFullYear()} Vision International Education Consultants. All rights reserved.
           </p>
           <div className="flex items-center gap-3">
             {socials.map(({ icon: Icon, href, label }) => (

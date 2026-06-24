@@ -115,6 +115,8 @@ class Testimonial(Base):
     avatar_color: Mapped[str] = mapped_column(String(20), default="#fde9d1")
     initial: Mapped[str] = mapped_column(String(5))
     highlight: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    media_type: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    media_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     sort_order: Mapped[int] = mapped_column(Integer, default=0)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)

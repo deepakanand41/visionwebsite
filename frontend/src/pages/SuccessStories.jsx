@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaQuoteLeft, FaGraduationCap } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { ServiceHero } from '../components/PageLayouts';
+import StoryMedia from '../components/StoryMedia';
 import { useTestimonials } from '../hooks/useTestimonials';
 
 const stats = [
@@ -49,7 +50,6 @@ export default function SuccessStories() {
         features={['15,000+ Happy Students', '20+ Countries', '98% Visa Success', '10+ Years Trust']}
       />
 
-      {/* Stats bar */}
       <section className="py-10 bg-white border-b border-gray-100">
         <div className="max-w-5xl mx-auto px-4 grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
           {stats.map((s) => (
@@ -61,7 +61,6 @@ export default function SuccessStories() {
         </div>
       </section>
 
-      {/* Filter */}
       <section className="py-8 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 flex flex-wrap gap-2 justify-center">
           {destinations.map((d) => (
@@ -81,51 +80,65 @@ export default function SuccessStories() {
         </div>
       </section>
 
-      {/* Stories grid */}
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <AnimatePresence mode="popLayout">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filtered.map((story, i) => (
-                <motion.div
-                  key={story.name}
-                  layout
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ delay: i * 0.05 }}
-                  className="bg-white rounded-2xl p-6 border border-gray-100 flex flex-col"
-                  style={{ boxShadow: '0 4px 20px rgba(165,0,0,0.07)' }}
-                >
-                  <FaQuoteLeft className="text-2xl mb-3" style={{ color: 'rgba(165,0,0,0.12)' }} />
-                  <p className="text-gray-600 text-sm leading-relaxed flex-1 mb-4">"{story.review}"</p>
+              {filtered.map((story, i) => {
+                const hasMedia = story.mediaUrl && story.mediaType;
+                const isVideo = story.mediaType === 'video';
+                return (
+                  <motion.div
+                    key={story.id || story.name}
+                    layout
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ delay: i * 0.05 }}
+                    className={`bg-white rounded-2xl border border-gray-100 flex flex-col overflow-hidden ${hasMedia ? '' : 'p-6'}`}
+                    style={{ boxShadow: '0 4px 20px rgba(165,0,0,0.07)' }}
+                  >
+                    {hasMedia && (
+                      <StoryMedia
+                        mediaType={story.mediaType}
+                        mediaUrl={story.mediaUrl}
+                        variant={isVideo ? 'reel' : 'default'}
+                        className={isVideo ? '' : 'aspect-[16/10] w-full'}
+                        alt={`${story.name} success story`}
+                      />
+                    )}
 
-                  <div className="px-3 py-1.5 rounded-full text-xs font-semibold mb-4 self-start" style={{ background: 'rgba(122,0,0,0.1)', color: '#7A0000' }}>
-                    ✓ {story.highlight || 'Success Story'}
-                  </div>
+                    <div className={hasMedia ? 'p-6 flex flex-col flex-1' : 'flex flex-col flex-1'}>
+                      <FaQuoteLeft className="text-2xl mb-3" style={{ color: 'rgba(165,0,0,0.12)' }} />
+                      <p className="text-gray-600 text-sm leading-relaxed flex-1 mb-4">"{story.review}"</p>
 
-                  <StarRating rating={story.rating} />
+                      <div className="px-3 py-1.5 rounded-full text-xs font-semibold mb-4 self-start" style={{ background: 'rgba(122,0,0,0.1)', color: '#7A0000' }}>
+                        ✓ {story.highlight || 'Success Story'}
+                      </div>
 
-                  <div className="mt-3 flex items-center gap-3 pt-3 border-t border-gray-100">
-                    <div className="w-11 h-11 rounded-full flex items-center justify-center font-bold text-sm shrink-0" style={{ background: story.avatarColor, color: '#333' }}>
-                      {story.initial}
-                    </div>
-                    <div>
-                      <div className="font-semibold text-gray-800 text-sm">{story.name}</div>
-                      <div className="text-xs text-gray-500">{story.course}</div>
-                      <div className="text-xs font-medium mt-0.5 flex items-center gap-1" style={{ color: '#A50000' }}>
-                        <FaGraduationCap size={10} /> {story.university} · {story.flag} {story.destination}
+                      <StarRating rating={story.rating} />
+
+                      <div className="mt-3 flex items-center gap-3 pt-3 border-t border-gray-100">
+                        <div className="w-11 h-11 rounded-full flex items-center justify-center font-bold text-sm shrink-0" style={{ background: story.avatarColor, color: '#333' }}>
+                          {story.initial}
+                        </div>
+                        <div>
+                          <div className="font-semibold text-gray-800 text-sm">{story.name}</div>
+                          <div className="text-xs text-gray-500">{story.course}</div>
+                          <div className="text-xs font-medium mt-0.5 flex items-center gap-1" style={{ color: '#A50000' }}>
+                            <FaGraduationCap size={10} /> {story.university} · {story.destination}
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                );
+              })}
             </div>
           </AnimatePresence>
         </div>
       </section>
 
-      {/* CTA */}
       <section className="py-16" style={{ background: 'linear-gradient(135deg, #A50000, #7A0000)' }}>
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Write Your Success Story With Us</h2>

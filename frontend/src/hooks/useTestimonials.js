@@ -13,6 +13,8 @@ function normalizeTestimonial(t) {
     avatarColor: t.avatar_color || t.avatarColor || '#fde9d1',
     initial: t.initial,
     highlight: t.highlight,
+    mediaType: t.media_type || t.mediaType || null,
+    mediaUrl: t.media_url || t.mediaUrl || null,
   };
 }
 
