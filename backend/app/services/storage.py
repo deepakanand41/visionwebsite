@@ -5,7 +5,6 @@ from pathlib import Path
 from fastapi import HTTPException, UploadFile
 
 from app.config import settings
-from app.services.ec2_detect import is_running_on_ec2
 
 ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif"}
 ALLOWED_VIDEO_TYPES = {"video/mp4", "video/webm", "video/quicktime"}
@@ -16,11 +15,15 @@ TESTIMONIAL_PREFIX = "testimonials"
 
 def _use_s3() -> bool:
     backend = settings.storage_backend.lower()
+    bucket_set = bool(settings.aws_s3_bucket.strip())
+
     if backend == "s3":
-        return bool(settings.aws_s3_bucket)
+        return bucket_set
     if backend == "local":
         return False
-    return is_running_on_ec2() and bool(settings.aws_s3_bucket)
+
+    # auto: S3 when APP_ENV=production and bucket is configured
+    return bucket_set and settings.is_production
 
 
 def _local_root() -> Path:

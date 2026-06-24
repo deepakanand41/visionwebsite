@@ -1,14 +1,24 @@
+from pathlib import Path
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+_BACKEND_DIR = Path(__file__).resolve().parent.parent
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=_BACKEND_DIR / ".env",
+        extra="ignore",
+    )
 
     database_url: str = "postgresql://postgres:password@localhost:5432/visionwebsite"
     admin_secret_key: str = "vision-admin-secret-2026"
     cors_origins: str = "http://localhost:5173"
 
-    # Storage: auto = S3 on EC2 when bucket configured, else local uploads
+    # development | production — set APP_ENV=production on the server
+    app_env: str = "development"
+
+    # Storage: auto = S3 in production when bucket configured, else local uploads
     storage_backend: str = "auto"
     local_upload_dir: str = "uploads"
     upload_max_bytes: int = 10 * 1024 * 1024
@@ -23,6 +33,10 @@ class Settings(BaseSettings):
     @property
     def cors_origin_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
+
+    @property
+    def is_production(self) -> bool:
+        return self.app_env.strip().lower() in ("production", "prod")
 
 
 settings = Settings()

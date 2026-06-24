@@ -42,10 +42,16 @@ STATIC_DIR = Path(__file__).parent / "static" / "admin"
 
 @app.get("/api/health")
 def health_check():
+    bucket = settings.aws_s3_bucket.strip()
     return {
         "status": "ok",
         "service": "vision-fastapi-backend",
+        "app_env": settings.app_env,
+        "is_production": settings.is_production,
         "storage_backend": storage_service.backend_name(),
+        "storage_mode": settings.storage_backend,
+        "s3_bucket_configured": bool(bucket),
+        "s3_bucket": bucket or None,
         "upload_max_image_mb": settings.upload_max_bytes // (1024 * 1024),
         "upload_max_video_mb": settings.upload_max_video_bytes // (1024 * 1024),
     }

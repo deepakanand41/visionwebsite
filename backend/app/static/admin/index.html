@@ -146,7 +146,7 @@
         <div class="form-group">
           <label>Photo (max 10MB) or Video (max 40MB)</label>
           <input id="t-media" type="file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime" />
-          <p style="font-size:0.75rem;color:#6b7280;margin-top:0.35rem;">JPEG, PNG, WebP, GIF, MP4, or WebM. Stored on S3 in production (EC2) or locally in development.</p>
+          <p style="font-size:0.75rem;color:#6b7280;margin-top:0.35rem;">JPEG, PNG, WebP, GIF, MP4, or WebM. Uses S3 when APP_ENV=production; otherwise stored locally.</p>
           <div id="t-media-preview" style="margin-top:0.75rem;display:none;"></div>
           <button type="button" id="t-media-remove" class="btn btn-danger btn-sm" style="margin-top:0.5rem;display:none;" onclick="removeTestimonialMedia()">Remove media</button>
         </div>

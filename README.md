@@ -74,14 +74,55 @@ When editing a testimonial, use **Photo or Video** to attach JPEG, PNG, WebP, GI
 
 Testimonial images and videos are stored via `backend/app/services/storage.py`:
 
-| Environment | Behaviour (`STORAGE_BACKEND=auto`) |
-|-------------|-----------------------------------|
-| Local dev | Files saved under `backend/uploads/` and served at `/uploads/...` |
-| EC2 production | Files uploaded to **AWS S3** when `AWS_S3_BUCKET` is set |
+| `APP_ENV` | `STORAGE_BACKEND=auto` behaviour |
+|-----------|----------------------------------|
+| `development` | Files saved under `backend/uploads/` |
+| `production` + `AWS_S3_BUCKET` set | Files uploaded to **AWS S3** |
+
+### Production `.env` (on EC2 server)
+
+Put this in `backend/.env`:
+
+```env
+APP_ENV=production
+STORAGE_BACKEND=auto
+AWS_S3_BUCKET=visionwebsite
+AWS_S3_REGION=ap-south-1
+```
+
+Optional: use `STORAGE_BACKEND=s3` to always force S3 when the bucket is set.
+
+Verify after restart:
+
+```bash
+curl https://vision.educollab.com/api/health
+```
+
+Expected:
+
+```json
+{
+  "app_env": "production",
+  "is_production": true,
+  "storage_backend": "s3",
+  "s3_bucket_configured": true,
+  "s3_bucket": "visionwebsite"
+}
+```
+
+### Local development `.env`
+
+```env
+APP_ENV=development
+STORAGE_BACKEND=auto
+```
+
+Files stay in `backend/uploads/` — no S3 needed locally.
 
 Set in `backend/.env`:
 
 ```env
+APP_ENV=development          # development | production
 STORAGE_BACKEND=auto          # auto | local | s3
 LOCAL_UPLOAD_DIR=uploads
 UPLOAD_MAX_BYTES=10485760         # 10MB images
@@ -98,9 +139,37 @@ AWS_SECRET_ACCESS_KEY=
 1. Create an S3 bucket (e.g. `vision-website-media`) with public read on `testimonials/*` or use CloudFront.
 2. Attach an IAM role to the EC2 instance with `s3:PutObject`, `s3:GetObject`, `s3:DeleteObject` on that bucket.
 3. Set `AWS_S3_BUCKET` (and region) in the backend `.env` on the server.
-4. Restart the backend: `systemctl restart vision`
+4. **Raise nginx upload limit** (see below) — required for videos over ~1MB.
+5. Restart the backend: `systemctl restart vision`
 
 Check active storage: `GET /api/health` → `storage_backend` is `"local"` or `"s3"`.
+
+### Fix `413 Request Entity Too Large` (nginx)
+
+nginx blocks large uploads **before** they reach FastAPI. Default limit is **1MB**.
+
+On the EC2 server, edit your site config (e.g. `/etc/nginx/sites-available/vision`) and add inside the `server` block **and** in `/api/` and `/admin/` locations:
+
+```nginx
+client_max_body_size 50m;
+client_body_timeout 300s;
+```
+
+For API proxy locations, also add:
+
+```nginx
+proxy_read_timeout 300s;
+proxy_send_timeout 300s;
+```
+
+Then test and reload:
+
+```bash
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+See `deploy/nginx-vision.example.conf` for a full example.
 
 ---
 
