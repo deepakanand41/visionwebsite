@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { FiArrowRight } from 'react-icons/fi';
+import { HOME_THEME as T } from '../utils/constants';
 
 const destinations = [
   {
@@ -49,18 +50,6 @@ const destinations = [
     bgColor: 'rgba(60, 59, 110, 0.06)',
   },
   {
-    slug: 'germany',
-    name: 'Germany',
-    flag: '🇩🇪',
-    tagline: 'Free/low-cost education in Europe',
-    description: 'Tuition-free public universities, strong engineering programs and booming job market.',
-    highlights: ['Low/No Tuition', 'Engineering Hub', '18-month Job Seeker'],
-    color: '#FFCE00',
-    gradient: 'from-yellow-600 to-yellow-400',
-    bgColor: 'rgba(255, 206, 0, 0.08)',
-    textColor: '#5a4500',
-  },
-  {
     slug: 'new-zealand',
     name: 'New Zealand',
     flag: '🇳🇿',
@@ -93,9 +82,9 @@ function DestCard({ dest, index }) {
       initial="hidden"
       animate={inView ? 'visible' : 'hidden'}
       custom={index}
-      whileHover={{ y: -8, boxShadow: '0 20px 60px rgba(10,61,145,0.15)' }}
+      whileHover={{ y: -8, boxShadow: '0 20px 60px rgba(165,0,0,0.15)' }}
       className="group bg-white rounded-3xl overflow-hidden border border-gray-100 transition-all duration-300 cursor-pointer"
-      style={{ boxShadow: '0 4px 20px rgba(10,61,145,0.07)' }}
+      style={{ boxShadow: '0 4px 20px rgba(165,0,0,0.07)' }}
     >
       {/* Card header with flag and gradient */}
       <div
@@ -133,7 +122,7 @@ function DestCard({ dest, index }) {
         <Link
           to={`/study-abroad/${dest.slug}`}
           className="inline-flex items-center gap-1.5 text-sm font-semibold transition-all"
-          style={{ color: '#0A3D91' }}
+          style={{ color: T.red }}
         >
           Explore <FiArrowRight className="transition-transform group-hover:translate-x-1" />
         </Link>
@@ -147,7 +136,7 @@ export default function Destinations() {
   const titleInView = useInView(titleRef, { once: true });
 
   return (
-    <section id="destinations" className="py-20 bg-white">
+    <section id="destinations" className="py-20" style={{ background: T.gradientLight }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -159,22 +148,13 @@ export default function Destinations() {
         >
           <div
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-4"
-            style={{ background: 'rgba(242,140,40,0.1)', color: '#F28C28' }}
+            style={{ background: T.redSoft, color: T.red }}
           >
             Study Destinations
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-4">
             Popular{' '}
-            <span
-              style={{
-                background: 'linear-gradient(135deg, #0A3D91, #F28C28)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
-            >
-              Study Destinations
-            </span>
+            <span style={{ color: T.red }}>Study Destinations</span>
           </h2>
           <p className="text-gray-500 text-lg max-w-2xl mx-auto">
             Explore top destinations and find the country that perfectly matches your academic and career aspirations.
@@ -199,7 +179,7 @@ export default function Destinations() {
           <Link
             to="/contact-us"
             className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-semibold text-white transition-all hover:shadow-lg hover:-translate-y-0.5"
-            style={{ background: 'linear-gradient(135deg, #0A3D91, #1a5cb8)' }}
+            style={{ background: T.gradientRed }}
           >
             Get Free Destination Guidance <FiArrowRight />
           </Link>

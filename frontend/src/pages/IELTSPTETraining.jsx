@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ServiceHero, FeatureGrid } from '../components/PageLayouts';
 import DemoClassForm from '../components/DemoClassForm';
@@ -64,7 +63,7 @@ function TrainingSplitLayout({ examType, leftContent, rightBelowForm }) {
         exit={{ opacity: 0, y: -16 }}
         transition={{ duration: 0.3 }}
         className="py-14"
-        style={{ background: 'linear-gradient(135deg, #f0f4ff 0%, #fff8f0 100%)' }}
+        style={{ background: 'linear-gradient(135deg, #fff5f5 0%, #ffffff 100%)' }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.05fr] gap-10 lg:gap-12 items-start">
@@ -97,8 +96,8 @@ function IELTSContent() {
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6">Four Modules Covered</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {ieltsModules.map((m, i) => (
-                <div key={m.name} className="rounded-2xl p-5 border border-gray-100 bg-white text-center" style={{ boxShadow: '0 4px 20px rgba(10,61,145,0.06)' }}>
-                  <div className="text-2xl font-black mb-2" style={{ color: i % 2 === 0 ? '#0A3D91' : '#F28C28' }}>0{i + 1}</div>
+                <div key={m.name} className="rounded-2xl p-5 border border-gray-100 bg-white text-center" style={{ boxShadow: '0 4px 20px rgba(165,0,0,0.06)' }}>
+                  <div className="text-2xl font-black mb-2" style={{ color: i % 2 === 0 ? '#A50000' : '#A50000' }}>0{i + 1}</div>
                   <h3 className="font-bold text-gray-800 mb-1.5">{m.name}</h3>
                   <p className="text-gray-500 text-sm">{m.desc}</p>
                 </div>
@@ -117,7 +116,7 @@ function IELTSContent() {
                   <h3 className="font-bold text-gray-800">{b.type}</h3>
                   <p className="text-sm text-gray-500">{b.duration} · {b.hours}</p>
                 </div>
-                <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: 'rgba(10,61,145,0.08)', color: '#0A3D91' }}>Open</span>
+                <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: 'rgba(165,0,0,0.08)', color: '#A50000' }}>Open</span>
               </div>
             ))}
           </div>
@@ -146,7 +145,7 @@ function PTEContent() {
             <div className="space-y-3">
               {pteScoreGuide.map((s) => (
                 <div key={s.range} className="flex items-center gap-4 bg-white rounded-xl p-4 border border-gray-100">
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center font-black text-white shrink-0" style={{ background: '#0A3D91' }}>
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center font-black text-white shrink-0" style={{ background: '#A50000' }}>
                     {s.range}
                   </div>
                   <div>
@@ -169,7 +168,7 @@ function PTEContent() {
                   <h3 className="font-bold text-gray-800">{b.type}</h3>
                   <p className="text-sm text-gray-500">{b.duration} · {b.hours}</p>
                 </div>
-                <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: 'rgba(242,140,40,0.1)', color: '#c27020' }}>Open</span>
+                <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: 'rgba(122,0,0,0.1)', color: '#7A0000' }}>Open</span>
               </div>
             ))}
           </div>
@@ -179,47 +178,34 @@ function PTEContent() {
   );
 }
 
-export default function IELTSPTETraining() {
-  const [activeTab, setActiveTab] = useState('ielts');
+export default function IELTSPTETraining({ exam = 'ielts' }) {
+  const isIelts = exam !== 'pte';
+
+  const heroCopy = isIelts
+    ? {
+        title: 'IELTS',
+        highlight: 'Training',
+        subtitle:
+          'Master the IELTS exam with expert coaching, full-length mock tests, and personalized study plans to achieve your target band score.',
+      }
+    : {
+        title: 'PTE',
+        highlight: 'Training',
+        subtitle:
+          'Ace the PTE Academic exam with AI-scored practice, computer-based training, and proven strategies to hit your target score fast.',
+      };
 
   return (
     <main>
       <ServiceHero
         badge="Test Preparation"
-        title="IELTS / PTE"
-        highlight="Training"
-        subtitle="Master English proficiency tests with expert coaching, mock tests, and personalized study plans. Choose IELTS or PTE — we'll help you score your best."
+        title={heroCopy.title}
+        highlight={heroCopy.highlight}
+        subtitle={heroCopy.subtitle}
         features={['Free Demo Class', 'Expert Trainers', 'Mock Tests Included', 'Online & Offline']}
       />
 
-      {/* Tab Switcher */}
-      <section className="sticky top-[72px] z-40 bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-center gap-2 py-4">
-            {[
-              { id: 'ielts', label: 'IELTS Training', color: '#0A3D91' },
-              { id: 'pte', label: 'PTE Training', color: '#F28C28' },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className="px-6 sm:px-10 py-3 rounded-full text-sm font-semibold transition-all"
-                style={{
-                  background: activeTab === tab.id ? tab.color : 'transparent',
-                  color: activeTab === tab.id ? 'white' : '#4b5563',
-                  border: activeTab === tab.id ? 'none' : '2px solid #e5e7eb',
-                  boxShadow: activeTab === tab.id ? '0 4px 16px rgba(10,61,145,0.2)' : 'none',
-                }}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Tab Content */}
-      {activeTab === 'ielts' ? <IELTSContent /> : <PTEContent />}
+      {isIelts ? <IELTSContent /> : <PTEContent />}
     </main>
   );
 }

@@ -1,6 +1,54 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiChevronRight } from 'react-icons/fi';
+import { EnquiryFormCard } from './EnquiryForm';
+
+function DestinationHeroVisual({ flag, country, accentColor }) {
+  return (
+    <div className="relative w-full max-w-xl mt-2">
+      <div
+        className="absolute -top-4 -right-4 w-32 h-32 rounded-full opacity-20 pointer-events-none"
+        style={{ background: `radial-gradient(circle, ${accentColor}, transparent)` }}
+      />
+      <div
+        className="relative rounded-3xl overflow-hidden shadow-2xl border-2"
+        style={{ borderColor: `${accentColor}55` }}
+      >
+        <img
+          src="/images/hero-students.png"
+          alt={`Students studying in ${country}`}
+          className="w-full h-56 sm:h-64 object-cover"
+        />
+        <div
+          className="absolute inset-0"
+          style={{ background: `linear-gradient(to top, rgba(17,17,17,0.88) 0%, ${accentColor}22 45%, transparent 100%)` }}
+        />
+        <div className="absolute top-4 left-4 flex items-center gap-3 bg-white/95 backdrop-blur-sm rounded-2xl px-4 py-2.5 shadow-lg">
+          <span className="text-4xl leading-none">{flag}</span>
+          <div>
+            <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Study in</div>
+            <div className="font-bold text-gray-900 text-sm sm:text-base">{country}</div>
+          </div>
+        </div>
+        <div className="absolute bottom-0 left-0 right-0 p-5 flex items-end justify-between gap-4">
+          <div>
+            <p className="text-white font-bold text-lg leading-tight">World-Class Education</p>
+            <p className="text-gray-300 text-sm mt-1">Top universities & global career pathways</p>
+          </div>
+          <div
+            className="hidden sm:block w-28 h-20 rounded-xl overflow-hidden border-2 border-white/80 shadow-lg shrink-0"
+          >
+            <img
+              src="/images/campus-students.png"
+              alt="University campus"
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function Breadcrumbs({ items }) {
   return (
@@ -9,7 +57,7 @@ export function Breadcrumbs({ items }) {
         <span key={item.label} className="flex items-center gap-1.5">
           {i > 0 && <FiChevronRight size={12} className="text-gray-300" />}
           {item.href ? (
-            <Link to={item.href} className="hover:text-blue-700 transition-colors">
+            <Link to={item.href} className="hover:text-red-800 transition-colors">
               {item.label}
             </Link>
           ) : (
@@ -21,11 +69,21 @@ export function Breadcrumbs({ items }) {
   );
 }
 
-export function PageHero({ breadcrumbs, title, subtitle, stats, flag, accentColor, ctaText = 'Avail FREE Counselling', ctaLink = '/contact-us' }) {
+export function PageHero({
+  breadcrumbs,
+  title,
+  subtitle,
+  stats,
+  flag,
+  accentColor,
+  ctaText = 'Avail FREE Counselling',
+  ctaLink = '/contact-us',
+  enquiryCountry,
+}) {
   return (
     <section className="pt-28 pb-12 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
           <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}>
             <Breadcrumbs items={breadcrumbs} />
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight mb-4">
@@ -33,7 +91,7 @@ export function PageHero({ breadcrumbs, title, subtitle, stats, flag, accentColo
             </h1>
             <p className="text-gray-600 text-lg leading-relaxed mb-6">{subtitle}</p>
             {stats && (
-              <div className="flex flex-wrap gap-2 mb-8">
+              <div className="flex flex-wrap gap-2 mb-6">
                 {stats.map((s) => (
                   <span
                     key={s}
@@ -45,37 +103,52 @@ export function PageHero({ breadcrumbs, title, subtitle, stats, flag, accentColo
                 ))}
               </div>
             )}
-            <Link
-              to={ctaLink}
-              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-semibold text-white transition-all hover:shadow-lg hover:-translate-y-0.5"
-              style={{ background: 'linear-gradient(135deg, #0A3D91, #1a5cb8)' }}
-            >
-              {ctaText}
-            </Link>
+            {enquiryCountry && flag && (
+              <DestinationHeroVisual flag={flag} country={enquiryCountry} accentColor={accentColor} />
+            )}
+            {!enquiryCountry && (
+              <Link
+                to={ctaLink}
+                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-semibold text-white transition-all hover:shadow-lg hover:-translate-y-0.5"
+                style={{ background: 'linear-gradient(135deg, #A50000, #C41E3A)' }}
+              >
+                {ctaText}
+              </Link>
+            )}
           </motion.div>
 
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="relative flex items-center justify-center"
+            className="relative w-full"
           >
-            <div
-              className="absolute w-72 h-72 rounded-full opacity-20"
-              style={{ background: `radial-gradient(circle, ${accentColor}, transparent)` }}
-            />
-            <div
-              className="relative w-full max-w-md rounded-3xl overflow-hidden shadow-2xl"
-              style={{ background: `linear-gradient(135deg, ${accentColor}22, #0A3D9111)`, minHeight: '320px' }}
-            >
-              <div className="flex flex-col items-center justify-center h-full py-12 px-8 text-center">
-                <span className="text-8xl mb-4">{flag}</span>
-                <div className="text-2xl font-black" style={{ color: '#0A3D91' }}>
-                  Study Abroad
+            {enquiryCountry ? (
+              <EnquiryFormCard
+                defaultDestination={enquiryCountry}
+                title={`Enquire for ${enquiryCountry}`}
+                subtitle={`Get free counselling for studying in ${enquiryCountry}. Our experts will contact you within 24 hours.`}
+              />
+            ) : (
+              <div className="relative flex items-center justify-center">
+                <div
+                  className="absolute w-72 h-72 rounded-full opacity-20"
+                  style={{ background: `radial-gradient(circle, ${accentColor}, transparent)` }}
+                />
+                <div
+                  className="relative w-full max-w-md rounded-3xl overflow-hidden shadow-2xl"
+                  style={{ background: `linear-gradient(135deg, ${accentColor}22, #A5000011)`, minHeight: '320px' }}
+                >
+                  <div className="flex flex-col items-center justify-center h-full py-12 px-8 text-center">
+                    <span className="text-8xl mb-4">{flag}</span>
+                    <div className="text-2xl font-black" style={{ color: '#A50000' }}>
+                      Study Abroad
+                    </div>
+                    <div className="text-sm text-gray-500 mt-1">Your dream destination awaits</div>
+                  </div>
                 </div>
-                <div className="text-sm text-gray-500 mt-1">Your dream destination awaits</div>
               </div>
-            </div>
+            )}
           </motion.div>
         </div>
       </div>
@@ -94,8 +167,8 @@ export function TabNavigation({ tabs, activeTab, onTabClick }) {
               onClick={() => onTabClick(tab.id)}
               className="px-4 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors shrink-0"
               style={{
-                borderColor: activeTab === tab.id ? '#0A3D91' : 'transparent',
-                color: activeTab === tab.id ? '#0A3D91' : '#6b7280',
+                borderColor: activeTab === tab.id ? '#A50000' : 'transparent',
+                color: activeTab === tab.id ? '#A50000' : '#6b7280',
               }}
             >
               {tab.label}
@@ -109,11 +182,11 @@ export function TabNavigation({ tabs, activeTab, onTabClick }) {
 
 export function PromoBanner() {
   return (
-    <section className="py-10 bg-blue-50/50">
+    <section className="py-10 bg-red-50/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div
           className="rounded-2xl border overflow-hidden"
-          style={{ borderColor: 'rgba(10,61,145,0.15)', background: 'linear-gradient(135deg, #f0f4ff, #e8f0fe)' }}
+          style={{ borderColor: 'rgba(165,0,0,0.15)', background: 'linear-gradient(135deg, #fff5f5, #ffffff)' }}
         >
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-0">
             <div className="lg:col-span-2 p-8">
@@ -127,23 +200,23 @@ export function PromoBanner() {
               <div className="flex flex-wrap gap-3">
                 {['Up to 100% Scholarships*', 'Exclusive University Access', 'On-Spot Offer Letters'].map((item) => (
                   <div key={item} className="flex items-center gap-2 bg-white rounded-xl px-4 py-2.5 border border-gray-100 shadow-sm text-sm font-medium text-gray-700">
-                    <span style={{ color: '#F28C28' }}>✓</span> {item}
+                    <span style={{ color: '#A50000' }}>✓</span> {item}
                   </div>
                 ))}
               </div>
             </div>
-            <div className="p-8 flex flex-col justify-center items-center text-center" style={{ background: 'rgba(10,61,145,0.06)' }}>
-              <div className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#0A3D91' }}>
+            <div className="p-8 flex flex-col justify-center items-center text-center" style={{ background: 'rgba(165,0,0,0.06)' }}>
+              <div className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#A50000' }}>
                 Registrations Now Open
               </div>
-              <div className="text-3xl font-black mb-1" style={{ color: '#F28C28' }}>500+</div>
+              <div className="text-3xl font-black mb-1" style={{ color: '#A50000' }}>500+</div>
               <div className="text-sm text-gray-600 mb-1">Scholarships Available</div>
-              <div className="text-3xl font-black mb-1" style={{ color: '#0A3D91' }}>35+</div>
+              <div className="text-3xl font-black mb-1" style={{ color: '#A50000' }}>35+</div>
               <div className="text-sm text-gray-600 mb-5">Universities Participating</div>
               <Link
                 to="/contact-us"
                 className="px-6 py-3 rounded-full font-semibold text-white text-sm transition-all hover:shadow-lg"
-                style={{ background: 'linear-gradient(135deg, #0A3D91, #1a5cb8)' }}
+                style={{ background: 'linear-gradient(135deg, #A50000, #C41E3A)' }}
               >
                 Register for Free
               </Link>
@@ -159,7 +232,7 @@ export function ContentSection({ section, accentColor }) {
   return (
     <section id={section.id} className="py-12 border-b border-gray-100 scroll-mt-36">
       <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">{section.title}</h2>
-      <div className="w-16 h-1 rounded-full mb-6" style={{ background: accentColor || '#F28C28' }} />
+      <div className="w-16 h-1 rounded-full mb-6" style={{ background: accentColor || '#A50000' }} />
       {section.highlight && (
         <p className="font-semibold text-gray-700 mb-4 text-sm sm:text-base">{section.highlight}</p>
       )}
@@ -170,7 +243,7 @@ export function ContentSection({ section, accentColor }) {
         <ul className="space-y-2.5 mt-4">
           {section.bullets.map((b) => (
             <li key={b} className="flex items-start gap-3 text-gray-600 text-sm sm:text-base">
-              <span className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold text-white" style={{ background: '#0A3D91' }}>✓</span>
+              <span className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold text-white" style={{ background: '#A50000' }}>✓</span>
               {b}
             </li>
           ))}
@@ -179,7 +252,7 @@ export function ContentSection({ section, accentColor }) {
       <Link
         to="/contact-us"
         className="inline-flex items-center gap-2 mt-8 px-6 py-3 rounded-full font-semibold text-white transition-all hover:shadow-lg hover:-translate-y-0.5"
-        style={{ background: 'linear-gradient(135deg, #0A3D91, #1a5cb8)' }}
+        style={{ background: 'linear-gradient(135deg, #A50000, #C41E3A)' }}
       >
         Help me study abroad
       </Link>
@@ -191,7 +264,7 @@ export function ServiceHero({ badge, title, highlight, subtitle, features, ctaLi
   return (
     <section
       className="pt-28 pb-16 relative overflow-hidden"
-      style={{ background: 'linear-gradient(135deg, #051e47 0%, #0A3D91 60%, #1a5cb8 100%)' }}
+      style={{ background: 'linear-gradient(135deg, #111111 0%, #1a1a1a 40%, #7A0000 100%)' }}
     >
       <div className="absolute inset-0 opacity-10 pointer-events-none">
         <svg viewBox="0 0 1200 400" className="w-full h-full">
@@ -202,20 +275,20 @@ export function ServiceHero({ badge, title, highlight, subtitle, features, ctaLi
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="max-w-3xl">
           {badge && (
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-6" style={{ background: 'rgba(242,140,40,0.2)', color: '#F28C28' }}>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-6" style={{ background: 'rgba(255,255,255,0.1)', color: '#FEE2E2', border: '1px solid rgba(255,255,255,0.15)' }}>
               {badge}
             </div>
           )}
           <h1 className="text-4xl sm:text-5xl font-black text-white leading-tight mb-4">
             {title}{' '}
-            {highlight && <span style={{ color: '#F28C28' }}>{highlight}</span>}
+            {highlight && <span style={{ color: '#A50000' }}>{highlight}</span>}
           </h1>
-          <p className="text-blue-200 text-lg leading-relaxed mb-8">{subtitle}</p>
+          <p className="text-gray-300 text-lg leading-relaxed mb-8">{subtitle}</p>
           {features && (
             <div className="flex flex-wrap gap-4 mb-8">
               {features.map((f) => (
-                <div key={f} className="flex items-center gap-2 text-blue-100 text-sm">
-                  <span className="w-2 h-2 rounded-full" style={{ background: '#F28C28' }} />
+                <div key={f} className="flex items-center gap-2 text-gray-200 text-sm">
+                  <span className="w-2 h-2 rounded-full" style={{ background: '#A50000' }} />
                   {f}
                 </div>
               ))}
@@ -224,7 +297,7 @@ export function ServiceHero({ badge, title, highlight, subtitle, features, ctaLi
           <Link
             to={ctaLink}
             className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-semibold transition-all hover:shadow-xl hover:-translate-y-0.5"
-            style={{ background: 'linear-gradient(135deg, #F28C28, #d4751a)', color: 'white' }}
+            style={{ background: 'linear-gradient(135deg, #A50000, #7A0000)', color: 'white' }}
           >
             Book Free Counselling
           </Link>
@@ -246,11 +319,11 @@ export function FeatureGrid({ items, columns = 3 }) {
           viewport={{ once: true }}
           transition={{ delay: i * 0.08 }}
           className="bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-lg transition-all"
-          style={{ boxShadow: '0 4px 20px rgba(10,61,145,0.06)' }}
+          style={{ boxShadow: '0 4px 20px rgba(165,0,0,0.06)' }}
         >
           {item.icon && (
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ background: 'rgba(10,61,145,0.08)' }}>
-              <item.icon className="text-xl" style={{ color: '#0A3D91' }} />
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ background: 'rgba(165,0,0,0.08)' }}>
+              <item.icon className="text-xl" style={{ color: '#A50000' }} />
             </div>
           )}
           <h3 className="font-bold text-gray-800 mb-2">{item.title}</h3>

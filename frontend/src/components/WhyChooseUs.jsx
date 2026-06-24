@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { FaCheckCircle } from 'react-icons/fa';
 import { FiArrowRight } from 'react-icons/fi';
+import { HOME_THEME as T } from '../utils/constants';
 
 const features = [
   {
@@ -48,7 +49,7 @@ export default function WhyChooseUs() {
   const inView = useInView(ref, { once: true, margin: '-100px' });
 
   return (
-    <section id="why-us" className="py-20" style={{ background: 'linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 100%)' }}>
+    <section id="why-us" className="py-20" style={{ background: T.gradientLight }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center" ref={ref}>
           {/* Left - Visual */}
@@ -58,34 +59,20 @@ export default function WhyChooseUs() {
             transition={{ duration: 0.7 }}
             className="relative"
           >
-            {/* Main illustration card */}
-            <div
-              className="relative rounded-3xl overflow-hidden shadow-2xl"
-              style={{
-                background: 'linear-gradient(135deg, #0A3D91 0%, #1a5cb8 60%, #2563eb 100%)',
-                minHeight: '460px',
-              }}
-            >
-              {/* Pattern overlay */}
-              <div className="absolute inset-0 opacity-10">
-                <svg viewBox="0 0 400 460" className="w-full h-full">
-                  <circle cx="350" cy="50" r="150" fill="white" />
-                  <circle cx="50" cy="400" r="120" fill="white" />
-                  {/* Grid pattern */}
-                  {[...Array(8)].map((_, i) => (
-                    <line key={`h${i}`} x1="0" y1={i * 60} x2="400" y2={i * 60} stroke="white" strokeWidth="0.5" />
-                  ))}
-                  {[...Array(7)].map((_, i) => (
-                    <line key={`v${i}`} x1={i * 60} y1="0" x2={i * 60} y2="460" stroke="white" strokeWidth="0.5" />
-                  ))}
-                </svg>
-              </div>
-
-              {/* Content */}
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl min-h-[460px]">
+              <img
+                src="/images/hero-students.png"
+                alt="Happy international students"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div
+                className="absolute inset-0"
+                style={{ background: 'linear-gradient(135deg, rgba(17,17,17,0.9) 0%, rgba(122,0,0,0.8) 100%)' }}
+              />
               <div className="relative z-10 p-10 flex flex-col justify-center h-full min-h-[460px]">
                 <div className="text-white mb-8">
                   <div className="text-5xl font-black mb-2">10+</div>
-                  <div className="text-blue-200 font-medium">Years of Excellence</div>
+                  <div className="text-gray-300 font-medium">Years of Excellence</div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -100,17 +87,17 @@ export default function WhyChooseUs() {
                       className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 text-center"
                     >
                       <div className="text-2xl font-bold text-white">{stat.value}</div>
-                      <div className="text-xs text-blue-200 mt-1">{stat.label}</div>
+                      <div className="text-xs text-gray-300 mt-1">{stat.label}</div>
                     </div>
                   ))}
                 </div>
 
                 <div className="mt-8 flex items-center gap-3">
                   <div className="flex -space-x-2">
-                    {['#fde9d1', '#d4e8ff', '#ffd9b3', '#c8e6c9'].map((bg, i) => (
+                    {['#fde9d1', '#ffd9b3', '#ffc9c9', '#f5f5f5'].map((bg, i) => (
                       <div
                         key={i}
-                        className="w-8 h-8 rounded-full border-2 border-blue-700 flex items-center justify-center text-xs font-bold"
+                        className="w-8 h-8 rounded-full border-2 border-white/30 flex items-center justify-center text-xs font-bold"
                         style={{ background: bg, color: '#333' }}
                       >
                         {['S', 'P', 'A', 'R'][i]}
@@ -132,7 +119,7 @@ export default function WhyChooseUs() {
               className="absolute -right-6 top-12 bg-white rounded-2xl shadow-xl p-4 text-center"
               style={{ minWidth: '120px' }}
             >
-              <div className="text-2xl font-black" style={{ color: '#F28C28' }}>500+</div>
+              <div className="text-2xl font-black" style={{ color: T.red }}>500+</div>
               <div className="text-xs text-gray-500 font-medium">University<br/>Partners</div>
             </motion.div>
 
@@ -155,22 +142,13 @@ export default function WhyChooseUs() {
             >
               <div
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-4"
-                style={{ background: 'rgba(10,61,145,0.08)', color: '#0A3D91' }}
+                style={{ background: T.redSoft, color: T.red }}
               >
                 Why Choose Us
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-4">
                 Why Students{' '}
-                <span
-                  style={{
-                    background: 'linear-gradient(135deg, #0A3D91, #F28C28)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
-                  }}
-                >
-                  Trust Us
-                </span>
+                <span style={{ color: T.red }}>Trust Us</span>
               </h2>
               <p className="text-gray-500 text-lg mb-8">
                 We combine expertise, technology and genuine care to make your study abroad journey seamless and successful.
@@ -191,9 +169,9 @@ export default function WhyChooseUs() {
                 >
                   <div
                     className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5"
-                    style={{ background: 'rgba(10,61,145,0.08)' }}
+                    style={{ background: T.redSoft }}
                   >
-                    <FaCheckCircle className="text-lg" style={{ color: '#0A3D91' }} />
+                    <FaCheckCircle className="text-lg" style={{ color: T.red }} />
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-800 mb-0.5">{feature.title}</h4>
@@ -212,7 +190,7 @@ export default function WhyChooseUs() {
               <a
                 href="#enquiry"
                 className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-white transition-all hover:shadow-lg hover:-translate-y-0.5"
-                style={{ background: 'linear-gradient(135deg, #F28C28, #d4751a)' }}
+                style={{ background: T.gradientRed }}
               >
                 Start Your Journey <FiArrowRight />
               </a>

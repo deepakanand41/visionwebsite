@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #0A3D91;
-  --color-primary-dark: #072d6b;
-  --color-primary-light: #1a5cb8;
-  --color-secondary: #F28C28;
-  --color-secondary-dark: #d4751a;
-  --color-secondary-light: #f5a64e;
+  --color-primary: #A50000;
+  --color-primary-dark: #7A0000;
+  --color-primary-light: #C41E3A;
+  --color-secondary: #111111;
+  --color-secondary-dark: #000000;
+  --color-secondary-light: #333333;
   --font-family-sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
 }
 
@@ -21,22 +21,22 @@ body {
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #0A3D91, #F28C28);
+  background: linear-gradient(135deg, #A50000, #7A0000);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .hero-gradient {
-  background: linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 50%, #fff8f0 100%);
+  background: linear-gradient(135deg, #fff5f5 0%, #ffffff 50%, #f9f9f9 100%);
 }
 
 .card-shadow {
-  box-shadow: 0 4px 24px rgba(10, 61, 145, 0.08);
+  box-shadow: 0 4px 24px rgba(165, 0, 0, 0.08);
 }
 
 .card-shadow-hover {
-  box-shadow: 0 12px 40px rgba(10, 61, 145, 0.18);
+  box-shadow: 0 12px 40px rgba(165, 0, 0, 0.15);
 }
 
 .section-padding {

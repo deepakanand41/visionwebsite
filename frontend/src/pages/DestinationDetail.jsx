@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, Navigate, Link } from 'react-router-dom';
+import { useParams, Navigate } from 'react-router-dom';
 import { getDestination } from '../utils/destinationData';
 import { PageHero, TabNavigation, PromoBanner, ContentSection } from '../components/PageLayouts';
 
@@ -35,6 +35,7 @@ export default function DestinationDetail() {
         stats={destination.stats}
         flag={destination.flag}
         accentColor={destination.accentColor}
+        enquiryCountry={destination.name}
       />
 
       <TabNavigation tabs={destination.tabs} activeTab={activeTab} onTabClick={handleTabClick} />
@@ -48,21 +49,21 @@ export default function DestinationDetail() {
       </div>
 
       {/* Bottom CTA */}
-      <section className="py-16" style={{ background: 'linear-gradient(135deg, #0A3D91, #072d6b)' }}>
+      <section className="py-16" style={{ background: 'linear-gradient(135deg, #A50000, #7A0000)' }}>
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
             Ready to Study in {destination.name}? {destination.flag}
           </h2>
-          <p className="text-blue-200 mb-8">
+          <p className="text-gray-300 mb-8">
             Our expert counsellors will guide you through university selection, applications, visa, and pre-departure — completely free.
           </p>
-          <Link
-            to="/contact-us"
+          <a
+            href="#enquiry-form"
             className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-semibold transition-all hover:shadow-xl hover:-translate-y-0.5"
-            style={{ background: 'linear-gradient(135deg, #F28C28, #d4751a)', color: 'white' }}
+            style={{ background: 'linear-gradient(135deg, #A50000, #7A0000)', color: 'white' }}
           >
-            Avail FREE Counselling
-          </Link>
+            Enquire Now
+          </a>
         </div>
       </section>
     </main>

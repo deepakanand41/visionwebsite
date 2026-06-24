@@ -54,7 +54,7 @@ export default function SuccessStories() {
         <div className="max-w-5xl mx-auto px-4 grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
           {stats.map((s) => (
             <div key={s.label}>
-              <div className="text-3xl font-black" style={{ color: '#0A3D91' }}>{s.value}</div>
+              <div className="text-3xl font-black" style={{ color: '#A50000' }}>{s.value}</div>
               <div className="text-sm text-gray-500 mt-1">{s.label}</div>
             </div>
           ))}
@@ -70,7 +70,7 @@ export default function SuccessStories() {
               onClick={() => setFilter(d)}
               className="px-4 py-2 rounded-full text-sm font-medium transition-all"
               style={{
-                background: filter === d ? '#0A3D91' : 'white',
+                background: filter === d ? '#A50000' : 'white',
                 color: filter === d ? 'white' : '#4b5563',
                 border: filter === d ? 'none' : '1px solid #e5e7eb',
               }}
@@ -95,12 +95,12 @@ export default function SuccessStories() {
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ delay: i * 0.05 }}
                   className="bg-white rounded-2xl p-6 border border-gray-100 flex flex-col"
-                  style={{ boxShadow: '0 4px 20px rgba(10,61,145,0.07)' }}
+                  style={{ boxShadow: '0 4px 20px rgba(165,0,0,0.07)' }}
                 >
-                  <FaQuoteLeft className="text-2xl mb-3" style={{ color: 'rgba(10,61,145,0.12)' }} />
+                  <FaQuoteLeft className="text-2xl mb-3" style={{ color: 'rgba(165,0,0,0.12)' }} />
                   <p className="text-gray-600 text-sm leading-relaxed flex-1 mb-4">"{story.review}"</p>
 
-                  <div className="px-3 py-1.5 rounded-full text-xs font-semibold mb-4 self-start" style={{ background: 'rgba(242,140,40,0.1)', color: '#c27020' }}>
+                  <div className="px-3 py-1.5 rounded-full text-xs font-semibold mb-4 self-start" style={{ background: 'rgba(122,0,0,0.1)', color: '#7A0000' }}>
                     ✓ {story.highlight || 'Success Story'}
                   </div>
 
@@ -113,7 +113,7 @@ export default function SuccessStories() {
                     <div>
                       <div className="font-semibold text-gray-800 text-sm">{story.name}</div>
                       <div className="text-xs text-gray-500">{story.course}</div>
-                      <div className="text-xs font-medium mt-0.5 flex items-center gap-1" style={{ color: '#0A3D91' }}>
+                      <div className="text-xs font-medium mt-0.5 flex items-center gap-1" style={{ color: '#A50000' }}>
                         <FaGraduationCap size={10} /> {story.university} · {story.flag} {story.destination}
                       </div>
                     </div>
@@ -126,11 +126,11 @@ export default function SuccessStories() {
       </section>
 
       {/* CTA */}
-      <section className="py-16" style={{ background: 'linear-gradient(135deg, #0A3D91, #072d6b)' }}>
+      <section className="py-16" style={{ background: 'linear-gradient(135deg, #A50000, #7A0000)' }}>
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Write Your Success Story With Us</h2>
-          <p className="text-blue-200 mb-8">Join 15,000+ students who trusted Vision Overseas for their study abroad journey.</p>
-          <Link to="/contact-us" className="inline-flex px-8 py-4 rounded-full font-semibold text-white" style={{ background: 'linear-gradient(135deg, #F28C28, #d4751a)' }}>
+          <p className="text-gray-300 mb-8">Join 15,000+ students who trusted Vision Overseas for their study abroad journey.</p>
+          <Link to="/contact-us" className="inline-flex px-8 py-4 rounded-full font-semibold text-white" style={{ background: 'linear-gradient(135deg, #A50000, #7A0000)' }}>
             Start Your Journey — Free Counselling
           </Link>
         </div>

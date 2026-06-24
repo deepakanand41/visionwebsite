@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { FiPlus, FiMinus } from 'react-icons/fi';
+import { HOME_THEME as T } from '../utils/constants';
 
 const faqs = [
   {
@@ -50,22 +51,22 @@ function FAQItem({ item, index }) {
       viewport={{ once: true }}
       transition={{ delay: index * 0.07, duration: 0.4 }}
       className="border border-gray-200 rounded-2xl overflow-hidden"
-      style={{ boxShadow: open ? '0 4px 20px rgba(10,61,145,0.08)' : 'none' }}
+      style={{ boxShadow: open ? '0 4px 20px rgba(165,0,0,0.08)' : 'none' }}
     >
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between p-5 text-left transition-colors hover:bg-gray-50"
-        style={{ background: open ? 'rgba(10,61,145,0.03)' : 'white' }}
+        style={{ background: open ? T.redSoft : 'white' }}
       >
         <span className="font-semibold text-gray-800 pr-4 text-sm sm:text-base">{item.question}</span>
         <div
           className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all"
-          style={{ background: open ? '#0A3D91' : 'rgba(10,61,145,0.08)' }}
+          style={{ background: open ? T.red : T.redSoft }}
         >
           {open ? (
             <FiMinus className="text-white" size={14} />
           ) : (
-            <FiPlus size={14} style={{ color: '#0A3D91' }} />
+            <FiPlus size={14} style={{ color: T.red }} />
           )}
         </div>
       </button>
@@ -94,7 +95,7 @@ export default function FAQ() {
   const titleInView = useInView(titleRef, { once: true });
 
   return (
-    <section id="faq" className="py-20" style={{ background: 'linear-gradient(135deg, #f0f4ff 0%, #fff8f0 100%)' }}>
+    <section id="faq" className="py-20" style={{ background: T.gradientLight }}>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -106,25 +107,16 @@ export default function FAQ() {
         >
           <div
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-4"
-            style={{ background: 'rgba(10,61,145,0.08)', color: '#0A3D91' }}
+            style={{ background: T.redSoft, color: T.red }}
           >
             FAQ
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-4">
             Frequently Asked{' '}
-            <span
-              style={{
-                background: 'linear-gradient(135deg, #0A3D91, #F28C28)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
-            >
-              Questions
-            </span>
+            <span style={{ color: T.red }}>Questions</span>
           </h2>
           <p className="text-gray-500 text-lg">
-            Everything you need to know about studying abroad with Vision Overseas.
+            Everything you need to know about studying abroad with Vision International.
           </p>
         </motion.div>
 
@@ -142,13 +134,13 @@ export default function FAQ() {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
           className="text-center mt-10 p-6 rounded-2xl"
-          style={{ background: 'rgba(10,61,145,0.04)', border: '1px solid rgba(10,61,145,0.1)' }}
+          style={{ background: T.redSoft, border: '1px solid rgba(165,0,0,0.1)' }}
         >
           <p className="text-gray-600 mb-3">Still have questions? Talk to our expert counsellors.</p>
           <a
             href="#enquiry"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white transition-all hover:shadow-md hover:-translate-y-0.5"
-            style={{ background: 'linear-gradient(135deg, #0A3D91, #1a5cb8)' }}
+            style={{ background: T.gradientRed }}
           >
             Book Free Counselling
           </a>

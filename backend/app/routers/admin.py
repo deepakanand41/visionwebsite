@@ -7,11 +7,12 @@ from sqlalchemy.orm import Session
 from app.auth import verify_admin_secret
 from app.constants import ALL_STATUSES, SUBMISSION_STATUSES
 from app.database import get_db
-from app.models import Enquiry, DemoClassBooking, ReferralApplication, Testimonial
+from app.models import Enquiry, DemoClassBooking, ReferralApplication, EducationLoanRequest, Testimonial
 from app.schemas import (
     EnquiryResponse,
     DemoClassResponse,
     ReferralResponse,
+    EducationLoanResponse,
     TestimonialCreate,
     TestimonialUpdate,
     TestimonialResponse,
@@ -67,6 +68,23 @@ def _apply_search_referral(query, search: str):
             ReferralApplication.country.ilike(term),
             ReferralApplication.occupation.ilike(term),
             ReferralApplication.admin_notes.ilike(term),
+        )
+    )
+
+
+def _apply_search_loan(query, search: str):
+    term = f"%{search.lower()}%"
+    return query.filter(
+        or_(
+            EducationLoanRequest.full_name.ilike(term),
+            EducationLoanRequest.email.ilike(term),
+            EducationLoanRequest.phone.ilike(term),
+            EducationLoanRequest.destination.ilike(term),
+            EducationLoanRequest.course_program.ilike(term),
+            EducationLoanRequest.loan_type.ilike(term),
+            EducationLoanRequest.city.ilike(term),
+            EducationLoanRequest.state.ilike(term),
+            EducationLoanRequest.admin_notes.ilike(term),
         )
     )
 
@@ -166,6 +184,35 @@ def update_referral_status(
     record = db.query(ReferralApplication).filter(ReferralApplication.id == referral_id).first()
     if not record:
         raise HTTPException(status_code=404, detail="Referral application not found")
+    _update_status(record, payload)
+    db.commit()
+    db.refresh(record)
+    return record
+
+
+@router.get("/education-loans", response_model=list[EducationLoanResponse])
+def list_education_loans(
+    status: str | None = Query(None),
+    search: str | None = Query(None),
+    db: Session = Depends(get_db),
+):
+    query = db.query(EducationLoanRequest)
+    if status:
+        query = query.filter(EducationLoanRequest.status == status)
+    if search:
+        query = _apply_search_loan(query, search)
+    return query.order_by(EducationLoanRequest.created_at.desc()).all()
+
+
+@router.patch("/education-loans/{loan_id}", response_model=EducationLoanResponse)
+def update_education_loan_status(
+    loan_id: int,
+    payload: StatusUpdate,
+    db: Session = Depends(get_db),
+):
+    record = db.query(EducationLoanRequest).filter(EducationLoanRequest.id == loan_id).first()
+    if not record:
+        raise HTTPException(status_code=404, detail="Education loan request not found")
     _update_status(record, payload)
     db.commit()
     db.refresh(record)

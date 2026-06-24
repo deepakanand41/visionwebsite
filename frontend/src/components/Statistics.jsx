@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { FaUserGraduate, FaUniversity, FaGlobe, FaPassport, FaAward } from 'react-icons/fa';
+import { HOME_THEME as T } from '../utils/constants';
 
 const stats = [
   { icon: FaUserGraduate, value: 15000, suffix: '+', label: 'Students Placed', description: 'Across the globe' },
@@ -49,13 +50,13 @@ function StatItem({ stat, index }) {
         className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center transition-transform group-hover:scale-110"
         style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)' }}
       >
-        <stat.icon className="text-2xl" style={{ color: '#F28C28' }} />
+        <stat.icon className="text-2xl" style={{ color: T.red }} />
       </div>
       <div className="text-4xl sm:text-5xl font-black text-white mb-1">
         {count.toLocaleString()}{stat.suffix}
       </div>
       <div className="text-lg font-semibold text-white mb-1">{stat.label}</div>
-      <div className="text-sm text-blue-200">{stat.description}</div>
+      <div className="text-sm text-gray-300">{stat.description}</div>
     </motion.div>
   );
 }
@@ -68,7 +69,7 @@ export default function Statistics() {
     <section
       id="stats"
       className="py-20 relative overflow-hidden"
-      style={{ background: 'linear-gradient(135deg, #0A3D91 0%, #072d6b 50%, #051e47 100%)' }}
+      style={{ background: T.gradientHero }}
     >
       {/* Background pattern */}
       <div className="absolute inset-0 opacity-5 pointer-events-none">
@@ -81,9 +82,9 @@ export default function Statistics() {
 
       {/* Decorative orbs */}
       <div className="absolute top-0 right-0 w-96 h-96 rounded-full opacity-10 pointer-events-none"
-        style={{ background: 'radial-gradient(circle, #F28C28, transparent)' }} />
+        style={{ background: 'radial-gradient(circle, #A50000, transparent)' }} />
       <div className="absolute bottom-0 left-0 w-72 h-72 rounded-full opacity-10 pointer-events-none"
-        style={{ background: 'radial-gradient(circle, #1a5cb8, transparent)' }} />
+        style={{ background: 'radial-gradient(circle, #7A0000, transparent)' }} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}
@@ -96,15 +97,15 @@ export default function Statistics() {
         >
           <div
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-4"
-            style={{ background: 'rgba(242,140,40,0.15)', color: '#F28C28', border: '1px solid rgba(242,140,40,0.2)' }}
+            style={{ background: T.redSoft, color: T.red, border: '1px solid rgba(165,0,0,0.15)' }}
           >
             Our Impact
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             Numbers That{' '}
-            <span style={{ color: '#F28C28' }}>Speak for Themselves</span>
+            <span style={{ color: T.red }}>Speak for Themselves</span>
           </h2>
-          <p className="text-blue-200 text-lg max-w-2xl mx-auto">
+          <p className="text-gray-300 text-lg max-w-2xl mx-auto">
             Over a decade of excellence in overseas education consultancy.
           </p>
         </motion.div>
@@ -124,11 +125,11 @@ export default function Statistics() {
           transition={{ duration: 0.5, delay: 0.5 }}
           className="mt-16 text-center"
         >
-          <p className="text-blue-200 mb-4">Ready to become part of our success story?</p>
+          <p className="text-gray-300 mb-4">Ready to become part of our success story?</p>
           <a
             href="#enquiry"
             className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-semibold transition-all hover:shadow-xl hover:-translate-y-0.5"
-            style={{ background: 'linear-gradient(135deg, #F28C28, #d4751a)', color: 'white' }}
+            style={{ background: T.gradientRed, color: 'white' }}
           >
             Start Your Journey Today
           </a>

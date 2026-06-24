@@ -182,3 +182,46 @@ class TestimonialResponse(BaseModel):
 
 class MessageResponse(BaseModel):
     message: str
+
+
+# ─── Education Loan ────────────────────────────────────────────────────────────
+
+class EducationLoanCreate(BaseModel):
+    fullName: str = Field(..., min_length=3, max_length=150)
+    email: EmailStr
+    phone: str = Field(..., min_length=8, max_length=20)
+    destination: str
+    university: Optional[str] = None
+    courseProgram: str = Field(..., min_length=2, max_length=200)
+    studyLevel: str
+    loanType: str
+    loanAmount: str
+    city: str = Field(..., min_length=2, max_length=100)
+    state: str = Field(..., min_length=2, max_length=100)
+    coApplicantName: Optional[str] = None
+    monthlyIncome: Optional[str] = None
+    message: Optional[str] = None
+
+
+class EducationLoanResponse(BaseModel):
+    id: int
+    full_name: str
+    email: str
+    phone: str
+    destination: str
+    university: Optional[str]
+    course_program: str
+    study_level: str
+    loan_type: str
+    loan_amount: str
+    city: str
+    state: str
+    co_applicant_name: Optional[str]
+    monthly_income: Optional[str]
+    message: Optional[str]
+    status: str
+    admin_notes: Optional[str] = None
+    status_updated_at: Optional[datetime] = None
+    created_at: datetime
+
+    model_config = {"from_attributes": True}

@@ -78,6 +78,30 @@ class ReferralApplication(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 
+class EducationLoanRequest(Base):
+    __tablename__ = "education_loan_requests"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    full_name: Mapped[str] = mapped_column(String(150))
+    email: Mapped[str] = mapped_column(String(255), index=True)
+    phone: Mapped[str] = mapped_column(String(20))
+    destination: Mapped[str] = mapped_column(String(100))
+    university: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    course_program: Mapped[str] = mapped_column(String(200))
+    study_level: Mapped[str] = mapped_column(String(100))
+    loan_type: Mapped[str] = mapped_column(String(100))
+    loan_amount: Mapped[str] = mapped_column(String(100))
+    city: Mapped[str] = mapped_column(String(100))
+    state: Mapped[str] = mapped_column(String(100))
+    co_applicant_name: Mapped[str | None] = mapped_column(String(150), nullable=True)
+    monthly_income: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    status: Mapped[str] = mapped_column(String(30), default="pending", index=True)
+    admin_notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    status_updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
 class Testimonial(Base):
     __tablename__ = "testimonials"
 

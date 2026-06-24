@@ -3,6 +3,7 @@ import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { FaQuoteLeft } from 'react-icons/fa';
 import { useTestimonials } from '../hooks/useTestimonials';
+import { HOME_THEME as T } from '../utils/constants';
 
 function StarRating({ rating }) {
   return (
@@ -61,7 +62,7 @@ export default function Testimonials() {
   ];
 
   return (
-    <section id="testimonials" className="py-20 bg-gray-50">
+    <section id="testimonials" className="py-20" style={{ background: T.gradientLight }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -73,25 +74,16 @@ export default function Testimonials() {
         >
           <div
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-4"
-            style={{ background: 'rgba(242,140,40,0.1)', color: '#F28C28' }}
+            style={{ background: T.redSoft, color: T.red }}
           >
             Student Stories
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-4">
             What Our{' '}
-            <span
-              style={{
-                background: 'linear-gradient(135deg, #0A3D91, #F28C28)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
-            >
-              Students Say
-            </span>
+            <span style={{ color: T.red }}>Students Say</span>
           </h2>
           <p className="text-gray-500 text-lg max-w-2xl mx-auto">
-            Real stories from real students who achieved their study abroad dreams with Vision Overseas.
+            Real stories from real students who achieved their study abroad dreams with Vision International.
           </p>
         </motion.div>
 
@@ -108,9 +100,9 @@ export default function Testimonials() {
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.4, delay: idx * 0.1 }}
                   className="bg-white rounded-2xl p-6 border border-gray-100 flex flex-col"
-                  style={{ boxShadow: '0 4px 20px rgba(10,61,145,0.07)' }}
+                  style={{ boxShadow: '0 4px 20px rgba(165,0,0,0.07)' }}
                 >
-                  <FaQuoteLeft className="text-2xl mb-4" style={{ color: 'rgba(10,61,145,0.15)' }} />
+                  <FaQuoteLeft className="text-2xl mb-4" style={{ color: 'rgba(165,0,0,0.15)' }} />
                   <p className="text-gray-600 text-sm leading-relaxed flex-1 mb-5">"{t.review}"</p>
                   <div>
                     <StarRating rating={t.rating} />
@@ -124,7 +116,7 @@ export default function Testimonials() {
                       <div>
                         <div className="font-semibold text-gray-800 text-sm">{t.name}</div>
                         <div className="text-xs text-gray-500">{t.course} · {t.destination}</div>
-                        <div className="text-xs font-medium mt-0.5" style={{ color: '#0A3D91' }}>{t.university}</div>
+                        <div className="text-xs font-medium mt-0.5" style={{ color: T.red }}>{t.university}</div>
                       </div>
                     </div>
                   </div>
@@ -143,9 +135,9 @@ export default function Testimonials() {
                 exit={{ opacity: 0, x: -direction * 40 }}
                 transition={{ duration: 0.35 }}
                 className="bg-white rounded-2xl p-6 border border-gray-100"
-                style={{ boxShadow: '0 4px 20px rgba(10,61,145,0.07)' }}
+                style={{ boxShadow: '0 4px 20px rgba(165,0,0,0.07)' }}
               >
-                <FaQuoteLeft className="text-2xl mb-4" style={{ color: 'rgba(10,61,145,0.15)' }} />
+                <FaQuoteLeft className="text-2xl mb-4" style={{ color: 'rgba(165,0,0,0.15)' }} />
                 <p className="text-gray-600 text-sm leading-relaxed mb-5">"{testimonials[current].review}"</p>
                 <StarRating rating={testimonials[current].rating} />
                 <div className="mt-3 flex items-center gap-3">
@@ -158,7 +150,7 @@ export default function Testimonials() {
                   <div>
                     <div className="font-semibold text-gray-800 text-sm">{testimonials[current].name}</div>
                     <div className="text-xs text-gray-500">{testimonials[current].course} · {testimonials[current].destination}</div>
-                    <div className="text-xs font-medium mt-0.5" style={{ color: '#0A3D91' }}>{testimonials[current].university}</div>
+                    <div className="text-xs font-medium mt-0.5" style={{ color: T.red }}>{testimonials[current].university}</div>
                   </div>
                 </div>
               </motion.div>
@@ -170,7 +162,7 @@ export default function Testimonials() {
             <button
               onClick={prev}
               className="w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all hover:shadow-md"
-              style={{ borderColor: '#0A3D91', color: '#0A3D91' }}
+              style={{ borderColor: T.red, color: T.red }}
             >
               <FiChevronLeft />
             </button>
@@ -181,7 +173,7 @@ export default function Testimonials() {
                   onClick={() => { setDirection(i > current ? 1 : -1); setCurrent(i); }}
                   className="w-2 h-2 rounded-full transition-all"
                   style={{
-                    background: i === current ? '#0A3D91' : '#d1d5db',
+                    background: i === current ? T.red : '#d1d5db',
                     width: i === current ? '20px' : '8px',
                   }}
                 />
@@ -190,7 +182,7 @@ export default function Testimonials() {
             <button
               onClick={next}
               className="w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all hover:shadow-md"
-              style={{ borderColor: '#0A3D91', color: '#0A3D91' }}
+              style={{ borderColor: T.red, color: T.red }}
             >
               <FiChevronRight />
             </button>

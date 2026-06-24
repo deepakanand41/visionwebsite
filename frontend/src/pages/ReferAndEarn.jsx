@@ -55,12 +55,12 @@ const benefits = [
 ];
 
 const services = [
-  { label: 'Study Abroad Counselling', color: '#0A3D91' },
-  { label: 'IELTS / PTE Coaching', color: '#F28C28' },
-  { label: 'University Admissions', color: '#0A3D91' },
-  { label: 'Education Loans', color: '#F28C28' },
-  { label: 'Visa Assistance', color: '#0A3D91' },
-  { label: 'Scholarship Guidance', color: '#F28C28' },
+  { label: 'Study Abroad Counselling', color: '#A50000' },
+  { label: 'IELTS / PTE Coaching', color: '#A50000' },
+  { label: 'University Admissions', color: '#A50000' },
+  { label: 'Education Loans', color: '#A50000' },
+  { label: 'Visa Assistance', color: '#A50000' },
+  { label: 'Scholarship Guidance', color: '#A50000' },
 ];
 
 const howItWorks = [
@@ -87,7 +87,7 @@ function SectionTitle({ badge, title, highlight, subtitle, align = 'center' }) {
     >
       <div
         className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-4"
-        style={{ background: 'rgba(10,61,145,0.08)', color: '#0A3D91' }}
+        style={{ background: 'rgba(165,0,0,0.08)', color: '#A50000' }}
       >
         {badge}
       </div>
@@ -96,7 +96,7 @@ function SectionTitle({ badge, title, highlight, subtitle, align = 'center' }) {
         {highlight && (
           <span
             style={{
-              background: 'linear-gradient(135deg, #0A3D91, #F28C28)',
+              background: 'linear-gradient(135deg, #A50000, #A50000)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
@@ -143,7 +143,7 @@ function ThankYou({ onReset }) {
         animate={{ scale: 1 }}
         transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
         className="w-24 h-24 rounded-full mx-auto flex items-center justify-center mb-6"
-        style={{ background: 'linear-gradient(135deg, #0A3D91, #1a5cb8)' }}
+        style={{ background: 'linear-gradient(135deg, #A50000, #C41E3A)' }}
       >
         <FaCheckCircle className="text-white text-4xl" />
       </motion.div>
@@ -165,9 +165,9 @@ function ThankYou({ onReset }) {
 
         <div
           className="inline-block px-6 py-4 rounded-2xl mb-8 text-center"
-          style={{ background: 'linear-gradient(135deg, rgba(10,61,145,0.06), rgba(242,140,40,0.06))', border: '1px solid rgba(10,61,145,0.1)' }}
+          style={{ background: 'linear-gradient(135deg, rgba(165,0,0,0.06), rgba(122,0,0,0.06))', border: '1px solid rgba(165,0,0,0.1)' }}
         >
-          <p className="font-bold text-lg" style={{ color: '#0A3D91' }}>
+          <p className="font-bold text-lg" style={{ color: '#A50000' }}>
             Start Referring. Start Earning. Grow With Vision International.
           </p>
         </div>
@@ -176,14 +176,14 @@ function ThankYou({ onReset }) {
           <a
             href="/"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white transition-all hover:shadow-lg hover:-translate-y-0.5"
-            style={{ background: 'linear-gradient(135deg, #0A3D91, #1a5cb8)' }}
+            style={{ background: 'linear-gradient(135deg, #A50000, #C41E3A)' }}
           >
             Back to Home
           </a>
           <button
             onClick={onReset}
             className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold border-2 transition-all hover:shadow-md"
-            style={{ borderColor: '#0A3D91', color: '#0A3D91' }}
+            style={{ borderColor: '#A50000', color: '#A50000' }}
           >
             Submit Another Application
           </button>
@@ -212,14 +212,14 @@ export default function ReferAndEarn() {
     `w-full px-4 py-2.5 rounded-xl border text-sm outline-none transition-all bg-white text-gray-800 ${
       err
         ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-100'
-        : 'border-gray-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-50'
+        : 'border-gray-200 focus:border-red-700 focus:ring-2 focus:ring-red-50'
     }`;
 
   const withIconCls = (err) =>
     `w-full pl-9 pr-4 py-2.5 rounded-xl border text-sm outline-none transition-all bg-white text-gray-800 ${
       err
         ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-100'
-        : 'border-gray-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-50'
+        : 'border-gray-200 focus:border-red-700 focus:ring-2 focus:ring-red-50'
     }`;
 
   const toggleReferralMethod = (id) => {
@@ -272,7 +272,7 @@ export default function ReferAndEarn() {
       {/* ── Left: Hero + How It Works + Benefits + FAQ | Right: Registration ── */}
       <section
         className="pt-28 pb-16"
-        style={{ background: 'linear-gradient(135deg, #f0f4ff 0%, #fff8f0 100%)' }}
+        style={{ background: 'linear-gradient(135deg, #fff5f5 0%, #ffffff 100%)' }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.05fr] gap-10 lg:gap-12 items-start">
@@ -281,11 +281,11 @@ export default function ReferAndEarn() {
               {/* Section 1 — Hero */}
               <div
                 className="relative rounded-3xl overflow-hidden p-8 sm:p-10"
-                style={{ background: 'linear-gradient(135deg, #051e47 0%, #0A3D91 50%, #1a5cb8 100%)' }}
+                style={{ background: 'linear-gradient(135deg, #111111 0%, #1a1a1a 40%, #7A0000 100%)' }}
               >
                 <div
                   className="absolute top-0 right-0 w-40 h-40 rounded-full opacity-20 pointer-events-none"
-                  style={{ background: 'radial-gradient(circle, #F28C28, transparent)' }}
+                  style={{ background: 'radial-gradient(circle, #A50000, transparent)' }}
                 />
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -295,14 +295,14 @@ export default function ReferAndEarn() {
                 >
                   <div
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-5"
-                    style={{ background: 'rgba(242,140,40,0.2)', color: '#F28C28', border: '1px solid rgba(242,140,40,0.3)' }}
+                    style={{ background: 'rgba(255,255,255,0.1)', color: '#FEE2E2', border: '1px solid rgba(255,255,255,0.15)' }}
                   >
                     <FaHandshake /> Partner Programme
                   </div>
                   <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight mb-4">
-                    Become a <span style={{ color: '#F28C28' }}>Referral Associate</span>
+                    Become a <span style={{ color: '#A50000' }}>Referral Associate</span>
                   </h1>
-                  <p className="text-blue-200 text-base sm:text-lg leading-relaxed mb-6">
+                  <p className="text-gray-300 text-base sm:text-lg leading-relaxed mb-6">
                     Join Vision International and earn attractive incentives by referring students for
                     Study Abroad, IELTS, PTE, Education Loans, and Visa Services.
                   </p>
@@ -313,9 +313,9 @@ export default function ReferAndEarn() {
                       { icon: FiAward, label: 'Official Associate ID' },
                       { icon: FiGift, label: 'Quarterly Bonuses' },
                     ].map(({ icon: Icon, label }) => (
-                      <div key={label} className="flex items-center gap-2 text-blue-100">
+                      <div key={label} className="flex items-center gap-2 text-gray-200">
                         <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
-                          <Icon style={{ color: '#F28C28' }} />
+                          <Icon style={{ color: '#A50000' }} />
                         </div>
                         <span className="text-sm font-medium">{label}</span>
                       </div>
@@ -336,11 +336,11 @@ export default function ReferAndEarn() {
                       viewport={{ once: true }}
                       transition={{ delay: i * 0.1, duration: 0.5 }}
                       className="relative bg-white rounded-2xl p-6 text-center border border-gray-100"
-                      style={{ boxShadow: '0 4px 20px rgba(10,61,145,0.07)' }}
+                      style={{ boxShadow: '0 4px 20px rgba(165,0,0,0.07)' }}
                     >
                       <div
                         className="text-3xl font-black mb-3"
-                        style={{ color: i % 2 === 0 ? '#0A3D91' : '#F28C28' }}
+                        style={{ color: i % 2 === 0 ? '#A50000' : '#A50000' }}
                       >
                         {item.step}
                       </div>
@@ -368,17 +368,17 @@ export default function ReferAndEarn() {
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ delay: i * 0.1, duration: 0.5 }}
-                      whileHover={{ y: -4, boxShadow: '0 16px 40px rgba(10,61,145,0.12)' }}
+                      whileHover={{ y: -4, boxShadow: '0 16px 40px rgba(165,0,0,0.12)' }}
                       className="rounded-2xl p-6 border border-gray-100 transition-all bg-white"
-                      style={{ boxShadow: '0 4px 20px rgba(10,61,145,0.06)' }}
+                      style={{ boxShadow: '0 4px 20px rgba(165,0,0,0.06)' }}
                     >
                       <div
                         className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
-                        style={{ background: i % 2 === 0 ? 'rgba(10,61,145,0.08)' : 'rgba(242,140,40,0.08)' }}
+                        style={{ background: i % 2 === 0 ? 'rgba(165,0,0,0.08)' : 'rgba(122,0,0,0.08)' }}
                       >
                         <b.icon
                           className="text-xl"
-                          style={{ color: i % 2 === 0 ? '#0A3D91' : '#F28C28' }}
+                          style={{ color: i % 2 === 0 ? '#A50000' : '#A50000' }}
                         />
                       </div>
                       <h4 className="font-bold text-gray-800 mb-2">{b.title}</h4>
@@ -459,7 +459,7 @@ export default function ReferAndEarn() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
                 className="bg-white rounded-3xl"
-                style={{ boxShadow: '0 12px 60px rgba(10,61,145,0.12)' }}
+                style={{ boxShadow: '0 12px 60px rgba(165,0,0,0.12)' }}
               >
             <AnimatePresence mode="wait">
               {submitted ? (
@@ -476,12 +476,12 @@ export default function ReferAndEarn() {
                   {/* ── Personal Information ──────────────────── */}
                   <div
                     className="px-8 py-5 border-b border-gray-100"
-                    style={{ background: 'linear-gradient(90deg, rgba(10,61,145,0.04), rgba(242,140,40,0.04))' }}
+                    style={{ background: 'linear-gradient(90deg, rgba(165,0,0,0.04), rgba(122,0,0,0.04))' }}
                   >
                     <div className="flex items-center gap-3">
                       <div
                         className="w-9 h-9 rounded-xl flex items-center justify-center"
-                        style={{ background: '#0A3D91' }}
+                        style={{ background: '#A50000' }}
                       >
                         <FiUser className="text-white" size={16} />
                       </div>
@@ -602,12 +602,12 @@ export default function ReferAndEarn() {
                   {/* ── Professional Information ──────────────── */}
                   <div
                     className="px-8 py-5 border-t border-b border-gray-100"
-                    style={{ background: 'linear-gradient(90deg, rgba(242,140,40,0.04), rgba(10,61,145,0.04))' }}
+                    style={{ background: 'linear-gradient(90deg, rgba(122,0,0,0.04), rgba(165,0,0,0.04))' }}
                   >
                     <div className="flex items-center gap-3">
                       <div
                         className="w-9 h-9 rounded-xl flex items-center justify-center"
-                        style={{ background: '#F28C28' }}
+                        style={{ background: '#A50000' }}
                       >
                         <FaBriefcase className="text-white" size={14} />
                       </div>
@@ -629,14 +629,14 @@ export default function ReferAndEarn() {
                               onClick={() => setValue('occupation', occ.value, { shouldValidate: true })}
                               className="flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-medium transition-all"
                               style={{
-                                borderColor: selected ? '#0A3D91' : '#e5e7eb',
-                                background: selected ? 'rgba(10,61,145,0.06)' : 'white',
-                                color: selected ? '#0A3D91' : '#4b5563',
+                                borderColor: selected ? '#A50000' : '#e5e7eb',
+                                background: selected ? 'rgba(165,0,0,0.06)' : 'white',
+                                color: selected ? '#A50000' : '#4b5563',
                               }}
                             >
-                              <occ.icon size={14} style={{ color: selected ? '#0A3D91' : '#9ca3af' }} />
+                              <occ.icon size={14} style={{ color: selected ? '#A50000' : '#9ca3af' }} />
                               {occ.label}
-                              {selected && <FiCheck className="ml-auto shrink-0 text-blue-700" size={13} />}
+                              {selected && <FiCheck className="ml-auto shrink-0 text-red-800" size={13} />}
                             </button>
                           );
                         })}
@@ -664,12 +664,12 @@ export default function ReferAndEarn() {
                   {/* ── Referral Network ──────────────────────── */}
                   <div
                     className="px-8 py-5 border-t border-b border-gray-100"
-                    style={{ background: 'linear-gradient(90deg, rgba(10,61,145,0.04), rgba(242,140,40,0.04))' }}
+                    style={{ background: 'linear-gradient(90deg, rgba(165,0,0,0.04), rgba(122,0,0,0.04))' }}
                   >
                     <div className="flex items-center gap-3">
                       <div
                         className="w-9 h-9 rounded-xl flex items-center justify-center"
-                        style={{ background: '#0A3D91' }}
+                        style={{ background: '#A50000' }}
                       >
                         <FiUsers className="text-white" size={16} />
                       </div>
@@ -700,16 +700,16 @@ export default function ReferAndEarn() {
                               onClick={() => toggleReferralMethod(m.id)}
                               className="flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-medium transition-all text-left"
                               style={{
-                                borderColor: selected ? '#F28C28' : '#e5e7eb',
-                                background: selected ? 'rgba(242,140,40,0.07)' : 'white',
-                                color: selected ? '#c27020' : '#4b5563',
+                                borderColor: selected ? '#A50000' : '#e5e7eb',
+                                background: selected ? 'rgba(122,0,0,0.07)' : 'white',
+                                color: selected ? '#7A0000' : '#4b5563',
                               }}
                             >
                               <div
                                 className="w-4 h-4 rounded border-2 flex items-center justify-center shrink-0"
                                 style={{
-                                  borderColor: selected ? '#F28C28' : '#d1d5db',
-                                  background: selected ? '#F28C28' : 'transparent',
+                                  borderColor: selected ? '#A50000' : '#d1d5db',
+                                  background: selected ? '#A50000' : 'transparent',
                                 }}
                               >
                                 {selected && <FiCheck className="text-white" size={10} />}
@@ -738,8 +738,8 @@ export default function ReferAndEarn() {
                               onClick={() => setValue('monthlyReferrals', opt, { shouldValidate: true })}
                               className="px-5 py-2 rounded-xl border text-sm font-semibold transition-all"
                               style={{
-                                borderColor: selected ? '#0A3D91' : '#e5e7eb',
-                                background: selected ? '#0A3D91' : 'white',
+                                borderColor: selected ? '#A50000' : '#e5e7eb',
+                                background: selected ? '#A50000' : 'white',
                                 color: selected ? 'white' : '#4b5563',
                               }}
                             >
@@ -758,12 +758,12 @@ export default function ReferAndEarn() {
                   {/* ── Bank Details ──────────────────────────── */}
                   <div
                     className="px-8 py-5 border-t border-b border-gray-100"
-                    style={{ background: 'linear-gradient(90deg, rgba(242,140,40,0.04), rgba(10,61,145,0.04))' }}
+                    style={{ background: 'linear-gradient(90deg, rgba(122,0,0,0.04), rgba(165,0,0,0.04))' }}
                   >
                     <div className="flex items-center gap-3">
                       <div
                         className="w-9 h-9 rounded-xl flex items-center justify-center"
-                        style={{ background: '#F28C28' }}
+                        style={{ background: '#A50000' }}
                       >
                         <FiDollarSign className="text-white" size={16} />
                       </div>
@@ -803,12 +803,12 @@ export default function ReferAndEarn() {
                   {/* ── Declaration ───────────────────────────── */}
                   <div
                     className="px-8 py-5 border-t border-b border-gray-100"
-                    style={{ background: 'linear-gradient(90deg, rgba(10,61,145,0.04), rgba(242,140,40,0.04))' }}
+                    style={{ background: 'linear-gradient(90deg, rgba(165,0,0,0.04), rgba(122,0,0,0.04))' }}
                   >
                     <div className="flex items-center gap-3">
                       <div
                         className="w-9 h-9 rounded-xl flex items-center justify-center"
-                        style={{ background: '#0A3D91' }}
+                        style={{ background: '#A50000' }}
                       >
                         <FaCheckCircle className="text-white" size={14} />
                       </div>
@@ -829,7 +829,7 @@ export default function ReferAndEarn() {
                         text: (
                           <>
                             I agree to Vision International's{' '}
-                            <a href="#" className="underline" style={{ color: '#0A3D91' }}>
+                            <a href="#" className="underline" style={{ color: '#A50000' }}>
                               Referral Associate Terms & Conditions
                             </a>.
                           </>
@@ -848,7 +848,7 @@ export default function ReferAndEarn() {
                           <input
                             type="checkbox"
                             {...register(d.name, d.required ? { required: 'This confirmation is required' } : {})}
-                            className="mt-0.5 accent-blue-700 w-4 h-4 shrink-0"
+                            className="mt-0.5 accent-red-700 w-4 h-4 shrink-0"
                           />
                           <span className="text-sm text-gray-600 leading-relaxed">{d.text}</span>
                         </label>
@@ -864,7 +864,7 @@ export default function ReferAndEarn() {
                     <button
                       type="submit"
                       className="w-full py-4 rounded-xl font-bold text-white text-lg flex items-center justify-center gap-3 transition-all hover:shadow-xl hover:-translate-y-0.5"
-                      style={{ background: 'linear-gradient(135deg, #0A3D91 0%, #1a5cb8 50%, #0A3D91 100%)', backgroundSize: '200%' }}
+                      style={{ background: 'linear-gradient(135deg, #A50000 0%, #C41E3A 50%, #A50000 100%)', backgroundSize: '200%' }}
                     >
                       <FaHandshake size={20} />
                       JOIN AS REFERRAL ASSOCIATE
@@ -891,19 +891,19 @@ function FAQMini({ item }) {
   return (
     <div
       className="rounded-2xl border border-gray-200 overflow-hidden"
-      style={{ boxShadow: open ? '0 4px 16px rgba(10,61,145,0.08)' : 'none' }}
+      style={{ boxShadow: open ? '0 4px 16px rgba(165,0,0,0.08)' : 'none' }}
     >
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between p-5 text-left hover:bg-gray-50 transition-colors"
-        style={{ background: open ? 'rgba(10,61,145,0.02)' : 'white' }}
+        style={{ background: open ? 'rgba(165,0,0,0.02)' : 'white' }}
       >
         <span className="font-semibold text-gray-800 pr-4 text-sm">{item.q}</span>
         <div
           className="w-7 h-7 rounded-full flex items-center justify-center shrink-0"
-          style={{ background: open ? '#0A3D91' : 'rgba(10,61,145,0.08)' }}
+          style={{ background: open ? '#A50000' : 'rgba(165,0,0,0.08)' }}
         >
-          <span className="text-sm font-bold" style={{ color: open ? 'white' : '#0A3D91' }}>
+          <span className="text-sm font-bold" style={{ color: open ? 'white' : '#A50000' }}>
             {open ? '−' : '+'}
           </span>
         </div>

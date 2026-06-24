@@ -46,6 +46,26 @@ export const submitReferral = async (payload) => {
   return response.data;
 };
 
+export const submitEducationLoan = async (payload) => {
+  const response = await api.post('/api/education-loan', {
+    fullName: payload.fullName,
+    email: payload.email,
+    phone: payload.phone,
+    destination: payload.destination,
+    university: payload.university || null,
+    courseProgram: payload.courseProgram,
+    studyLevel: payload.studyLevel,
+    loanType: payload.loanType,
+    loanAmount: payload.loanAmount,
+    city: payload.city,
+    state: payload.state,
+    coApplicantName: payload.coApplicantName || null,
+    monthlyIncome: payload.monthlyIncome || null,
+    message: payload.message || null,
+  });
+  return response.data;
+};
+
 export const fetchTestimonials = async () => {
   const response = await api.get('/api/testimonials');
   return response.data;

@@ -8,7 +8,7 @@ from app.config import settings
 from app.database import Base, engine
 from app.migrate import run_migrations
 from app.seed import seed_testimonials
-from app.routers import enquiry, demo_class, referral, testimonials, admin
+from app.routers import enquiry, demo_class, referral, testimonials, admin, education_loan
 
 Base.metadata.create_all(bind=engine)
 run_migrations()
@@ -31,6 +31,7 @@ app.add_middleware(
 app.include_router(enquiry.router)
 app.include_router(demo_class.router)
 app.include_router(referral.router)
+app.include_router(education_loan.router)
 app.include_router(testimonials.router)
 app.include_router(admin.router)
 

@@ -15,7 +15,7 @@ function PageLoader() {
     <div className="min-h-screen flex items-center justify-center">
       <div
         className="w-10 h-10 rounded-full border-4 animate-spin"
-        style={{ borderColor: '#0A3D91', borderTopColor: 'transparent' }}
+        style={{ borderColor: '#A50000', borderTopColor: 'transparent' }}
       />
     </div>
   );
@@ -29,9 +29,9 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/study-abroad/:slug" element={<DestinationDetail />} />
-            <Route path="/ielts-pte-training" element={<IELTSPTETraining />} />
-            <Route path="/ielts-training" element={<Navigate to="/ielts-pte-training" replace />} />
-            <Route path="/pte-training" element={<Navigate to="/ielts-pte-training" replace />} />
+            <Route path="/ielts-training" element={<IELTSPTETraining exam="ielts" />} />
+            <Route path="/pte-training" element={<IELTSPTETraining exam="pte" />} />
+            <Route path="/ielts-pte-training" element={<Navigate to="/ielts-training" replace />} />
             <Route path="/education-loans" element={<EducationLoans />} />
             <Route path="/refer-and-earn" element={<ReferAndEarn />} />
             <Route path="/success-stories" element={<SuccessStories />} />

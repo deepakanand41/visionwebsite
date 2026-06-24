@@ -1,11 +1,132 @@
-export const destinationsList = [
+export const mainDestinations = [
   { slug: 'canada', name: 'Canada', flag: '🇨🇦' },
   { slug: 'australia', name: 'Australia', flag: '🇦🇺' },
   { slug: 'united-kingdom', name: 'United Kingdom', flag: '🇬🇧' },
   { slug: 'united-states', name: 'United States', flag: '🇺🇸' },
-  { slug: 'germany', name: 'Germany', flag: '🇩🇪' },
   { slug: 'new-zealand', name: 'New Zealand', flag: '🇳🇿' },
 ];
+
+export const europeDestinations = [
+  { slug: 'france', name: 'France', flag: '🇫🇷' },
+  { slug: 'denmark', name: 'Denmark', flag: '🇩🇰' },
+  { slug: 'sweden', name: 'Sweden', flag: '🇸🇪' },
+  { slug: 'finland', name: 'Finland', flag: '🇫🇮' },
+  { slug: 'latvia', name: 'Latvia', flag: '🇱🇻' },
+  { slug: 'lithuania', name: 'Lithuania', flag: '🇱🇹' },
+];
+
+export const otherDestinations = [
+  { slug: 'singapore', name: 'Singapore', flag: '🇸🇬' },
+  { slug: 'cyprus', name: 'Cyprus', flag: '🇨🇾' },
+  { slug: 'malta', name: 'Malta', flag: '🇲🇹' },
+  { slug: 'mauritius', name: 'Mauritius', flag: '🇲🇺' },
+];
+
+/** @deprecated Use mainDestinations, europeDestinations, or otherDestinations */
+export const destinationsList = mainDestinations;
+
+export const allDestinations = [
+  ...mainDestinations,
+  ...europeDestinations,
+  ...otherDestinations,
+];
+
+/** Grouped options for enquiry / counselling forms */
+export const destinationFormGroups = [
+  { label: 'Popular Destinations', items: mainDestinations },
+  { label: 'Europe', items: europeDestinations },
+  { label: 'Other Destinations', items: otherDestinations },
+];
+
+export function getDestinationNameBySlug(slug) {
+  const found = allDestinations.find((d) => d.slug === slug);
+  return found?.name ?? null;
+}
+
+function createDestination({ slug, name, flag, accentColor, heroSubtitle, stats }) {
+  return {
+    slug,
+    name,
+    flag,
+    heroTitle: `Study in ${name} For Indian Students`,
+    heroSubtitle:
+      heroSubtitle ||
+      `Discover world-class universities, affordable programs, and global career pathways in ${name} with expert guidance from Vision International.`,
+    stats: stats || ['Quality Universities', 'Global Recognition', 'Career Pathways', 'Student Support'],
+    landmark: name,
+    accentColor,
+    tabs: [
+      { id: 'why-popular', label: `Why Study in ${name}` },
+      { id: 'latest-updates', label: 'Latest Updates' },
+      { id: 'top-universities', label: 'Top Universities' },
+      { id: 'cost-living', label: 'Cost & Living' },
+      { id: 'visa-process', label: 'Visa Process' },
+    ],
+    sections: [
+      {
+        id: 'why-popular',
+        title: `Why ${name} is a great study destination for Indian students`,
+        highlight: 'Quality Education | Global Degrees | Career Opportunities | Multicultural Environment',
+        content: [
+          `${name} offers internationally recognised qualifications, modern campuses, and strong industry connections that help graduates build successful global careers.`,
+          `Indian students benefit from English or bilingual programs, supportive student communities, and clear pathways from study to work in ${name} and beyond.`,
+        ],
+        bullets: [
+          'Globally recognised degrees and qualifications',
+          'Diverse programs across engineering, business, IT, and health sciences',
+          'Safe and welcoming environment for international students',
+          'Strong post-study work and career opportunities',
+        ],
+      },
+      {
+        id: 'latest-updates',
+        title: `Latest Updates for Studying in ${name} (2026 Onwards)`,
+        content: [`${name} continues to welcome international students with updated visa policies and expanded English-taught programs.`],
+        bullets: [
+          'Updated student visa guidelines for 2026 intakes',
+          'Expanded scholarship and financial aid options',
+          'Part-time work rights for eligible students',
+          'Streamlined admission processes for Indian applicants',
+        ],
+      },
+      {
+        id: 'top-universities',
+        title: `Top Universities in ${name}`,
+        content: [`Leading institutions in ${name} offer research-driven education and strong graduate employability.`],
+        bullets: [
+          `Top-ranked public and private universities in ${name}`,
+          'English-taught bachelor\'s and master\'s programs',
+          'Industry partnerships and internship opportunities',
+          'Strong alumni networks across Europe and globally',
+        ],
+      },
+      {
+        id: 'cost-living',
+        title: `Cost of Studying & Living in ${name}`,
+        content: [`Tuition and living costs in ${name} vary by city and program — our counsellors help you plan a realistic budget.`],
+        bullets: [
+          'Competitive tuition compared to other popular destinations',
+          'Student accommodation and living expense guidance',
+          'Scholarship and education loan assistance available',
+          'Part-time work options to offset living costs',
+        ],
+      },
+      {
+        id: 'visa-process',
+        title: `${name} Student Visa Process`,
+        content: ['Our visa specialists guide you through documentation, financial proof, and embassy appointments.'],
+        bullets: [
+          'Step 1: Receive admission letter from institution',
+          'Step 2: Gather financial and academic documents',
+          'Step 3: Complete visa application form',
+          'Step 4: Schedule biometrics and interview (if required)',
+          'Step 5: Submit application and track status',
+          'Step 6: Receive visa approval and prepare for departure',
+        ],
+      },
+    ],
+  };
+}
 
 export const destinationData = {
   canada: {
@@ -528,6 +649,106 @@ export const destinationData = {
       },
     ],
   },
+
+  france: createDestination({
+    slug: 'france',
+    name: 'France',
+    flag: '🇫🇷',
+    accentColor: '#002395',
+    heroSubtitle:
+      'France offers prestigious grandes écoles, affordable public universities, and a vibrant student life in the heart of Europe.',
+    stats: ['Top Grandes Écoles', 'Low Public Tuition', 'EU Access', 'Rich Culture'],
+  }),
+
+  denmark: createDestination({
+    slug: 'denmark',
+    name: 'Denmark',
+    flag: '🇩🇰',
+    accentColor: '#C8102E',
+    heroSubtitle:
+      'Denmark combines innovative teaching, English-taught programs, and one of Europe\'s highest standards of living.',
+    stats: ['Innovative Education', 'English Programs', 'High Quality of Life', 'EU Work Rights'],
+  }),
+
+  sweden: createDestination({
+    slug: 'sweden',
+    name: 'Sweden',
+    flag: '🇸🇪',
+    accentColor: '#006AA7',
+    heroSubtitle:
+      'Sweden is known for research excellence, sustainability-focused education, and strong tech and engineering industries.',
+    stats: ['Research Excellence', 'English-Taught', 'Innovation Hub', 'Post-Study Options'],
+  }),
+
+  finland: createDestination({
+    slug: 'finland',
+    name: 'Finland',
+    flag: '🇫🇮',
+    accentColor: '#003580',
+    heroSubtitle:
+      'Finland ranks among the world\'s best education systems with affordable tuition and a safe, student-friendly environment.',
+    stats: ['World-Class Education', 'Affordable Fees', 'Safe & Modern', 'English Programs'],
+  }),
+
+  latvia: createDestination({
+    slug: 'latvia',
+    name: 'Latvia',
+    flag: '🇱🇻',
+    accentColor: '#9E3039',
+    heroSubtitle:
+      'Latvia offers affordable EU education, English-taught degrees, and a gateway to careers across Europe.',
+    stats: ['Affordable EU Study', 'English Programs', 'EU Degrees', 'Central Location'],
+  }),
+
+  lithuania: createDestination({
+    slug: 'lithuania',
+    name: 'Lithuania',
+    flag: '🇱🇹',
+    accentColor: '#006A44',
+    heroSubtitle:
+      'Lithuania provides cost-effective European education with growing English programs and a dynamic student community.',
+    stats: ['Low Tuition', 'EU Recognition', 'English Courses', 'Growing Hub'],
+  }),
+
+  singapore: createDestination({
+    slug: 'singapore',
+    name: 'Singapore',
+    flag: '🇸🇬',
+    accentColor: '#EF3340',
+    heroSubtitle:
+      'Singapore is Asia\'s education hub with top global universities, strong industry links, and excellent graduate outcomes.',
+    stats: ['Asia\'s Top Hub', 'Global Universities', 'Strong Economy', 'Safe City'],
+  }),
+
+  cyprus: createDestination({
+    slug: 'cyprus',
+    name: 'Cyprus',
+    flag: '🇨🇾',
+    accentColor: '#D57800',
+    heroSubtitle:
+      'Cyprus offers affordable Mediterranean study options with EU-aligned degrees and a warm, welcoming environment.',
+    stats: ['Affordable Study', 'EU Standards', 'Mediterranean Lifestyle', 'English Programs'],
+  }),
+
+  malta: createDestination({
+    slug: 'malta',
+    name: 'Malta',
+    flag: '🇲🇹',
+    accentColor: '#CF142B',
+    heroSubtitle:
+      'Malta combines English-speaking education, EU membership benefits, and a sunny island lifestyle for international students.',
+    stats: ['English Speaking', 'EU Member', 'Affordable Living', 'Safe Environment'],
+  }),
+
+  mauritius: createDestination({
+    slug: 'mauritius',
+    name: 'Mauritius',
+    flag: '🇲🇺',
+    accentColor: '#EA2839',
+    heroSubtitle:
+      'Mauritius offers affordable British-pattern education, tropical living, and growing opportunities for Indian students.',
+    stats: ['Affordable Fees', 'English Medium', 'Tropical Island', 'British Curriculum'],
+  }),
 };
 
 export function getDestination(slug) {

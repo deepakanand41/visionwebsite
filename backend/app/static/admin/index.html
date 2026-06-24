@@ -80,6 +80,7 @@
   <div class="tabs">
     <button class="tab active" data-tab="enquiries">Enquiries <span class="count" id="count-enquiries">0</span></button>
     <button class="tab" data-tab="demo">Demo Classes <span class="count" id="count-demo">0</span></button>
+    <button class="tab" data-tab="loans">Education Loans <span class="count" id="count-loans">0</span></button>
     <button class="tab" data-tab="referrals">Referrals <span class="count" id="count-referrals">0</span></button>
     <button class="tab" data-tab="testimonials">Testimonials <span class="count" id="count-testimonials">0</span></button>
   </div>
@@ -87,6 +88,7 @@
   <div class="content">
     <div id="panel-enquiries" class="panel active"></div>
     <div id="panel-demo" class="panel"></div>
+    <div id="panel-loans" class="panel"></div>
     <div id="panel-referrals" class="panel"></div>
     <div id="panel-testimonials" class="panel"></div>
   </div>
@@ -151,11 +153,12 @@
     const SECRET = window.location.pathname.replace('/admin/', '');
     const headers = { 'X-Admin-Secret': SECRET, 'Content-Type': 'application/json' };
 
-    let cache = { enquiries: [], demo: [], referrals: [], testimonials: [] };
+    let cache = { enquiries: [], demo: [], loans: [], referrals: [], testimonials: [] };
     let statusOptions = { general: [], referral: [] };
     const filters = {
       enquiries: { search: '', status: '' },
       demo: { search: '', status: '', exam_type: '' },
+      loans: { search: '', status: '' },
       referrals: { search: '', status: '' },
       testimonials: { search: '', is_active: '' },
     };
@@ -245,7 +248,7 @@
         status: document.getElementById('s-status').value,
         admin_notes: document.getElementById('s-notes').value || null,
       };
-      const paths = { enquiries: 'enquiries', demo: 'demo-classes', referrals: 'referrals' };
+      const paths = { enquiries: 'enquiries', demo: 'demo-classes', loans: 'education-loans', referrals: 'referrals' };
       try {
         await api(`/${paths[type]}/${id}`, { method: 'PATCH', body: JSON.stringify(payload) });
         toast('Status updated');
@@ -315,6 +318,28 @@
       </tr></thead><tbody>${rows}</tbody></table></div>`;
     }
 
+    function renderLoans() {
+      const data = applyClientFilter(cache.loans, 'loans');
+      document.getElementById('count-loans').textContent = cache.loans.length;
+      const panel = document.getElementById('panel-loans');
+      if (!data.length) { panel.innerHTML = filterBar('loans') + renderStatPills(cache.loans,'loans') + '<div class="empty">No education loan requests found</div>'; return; }
+      const rows = data.map(l => `<tr>
+        <td>${l.id}</td>
+        <td><strong>${l.full_name}</strong><br/><small>${l.email}</small></td>
+        <td>${l.phone}</td><td>${l.destination}</td><td>${l.study_level}</td>
+        <td>${l.course_program}</td><td>${l.loan_type}</td><td>${l.loan_amount}</td>
+        <td>${l.city}, ${l.state}</td>
+        <td>${statusBadge(l.status)}</td>
+        <td><span class="notes-preview" title="${l.admin_notes||''}">${l.admin_notes || '-'}</span></td>
+        <td>${fmtDate(l.created_at)}</td>
+        <td class="actions"><button class="btn btn-primary btn-sm" onclick="openStatusModal('loans',${l.id},'${l.status}','${(l.admin_notes||'').replace(/'/g,"\\'")}')">Update</button></td>
+      </tr>`).join('');
+      panel.innerHTML = filterBar('loans') + renderStatPills(cache.loans,'loans') + `<div class="card"><table><thead><tr>
+        <th>ID</th><th>Name / Email</th><th>Phone</th><th>Destination</th><th>Level</th>
+        <th>Course</th><th>Loan Type</th><th>Amount</th><th>Location</th><th>Status</th><th>Notes</th><th>Submitted</th><th>Action</th>
+      </tr></thead><tbody>${rows}</tbody></table></div>`;
+    }
+
     function renderReferrals() {
       const data = applyClientFilter(cache.referrals, 'referrals');
       document.getElementById('count-referrals').textContent = cache.referrals.length;
@@ -367,18 +392,19 @@
     function renderTab(tab) {
       if (tab === 'enquiries') renderEnquiries();
       else if (tab === 'demo') renderDemo();
+      else if (tab === 'loans') renderLoans();
       else if (tab === 'referrals') renderReferrals();
       else renderTestimonials();
     }
 
     async function loadAll() {
       try {
-        const [statuses, enquiries, demo, referrals, testimonials] = await Promise.all([
-          api('/statuses'), api('/enquiries'), api('/demo-classes'), api('/referrals'), api('/testimonials')
+        const [statuses, enquiries, demo, loans, referrals, testimonials] = await Promise.all([
+          api('/statuses'), api('/enquiries'), api('/demo-classes'), api('/education-loans'), api('/referrals'), api('/testimonials')
         ]);
         statusOptions = statuses;
-        cache = { enquiries, demo, referrals, testimonials };
-        renderEnquiries(); renderDemo(); renderReferrals(); renderTestimonials();
+        cache = { enquiries, demo, loans, referrals, testimonials };
+        renderEnquiries(); renderDemo(); renderLoans(); renderReferrals(); renderTestimonials();
       } catch (e) { toast('Failed to load: ' + e.message, 'error'); }
     }
 

@@ -28,7 +28,7 @@ export default function MainLayout({ children }) {
             fontSize: '14px',
           },
           success: {
-            iconTheme: { primary: '#F28C28', secondary: '#fff' },
+            iconTheme: { primary: '#A50000', secondary: '#fff' },
           },
           error: {
             iconTheme: { primary: '#ef4444', secondary: '#fff' },

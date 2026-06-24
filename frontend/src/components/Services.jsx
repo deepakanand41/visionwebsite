@@ -7,65 +7,67 @@ import {
 } from 'react-icons/fa';
 import { FiArrowRight } from 'react-icons/fi';
 
+import { HOME_THEME as T } from '../utils/constants';
+
 const services = [
   {
     icon: FaGlobeAmericas,
     title: 'Study Abroad Counselling',
     description: 'Personalized guidance to help you choose the right country, university, and course aligned with your career goals.',
-    color: '#0A3D91',
-    bg: 'rgba(10,61,145,0.06)',
+    color: T.red,
+    bg: T.redSoft,
   },
   {
     icon: FaUniversity,
     title: 'University Admissions',
     description: 'End-to-end support for university applications including SOP writing, document preparation and submission.',
-    color: '#F28C28',
-    bg: 'rgba(242,140,40,0.06)',
+    color: T.redDark,
+    bg: 'rgba(122,0,0,0.06)',
   },
   {
     icon: FaBook,
     title: 'IELTS Coaching',
     description: 'Expert-led IELTS coaching with mock tests, listening, reading, writing and speaking practice sessions.',
-    color: '#0A3D91',
-    bg: 'rgba(10,61,145,0.06)',
-    link: '/ielts-pte-training',
+    color: T.red,
+    bg: T.redSoft,
+    link: '/ielts-training',
   },
   {
     icon: FaCertificate,
     title: 'PTE Coaching',
     description: 'Comprehensive PTE training with AI-scored practice tests and proven strategies to achieve your target score.',
-    color: '#F28C28',
-    bg: 'rgba(242,140,40,0.06)',
-    link: '/ielts-pte-training',
+    color: T.redDark,
+    bg: 'rgba(122,0,0,0.06)',
+    link: '/pte-training',
   },
   {
     icon: FaMoneyBillWave,
     title: 'Education Loans',
     description: 'Hassle-free education loan assistance with top banks and NBFCs offering competitive interest rates.',
-    color: '#0A3D91',
-    bg: 'rgba(10,61,145,0.06)',
+    color: T.red,
+    bg: T.redSoft,
     link: '/education-loans',
   },
   {
     icon: FaPassport,
     title: 'Visa Assistance',
     description: '98% visa success rate with complete visa documentation, interview preparation and embassy guidance.',
-    color: '#F28C28',
-    bg: 'rgba(242,140,40,0.06)',
+    color: T.redDark,
+    bg: 'rgba(122,0,0,0.06)',
   },
   {
     icon: FaAward,
     title: 'Scholarship Guidance',
     description: 'Discover and apply for scholarships worth thousands of dollars to make your education more affordable.',
-    color: '#0A3D91',
-    bg: 'rgba(10,61,145,0.06)',
+    color: T.red,
+    bg: T.redSoft,
   },
   {
     icon: FaHandshake,
     title: 'Refer & Earn',
     description: 'Refer your friends and family to earn exciting rewards while helping them achieve their study abroad dreams.',
-    color: '#F28C28',
-    bg: 'rgba(242,140,40,0.06)',
+    color: T.redDark,
+    bg: 'rgba(122,0,0,0.06)',
     link: '/refer-and-earn',
   },
 ];
@@ -90,9 +92,9 @@ function ServiceCard({ service, index }) {
       initial="hidden"
       animate={inView ? 'visible' : 'hidden'}
       custom={index}
-      whileHover={{ y: -6, boxShadow: '0 16px 48px rgba(10,61,145,0.15)' }}
+      whileHover={{ y: -6, boxShadow: '0 16px 48px rgba(165,0,0,0.12)' }}
       className="group bg-white rounded-2xl p-6 border border-gray-100 cursor-pointer transition-all duration-300"
-      style={{ boxShadow: '0 4px 20px rgba(10,61,145,0.06)' }}
+      style={{ boxShadow: '0 4px 20px rgba(165,0,0,0.06)' }}
     >
       <div
         className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 transition-all duration-300 group-hover:scale-110"
@@ -128,7 +130,7 @@ export default function Services() {
   const titleInView = useInView(titleRef, { once: true });
 
   return (
-    <section id="services" className="py-20 bg-gray-50">
+    <section id="services" className="py-20" style={{ background: T.gradientLight }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -140,22 +142,13 @@ export default function Services() {
         >
           <div
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-4"
-            style={{ background: 'rgba(10,61,145,0.08)', color: '#0A3D91' }}
+            style={{ background: T.redSoft, color: T.red }}
           >
             Our Services
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-4">
             Everything You Need{' '}
-            <span
-              style={{
-                background: 'linear-gradient(135deg, #0A3D91, #F28C28)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
-            >
-              Under One Roof
-            </span>
+            <span style={{ color: T.red }}>Under One Roof</span>
           </h2>
           <p className="text-gray-500 text-lg max-w-2xl mx-auto">
             From counselling to visa approval — we're with you every step of your study abroad journey.

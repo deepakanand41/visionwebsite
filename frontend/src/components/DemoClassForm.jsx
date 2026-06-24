@@ -35,12 +35,12 @@ export default function DemoClassForm({ examType }) {
 
   const inputCls = (err) =>
     `w-full px-4 py-2.5 rounded-xl border text-sm outline-none transition-all bg-white text-gray-800 ${
-      err ? 'border-red-400 focus:ring-2 focus:ring-red-100' : 'border-gray-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-50'
+      err ? 'border-red-400 focus:ring-2 focus:ring-red-100' : 'border-gray-200 focus:border-red-700 focus:ring-2 focus:ring-red-50'
     }`;
 
   const withIconCls = (err) =>
     `w-full pl-9 pr-4 py-2.5 rounded-xl border text-sm outline-none transition-all bg-white text-gray-800 ${
-      err ? 'border-red-400 focus:ring-2 focus:ring-red-100' : 'border-gray-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-50'
+      err ? 'border-red-400 focus:ring-2 focus:ring-red-100' : 'border-gray-200 focus:border-red-700 focus:ring-2 focus:ring-red-50'
     }`;
 
   const onSubmit = async (data) => {
@@ -62,7 +62,7 @@ export default function DemoClassForm({ examType }) {
   return (
     <div
       className="rounded-3xl p-6 sm:p-8 border border-gray-100 bg-white"
-      style={{ boxShadow: '0 8px 40px rgba(10,61,145,0.1)' }}
+      style={{ boxShadow: '0 8px 40px rgba(165,0,0,0.1)' }}
     >
       <div className="mb-6">
         <h3 className="text-xl font-bold text-gray-800">Book FREE {label} Demo Class</h3>
@@ -179,12 +179,12 @@ export default function DemoClassForm({ examType }) {
           type="submit"
           disabled={isSubmitting}
           className="w-full py-3.5 rounded-xl font-semibold text-white flex items-center justify-center gap-2 transition-all hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed"
-          style={{ background: 'linear-gradient(135deg, #F28C28, #d4751a)' }}
+          style={{ background: 'linear-gradient(135deg, #A50000, #7A0000)' }}
         >
           {isSubmitting ? (
             <><FiLoader className="animate-spin" /> Booking...</>
           ) : (
-            <><FiSend /> Book FREE {label} Demo Class</>
+            <><FiSend /> Enquire Now</>
           )}
         </button>
       </form>
