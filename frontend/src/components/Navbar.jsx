@@ -240,12 +240,12 @@ export default function Navbar() {
         <div className="grid grid-cols-[minmax(200px,240px)_1fr]">
           <Link
             to="/"
-            className="row-span-2 flex items-center justify-center px-5 py-4 bg-white"
+            className="row-span-2 flex items-center justify-center px-5 py-3 bg-white"
           >
             <Logo className="h-[5.25rem] w-auto max-w-[210px]" />
           </Link>
 
-          <div className="flex items-center justify-end h-10 px-6 bg-white">
+          <div className="flex items-center justify-end h-9 px-6 bg-white">
             <div
               className="inline-flex items-center gap-1 h-full px-4 text-white text-xs"
               style={{ background: '#111111' }}
@@ -278,7 +278,7 @@ export default function Navbar() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between gap-3 px-4 pt-4 pb-3 bg-white min-h-[4.25rem]">
+          <div className="flex items-center justify-between gap-3 px-4 pt-2 pb-2 bg-white min-h-[3.75rem]">
             <nav className="flex items-center gap-1 flex-1 min-w-0">
               <div className="relative" ref={dropdownRef}>
                 <button
