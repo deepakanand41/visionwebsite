@@ -72,52 +72,83 @@ class StorageService:
     def backend_name(self) -> str:
         return "s3" if _use_s3() else "local"
 
+    def public_url(self, key: str) -> str:
+        return f"/api/media/{key}"
+
+    def resolve_key(self, media_url: str | None) -> str | None:
+        if not media_url:
+            return None
+        url = media_url.strip()
+        if url.startswith("/api/media/"):
+            return url.removeprefix("/api/media/").lstrip("/")
+        if url.startswith("/uploads/"):
+            return url.removeprefix("/uploads/").lstrip("/")
+        if url.startswith("http://") or url.startswith("https://"):
+            return self._s3_key_from_url(url)
+        return None
+
+    def get_media_size(self, key: str) -> int:
+        if _use_s3():
+            bucket = settings.aws_s3_bucket.strip()
+            s3 = self._s3_client()
+            try:
+                head = s3.head_object(Bucket=bucket, Key=key)
+                return head["ContentLength"]
+            except Exception as exc:
+                raise HTTPException(status_code=404, detail="Media not found") from exc
+
+        path = _local_root() / key
+        if not path.exists() or not path.is_file():
+            raise HTTPException(status_code=404, detail="Media not found")
+        return path.stat().st_size
+
     def upload_testimonial_media(self, file: UploadFile, content: bytes) -> tuple[str, str]:
         media_type = _validate_file(file, content)
         ext = _extension(file.filename, media_type)
         key = f"{TESTIMONIAL_PREFIX}/{uuid.uuid4().hex}{ext}"
 
         if _use_s3():
-            url = self._upload_s3(key, content, file.content_type)
+            self._upload_s3(key, content, file.content_type)
         else:
-            url = self._upload_local(key, content)
+            self._upload_local(key, content)
 
-        return media_type, url
+        return media_type, self.public_url(key)
 
     def delete_media(self, media_url: str | None) -> None:
-        if not media_url:
+        key = self.resolve_key(media_url)
+        if not key:
             return
-        if media_url.startswith("http://") or media_url.startswith("https://"):
-            if _use_s3() and settings.aws_s3_bucket in media_url:
-                key = self._s3_key_from_url(media_url)
-                if key:
-                    self._delete_s3(key)
+
+        if _use_s3():
+            self._delete_s3(key)
             return
-        if media_url.startswith("/uploads/"):
-            relative = media_url.removeprefix("/uploads/")
-            path = _local_root() / relative
-            if path.exists() and path.is_file():
-                path.unlink()
 
-    def _upload_local(self, key: str, content: bytes) -> str:
-        dest = _local_root() / key
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        dest.write_bytes(content)
-        return f"/uploads/{key}"
+        path = _local_root() / key
+        if path.exists() and path.is_file():
+            path.unlink()
 
-    def _upload_s3(self, key: str, content: bytes, content_type: str | None) -> str:
+    def _s3_client(self):
         try:
             import boto3
-            from botocore.exceptions import BotoCoreError, ClientError
         except ImportError as exc:
-            raise HTTPException(status_code=500, detail="boto3 is required for S3 uploads") from exc
+            raise HTTPException(status_code=500, detail="boto3 is required for S3") from exc
 
         client_kwargs = {"region_name": settings.aws_s3_region}
         if settings.aws_access_key_id and settings.aws_secret_access_key:
             client_kwargs["aws_access_key_id"] = settings.aws_access_key_id
             client_kwargs["aws_secret_access_key"] = settings.aws_secret_access_key
+        return boto3.client("s3", **client_kwargs)
 
-        s3 = boto3.client("s3", **client_kwargs)
+    def _upload_local(self, key: str, content: bytes) -> str:
+        dest = _local_root() / key
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_bytes(content)
+        return key
+
+    def _upload_s3(self, key: str, content: bytes, content_type: str | None) -> str:
+        from botocore.exceptions import BotoCoreError, ClientError
+
+        s3 = self._s3_client()
         extra_args = {}
         if content_type:
             extra_args["ContentType"] = content_type
@@ -132,11 +163,7 @@ class StorageService:
         except (BotoCoreError, ClientError) as exc:
             raise HTTPException(status_code=500, detail=f"S3 upload failed: {exc}") from exc
 
-        if settings.aws_s3_public_base_url:
-            base = settings.aws_s3_public_base_url.rstrip("/")
-            return f"{base}/{key}"
-
-        return f"https://{settings.aws_s3_bucket}.s3.{settings.aws_s3_region}.amazonaws.com/{key}"
+        return key
 
     def _s3_key_from_url(self, url: str) -> str | None:
         if settings.aws_s3_public_base_url and url.startswith(settings.aws_s3_public_base_url):
@@ -147,18 +174,9 @@ class StorageService:
         return None
 
     def _delete_s3(self, key: str) -> None:
-        try:
-            import boto3
-            from botocore.exceptions import BotoCoreError, ClientError
-        except ImportError:
-            return
+        from botocore.exceptions import BotoCoreError, ClientError
 
-        client_kwargs = {"region_name": settings.aws_s3_region}
-        if settings.aws_access_key_id and settings.aws_secret_access_key:
-            client_kwargs["aws_access_key_id"] = settings.aws_access_key_id
-            client_kwargs["aws_secret_access_key"] = settings.aws_secret_access_key
-
-        s3 = boto3.client("s3", **client_kwargs)
+        s3 = self._s3_client()
         try:
             s3.delete_object(Bucket=settings.aws_s3_bucket, Key=key)
         except (BotoCoreError, ClientError):

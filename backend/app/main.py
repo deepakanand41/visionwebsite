@@ -10,7 +10,7 @@ from app.services.storage import storage_service
 from app.database import Base, engine
 from app.migrate import run_migrations
 from app.seed import seed_testimonials
-from app.routers import enquiry, demo_class, referral, testimonials, admin, education_loan
+from app.routers import enquiry, demo_class, referral, testimonials, admin, education_loan, media
 
 Base.metadata.create_all(bind=engine)
 run_migrations()
@@ -36,6 +36,7 @@ app.include_router(referral.router)
 app.include_router(education_loan.router)
 app.include_router(testimonials.router)
 app.include_router(admin.router)
+app.include_router(media.router)
 
 STATIC_DIR = Path(__file__).parent / "static" / "admin"
 

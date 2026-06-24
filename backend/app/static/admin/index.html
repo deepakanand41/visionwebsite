@@ -439,6 +439,9 @@
 
     function mediaSrc(url) {
       if (!url) return '';
+      if (url.startsWith('/api/media/')) return url;
+      const match = url.match(/testimonials\/[a-f0-9]+\.[a-z0-9]+$/i);
+      if (match) return '/api/media/' + match[0];
       return url.startsWith('http') ? url : url;
     }
 

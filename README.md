@@ -144,7 +144,15 @@ AWS_SECRET_ACCESS_KEY=
 
 Check active storage: `GET /api/health` → `storage_backend` is `"local"` or `"s3"`.
 
-### Fix `413 Request Entity Too Large` (nginx)
+### Video streaming (chunked playback)
+
+Videos are served from `GET /api/media/testimonials/{file}` with **HTTP Range** support (`206 Partial Content`). Browsers fetch large videos in chunks for fast start and seeking.
+
+New uploads store URLs like `/api/media/testimonials/abc123.mp4`. Older S3 or `/uploads/` URLs still work — the frontend maps them to the streaming endpoint automatically.
+
+On nginx, keep proxy buffering off for `/api/` (see `deploy/nginx-vision.example.conf`).
+
+---
 
 nginx blocks large uploads **before** they reach FastAPI. Default limit is **1MB**.
 
