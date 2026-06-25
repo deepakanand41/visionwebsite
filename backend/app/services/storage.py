@@ -20,8 +20,11 @@ ALLOWED_RESUME_EXTENSIONS = {".pdf", ".doc", ".docx"}
 TESTIMONIAL_PREFIX = "testimonials"
 OFFER_PREFIX = "offers"
 CONTENT_PREFIX = "content"
+ACCREDITATION_PREFIX = "accreditations"
 RESUME_PREFIX = "resumes"
-MEDIA_PREFIXES = (TESTIMONIAL_PREFIX, OFFER_PREFIX, CONTENT_PREFIX, RESUME_PREFIX)
+MEDIA_PREFIXES = (TESTIMONIAL_PREFIX, OFFER_PREFIX, CONTENT_PREFIX, ACCREDITATION_PREFIX, RESUME_PREFIX)
+
+ACCREDITATION_IMAGE_TYPES = {"image/jpeg", "image/png"}
 
 
 def _use_s3() -> bool:
@@ -171,6 +174,32 @@ class StorageService:
 
         if _use_s3():
             self._upload_s3(key, content, file.content_type)
+        else:
+            self._upload_local(key, content)
+
+        return self.public_url(key)
+
+    def upload_accreditation_image(self, file: UploadFile, content: bytes) -> str:
+        content_type = (file.content_type or "").split(";")[0].strip().lower()
+        if content_type not in ACCREDITATION_IMAGE_TYPES:
+            guessed, _ = mimetypes.guess_type(file.filename or "")
+            content_type = (guessed or "").lower()
+        if content_type not in ACCREDITATION_IMAGE_TYPES:
+            raise HTTPException(
+                status_code=400,
+                detail="Accreditation logo must be JPEG or PNG (max 10MB).",
+            )
+        if len(content) > settings.upload_max_bytes:
+            max_mb = settings.upload_max_bytes // (1024 * 1024)
+            raise HTTPException(status_code=400, detail=f"Image must be smaller than {max_mb}MB")
+
+        ext = _extension(file.filename, "image")
+        if ext not in {".jpg", ".jpeg", ".png"}:
+            ext = ".jpg" if content_type == "image/jpeg" else ".png"
+        key = f"{ACCREDITATION_PREFIX}/{uuid.uuid4().hex}{ext}"
+
+        if _use_s3():
+            self._upload_s3(key, content, content_type)
         else:
             self._upload_local(key, content)
 

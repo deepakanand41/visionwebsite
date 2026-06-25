@@ -86,6 +86,50 @@ body {
   scroll-margin-top: 8rem;
 }
 
+.accreditation-card {
+  min-height: 220px;
+}
+
+.accreditation-card--compact {
+  min-height: 110px;
+}
+
+.accreditation-logo {
+  width: 90%;
+  height: auto;
+  max-height: 180px;
+  min-height: 120px;
+  object-fit: contain;
+}
+
+@media (min-width: 640px) {
+  .accreditation-card {
+    min-height: 280px;
+  }
+
+  .accreditation-logo {
+    max-height: 220px;
+    min-height: 160px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .accreditation-card {
+    min-height: 320px;
+  }
+
+  .accreditation-logo {
+    max-height: 260px;
+    min-height: 180px;
+  }
+}
+
+.accreditation-card--compact .accreditation-logo {
+  width: 92%;
+  min-height: 72px;
+  max-height: 88px;
+}
+
 .article-prose p {
   margin: 0 0 1rem;
   color: #4b5563;

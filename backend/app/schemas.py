@@ -186,6 +186,34 @@ class TestimonialResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
+# ─── Accreditations ────────────────────────────────────────────────────────────
+
+class AccreditationCreate(BaseModel):
+    title: str = Field(default="Accreditation", max_length=200)
+    image_url: Optional[str] = Field(None, max_length=500)
+    is_active: bool = True
+    sort_order: int = 0
+
+
+class AccreditationUpdate(BaseModel):
+    title: Optional[str] = Field(None, max_length=200)
+    image_url: Optional[str] = Field(None, max_length=500)
+    is_active: Optional[bool] = None
+    sort_order: Optional[int] = None
+
+
+class AccreditationResponse(BaseModel):
+    id: int
+    title: str
+    image_url: Optional[str]
+    is_active: bool
+    sort_order: int
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
 class MediaUploadResponse(BaseModel):
     media_type: str
     media_url: str

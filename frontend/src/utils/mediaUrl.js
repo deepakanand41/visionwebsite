@@ -1,4 +1,4 @@
-const MEDIA_KEY_RE = /(?:testimonials|offers|content)\/[a-f0-9]+\.[a-z0-9]+$/i;
+const MEDIA_KEY_RE = /(?:testimonials|offers|content|accreditations)\/[a-f0-9]+\.[a-z0-9]+$/i;
 
 function extractMediaKey(url) {
   if (!url) return null;

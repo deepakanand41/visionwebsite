@@ -184,15 +184,15 @@ export default function IELTSPTETraining({ exam = 'ielts' }) {
   const heroCopy = isIelts
     ? {
         title: 'IELTS',
-        highlight: 'Training',
+        highlight: 'Coaching',
         subtitle:
           'Master the IELTS exam with expert coaching, full-length mock tests, and personalized study plans to achieve your target band score.',
       }
     : {
         title: 'PTE',
-        highlight: 'Training',
+        highlight: 'Coaching',
         subtitle:
-          'Ace the PTE Academic exam with AI-scored practice, computer-based training, and proven strategies to hit your target score fast.',
+          'Ace the PTE Academic exam with AI-scored practice, computer-based coaching, and proven strategies to hit your target score fast.',
       };
 
   return (

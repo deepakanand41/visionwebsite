@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from app.auth import verify_admin_secret
 from app.constants import ALL_STATUSES, SUBMISSION_STATUSES
 from app.database import get_db
-from app.models import Enquiry, DemoClassBooking, ReferralApplication, EducationLoanRequest, Testimonial, ContentPost, Offer, JobPosting, JobApplication
+from app.models import Enquiry, DemoClassBooking, ReferralApplication, EducationLoanRequest, Testimonial, ContentPost, Offer, JobPosting, JobApplication, Accreditation
 from app.schemas import (
     EnquiryResponse,
     DemoClassResponse,
@@ -30,6 +30,9 @@ from app.schemas import (
     JobPostingUpdate,
     JobPostingResponse,
     JobApplicationResponse,
+    AccreditationCreate,
+    AccreditationUpdate,
+    AccreditationResponse,
 )
 from app.services.storage import storage_service
 from app.utils.slugify import slugify
@@ -766,3 +769,94 @@ def delete_job_application(application_id: int, db: Session = Depends(get_db)):
     db.delete(application)
     db.commit()
     return MessageResponse(message="Application deleted successfully")
+
+
+# ─── Accreditations CRUD ───────────────────────────────────────────────────────
+
+@router.get("/accreditations", response_model=list[AccreditationResponse])
+def admin_list_accreditations(
+    search: str | None = Query(None),
+    is_active: bool | None = Query(None),
+    db: Session = Depends(get_db),
+):
+    query = db.query(Accreditation)
+    if is_active is not None:
+        query = query.filter(Accreditation.is_active == is_active)
+    if search:
+        term = f"%{search.lower()}%"
+        query = query.filter(Accreditation.title.ilike(term))
+    return query.order_by(Accreditation.sort_order.asc(), Accreditation.id.desc()).all()
+
+
+@router.post("/accreditations", response_model=AccreditationResponse, status_code=201)
+def create_accreditation(payload: AccreditationCreate, db: Session = Depends(get_db)):
+    accreditation = Accreditation(**payload.model_dump())
+    db.add(accreditation)
+    db.commit()
+    db.refresh(accreditation)
+    return accreditation
+
+
+@router.put("/accreditations/{accreditation_id}", response_model=AccreditationResponse)
+def update_accreditation(
+    accreditation_id: int,
+    payload: AccreditationUpdate,
+    db: Session = Depends(get_db),
+):
+    accreditation = db.query(Accreditation).filter(Accreditation.id == accreditation_id).first()
+    if not accreditation:
+        raise HTTPException(status_code=404, detail="Accreditation not found")
+
+    for field, value in payload.model_dump(exclude_unset=True).items():
+        setattr(accreditation, field, value)
+
+    db.commit()
+    db.refresh(accreditation)
+    return accreditation
+
+
+@router.delete("/accreditations/{accreditation_id}", response_model=MessageResponse)
+def delete_accreditation(accreditation_id: int, db: Session = Depends(get_db)):
+    accreditation = db.query(Accreditation).filter(Accreditation.id == accreditation_id).first()
+    if not accreditation:
+        raise HTTPException(status_code=404, detail="Accreditation not found")
+    storage_service.delete_media(accreditation.image_url)
+    db.delete(accreditation)
+    db.commit()
+    return MessageResponse(message="Accreditation deleted successfully")
+
+
+@router.post("/accreditations/{accreditation_id}/image", response_model=ImageUploadResponse)
+async def upload_accreditation_image(
+    accreditation_id: int,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+):
+    accreditation = db.query(Accreditation).filter(Accreditation.id == accreditation_id).first()
+    if not accreditation:
+        raise HTTPException(status_code=404, detail="Accreditation not found")
+
+    content = await file.read()
+    image_url = storage_service.upload_accreditation_image(file, content)
+
+    if accreditation.image_url:
+        storage_service.delete_media(accreditation.image_url)
+
+    accreditation.image_url = image_url
+    db.commit()
+    db.refresh(accreditation)
+    return ImageUploadResponse(image_url=image_url, message="Accreditation image uploaded")
+
+
+@router.delete("/accreditations/{accreditation_id}/image", response_model=MessageResponse)
+def delete_accreditation_image(accreditation_id: int, db: Session = Depends(get_db)):
+    accreditation = db.query(Accreditation).filter(Accreditation.id == accreditation_id).first()
+    if not accreditation:
+        raise HTTPException(status_code=404, detail="Accreditation not found")
+    if not accreditation.image_url:
+        raise HTTPException(status_code=404, detail="No image on this accreditation")
+
+    storage_service.delete_media(accreditation.image_url)
+    accreditation.image_url = None
+    db.commit()
+    return MessageResponse(message="Accreditation image removed")

@@ -16,6 +16,7 @@ const BlogListPage = lazy(() => import('./pages/ContentHub').then((m) => ({ defa
 const BlogDetailPage = lazy(() => import('./pages/ContentHub').then((m) => ({ default: m.BlogDetailPage })));
 const Offers = lazy(() => import('./pages/Offers'));
 const Careers = lazy(() => import('./pages/Careers'));
+const BookExam = lazy(() => import('./pages/BookExam'));
 
 function PageLoader() {
   return (
@@ -38,6 +39,8 @@ export default function App() {
             <Route path="/study-abroad/:slug" element={<DestinationDetail />} />
             <Route path="/ielts-training" element={<IELTSPTETraining exam="ielts" />} />
             <Route path="/pte-training" element={<IELTSPTETraining exam="pte" />} />
+            <Route path="/book-ielts-exam" element={<BookExam exam="ielts" />} />
+            <Route path="/book-pte-exam" element={<BookExam exam="pte" />} />
             <Route path="/ielts-pte-training" element={<Navigate to="/ielts-training" replace />} />
             <Route path="/education-loans" element={<EducationLoans />} />
             <Route path="/refer-and-earn" element={<ReferAndEarn />} />

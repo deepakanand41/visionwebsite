@@ -24,10 +24,10 @@ const topBarLinks = [
 ];
 
 const testPrepLinks = [
-  { label: 'IELTS Training', to: '/ielts-training' },
-  { label: 'PTE Training', to: '/pte-training' },
-  { label: 'Book IELTS exam', href: 'https://ieltsidpindia.com/', external: true },
-  { label: 'Book PTE exam', href: 'https://ptebazaar.com/', external: true },
+  { label: 'IELTS Coaching', to: '/ielts-training' },
+  { label: 'PTE Coaching', to: '/pte-training' },
+  { label: 'Book IELTS Exam', to: '/book-ielts-exam' },
+  { label: 'Book PTE Exam', to: '/book-pte-exam' },
 ];
 
 function TestPrepMenuItem({ link, pathname, onClick, className = '' }) {
@@ -37,20 +37,6 @@ function TestPrepMenuItem({ link, pathname, onClick, className = '' }) {
       ? 'font-semibold text-[#A50000] bg-red-50'
       : 'text-gray-700 hover:bg-red-50 hover:text-red-800'
   }`;
-
-  if (link.external) {
-    return (
-      <a
-        href={link.href}
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={onClick}
-        className={itemClass}
-      >
-        {link.label}
-      </a>
-    );
-  }
 
   return (
     <Link to={link.to} onClick={onClick} className={itemClass}>

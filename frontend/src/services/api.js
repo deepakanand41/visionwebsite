@@ -71,6 +71,11 @@ export const fetchTestimonials = async () => {
   return response.data;
 };
 
+export const fetchAccreditations = async () => {
+  const response = await api.get('/api/accreditations');
+  return response.data;
+};
+
 export const fetchNews = async () => {
   const response = await api.get('/api/news');
   return response.data;

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
-import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn, FaYoutube } from 'react-icons/fa';
+import { FaFacebookF, FaInstagram, FaLinkedinIn, FaYoutube } from 'react-icons/fa';
 import { FiMail, FiPhone, FiMapPin } from 'react-icons/fi';
-import { COMPANY } from '../utils/constants';
+import { COMPANY, SOCIAL_LINKS } from '../utils/constants';
 
 const footerLinks = {
   Company: [
@@ -33,11 +33,10 @@ const footerLinks = {
 };
 
 const socials = [
-  { icon: FaFacebookF, href: '#', label: 'Facebook' },
-  { icon: FaInstagram, href: '#', label: 'Instagram' },
-  { icon: FaTwitter, href: '#', label: 'Twitter' },
-  { icon: FaLinkedinIn, href: '#', label: 'LinkedIn' },
-  { icon: FaYoutube, href: '#', label: 'YouTube' },
+  { icon: FaFacebookF, href: SOCIAL_LINKS.facebook, label: 'Facebook' },
+  { icon: FaInstagram, href: SOCIAL_LINKS.instagram, label: 'Instagram' },
+  { icon: FaYoutube, href: SOCIAL_LINKS.youtube, label: 'YouTube' },
+  { icon: FaLinkedinIn, href: SOCIAL_LINKS.linkedin, label: 'LinkedIn' },
 ];
 
 export default function Footer() {
@@ -116,6 +115,8 @@ export default function Footer() {
               <a
                 key={label}
                 href={href}
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label={label}
                 className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-gray-300 hover:bg-red-600 hover:text-white transition-all"
               >

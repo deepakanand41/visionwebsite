@@ -27,15 +27,6 @@ export default function Testimonials() {
     if (testimonials.length) setCurrent(0);
   }, [testimonials.length]);
 
-  useEffect(() => {
-    if (!testimonials.length) return undefined;
-    const interval = setInterval(() => {
-      setDirection(1);
-      setCurrent((prev) => (prev + 1) % testimonials.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [testimonials.length]);
-
   const next = () => {
     setDirection(1);
     setCurrent((prev) => (prev + 1) % testimonials.length);

@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import FloatingSocialLinks from '../components/FloatingSocialLinks';
 import { Toaster } from 'react-hot-toast';
 
 function ScrollToTop() {
@@ -38,6 +39,7 @@ export default function MainLayout({ children }) {
       <Navbar />
       {children}
       <Footer />
+      <FloatingSocialLinks />
     </>
   );
 }
