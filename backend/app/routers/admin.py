@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from app.auth import verify_admin_secret
 from app.constants import ALL_STATUSES, SUBMISSION_STATUSES
 from app.database import get_db
-from app.models import Enquiry, DemoClassBooking, ReferralApplication, EducationLoanRequest, Testimonial, ContentPost, Offer
+from app.models import Enquiry, DemoClassBooking, ReferralApplication, EducationLoanRequest, Testimonial, ContentPost, Offer, JobPosting, JobApplication
 from app.schemas import (
     EnquiryResponse,
     DemoClassResponse,
@@ -26,6 +26,10 @@ from app.schemas import (
     OfferUpdate,
     OfferResponse,
     ImageUploadResponse,
+    JobPostingCreate,
+    JobPostingUpdate,
+    JobPostingResponse,
+    JobApplicationResponse,
 )
 from app.services.storage import storage_service
 from app.utils.slugify import slugify
@@ -605,3 +609,149 @@ def delete_offer_image(offer_id: int, db: Session = Depends(get_db)):
     offer.media_type = None
     db.commit()
     return MessageResponse(message="Image removed successfully")
+
+
+# ─── Careers (Jobs) ──────────────────────────────────────────────────────────────
+
+def _unique_job_slug(db: Session, base_slug: str, exclude_id: int | None = None) -> str:
+    slug = base_slug
+    counter = 1
+    while True:
+        query = db.query(JobPosting).filter(JobPosting.slug == slug)
+        if exclude_id:
+            query = query.filter(JobPosting.id != exclude_id)
+        if not query.first():
+            return slug
+        slug = f"{base_slug}-{counter}"
+        counter += 1
+
+
+@router.get("/careers", response_model=list[JobPostingResponse])
+def admin_list_careers(
+    search: str | None = Query(None),
+    job_type: str | None = Query(None),
+    is_active: bool | None = Query(None),
+    db: Session = Depends(get_db),
+):
+    query = db.query(JobPosting)
+    if job_type:
+        query = query.filter(JobPosting.job_type == job_type)
+    if is_active is not None:
+        query = query.filter(JobPosting.is_active == is_active)
+    if search:
+        term = f"%{search.lower()}%"
+        query = query.filter(
+            or_(
+                JobPosting.title.ilike(term),
+                JobPosting.description.ilike(term),
+                JobPosting.location.ilike(term),
+                JobPosting.requirements.ilike(term),
+            )
+        )
+    return query.order_by(JobPosting.sort_order.asc(), JobPosting.id.desc()).all()
+
+
+@router.post("/careers", response_model=JobPostingResponse, status_code=201)
+def create_career(payload: JobPostingCreate, db: Session = Depends(get_db)):
+    base_slug = slugify(payload.slug or payload.title)
+    if not base_slug:
+        raise HTTPException(status_code=400, detail="Invalid title for slug")
+
+    job = JobPosting(
+        **payload.model_dump(exclude={"slug"}),
+        slug=_unique_job_slug(db, base_slug),
+    )
+    db.add(job)
+    db.commit()
+    db.refresh(job)
+    return job
+
+
+@router.put("/careers/{job_id}", response_model=JobPostingResponse)
+def update_career(
+    job_id: int,
+    payload: JobPostingUpdate,
+    db: Session = Depends(get_db),
+):
+    job = db.query(JobPosting).filter(JobPosting.id == job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    data = payload.model_dump(exclude_unset=True)
+    if "slug" in data and data["slug"]:
+        data["slug"] = _unique_job_slug(db, slugify(data["slug"]), exclude_id=job_id)
+    elif "title" in data and data["title"]:
+        data["slug"] = _unique_job_slug(db, slugify(data["title"]), exclude_id=job_id)
+
+    for field, value in data.items():
+        setattr(job, field, value)
+
+    db.commit()
+    db.refresh(job)
+    return job
+
+
+@router.delete("/careers/{job_id}", response_model=MessageResponse)
+def delete_career(job_id: int, db: Session = Depends(get_db)):
+    job = db.query(JobPosting).filter(JobPosting.id == job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    db.delete(job)
+    db.commit()
+    return MessageResponse(message="Job deleted successfully")
+
+
+# ─── Job Applications ────────────────────────────────────────────────────────────
+
+@router.get("/job-applications", response_model=list[JobApplicationResponse])
+def list_job_applications(
+    status: str | None = Query(None),
+    job_id: int | None = Query(None),
+    search: str | None = Query(None),
+    db: Session = Depends(get_db),
+):
+    query = db.query(JobApplication)
+    if status:
+        query = query.filter(JobApplication.status == status)
+    if job_id:
+        query = query.filter(JobApplication.job_id == job_id)
+    if search:
+        term = f"%{search.lower()}%"
+        query = query.filter(
+            or_(
+                JobApplication.full_name.ilike(term),
+                JobApplication.email.ilike(term),
+                JobApplication.phone.ilike(term),
+                JobApplication.job_title.ilike(term),
+                JobApplication.admin_notes.ilike(term),
+            )
+        )
+    return query.order_by(JobApplication.id.desc()).all()
+
+
+@router.put("/job-applications/{application_id}/status", response_model=JobApplicationResponse)
+def update_job_application_status(
+    application_id: int,
+    payload: StatusUpdate,
+    db: Session = Depends(get_db),
+):
+    application = db.query(JobApplication).filter(JobApplication.id == application_id).first()
+    if not application:
+        raise HTTPException(status_code=404, detail="Application not found")
+
+    _update_status(application, payload)
+    db.commit()
+    db.refresh(application)
+    return application
+
+
+@router.delete("/job-applications/{application_id}", response_model=MessageResponse)
+def delete_job_application(application_id: int, db: Session = Depends(get_db)):
+    application = db.query(JobApplication).filter(JobApplication.id == application_id).first()
+    if not application:
+        raise HTTPException(status_code=404, detail="Application not found")
+
+    storage_service.delete_media(application.resume_url)
+    db.delete(application)
+    db.commit()
+    return MessageResponse(message="Application deleted successfully")

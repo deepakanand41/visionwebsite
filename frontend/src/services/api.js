@@ -97,4 +97,18 @@ export const fetchOffers = async (offerType = null) => {
   return response.data;
 };
 
+export const fetchCareers = async (jobType = null) => {
+  const params = jobType ? { job_type: jobType } : {};
+  const response = await api.get('/api/careers', { params });
+  return response.data;
+};
+
+export const submitJobApplication = async (formData) => {
+  const response = await api.post('/api/careers/apply', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+    timeout: 60000,
+  });
+  return response.data;
+};
+
 export default api;

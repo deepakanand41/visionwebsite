@@ -95,6 +95,7 @@ export default function Testimonials() {
             <AnimatePresence mode="popLayout">
               {visibleTestimonials.map((t, idx) => {
                 const hasMedia = t.mediaUrl && t.mediaType;
+                const isVideo = t.mediaType === 'video';
                 return (
                 <motion.div
                   key={`${t.id || t.name}-${current}-${idx}`}
@@ -106,7 +107,12 @@ export default function Testimonials() {
                   style={{ boxShadow: '0 4px 20px rgba(165,0,0,0.07)' }}
                 >
                   {hasMedia && (
-                    <StoryMedia mediaType={t.mediaType} mediaUrl={t.mediaUrl} className="aspect-video w-full" />
+                    <StoryMedia
+                      mediaType={t.mediaType}
+                      mediaUrl={t.mediaUrl}
+                      variant={isVideo ? 'reel' : 'default'}
+                      className={isVideo ? '' : 'aspect-[16/10] w-full'}
+                    />
                   )}
                   <div className={hasMedia ? 'p-6 flex flex-col flex-1' : 'flex flex-col flex-1'}>
                   <FaQuoteLeft className="text-2xl mb-4" style={{ color: 'rgba(165,0,0,0.15)' }} />
@@ -149,7 +155,8 @@ export default function Testimonials() {
                   <StoryMedia
                     mediaType={testimonials[current].mediaType}
                     mediaUrl={testimonials[current].mediaUrl}
-                    className="aspect-video w-full"
+                    variant={testimonials[current].mediaType === 'video' ? 'reel' : 'default'}
+                    className={testimonials[current].mediaType === 'video' ? '' : 'aspect-[16/10] w-full'}
                   />
                 )}
                 <div className={testimonials[current].mediaUrl ? 'p-6' : ''}>

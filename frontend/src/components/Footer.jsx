@@ -8,6 +8,7 @@ const footerLinks = {
     { label: 'About Us', to: '/' },
     { label: 'News & Articles', to: '/news' },
     { label: 'Blog', to: '/blog' },
+    { label: 'Careers', to: '/careers' },
     { label: 'Offers', to: '/offers' },
     { label: 'Success Stories', to: '/success-stories' },
     { label: 'Refer & Earn', to: '/refer-and-earn' },

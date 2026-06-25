@@ -13,12 +13,12 @@ export default function StoryMedia({
 
   const isReel = variant === 'reel' && mediaType === 'video';
 
-  const badge = showBadge ? (
+  const badge = showBadge && !isReel ? (
     <span
       className="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide text-white backdrop-blur-sm"
       style={{ background: 'rgba(165,0,0,0.85)' }}
     >
-      {isReel ? 'Reel' : mediaType === 'video' ? 'Video' : 'Photo'}
+      {mediaType === 'video' ? 'Video' : 'Photo'}
     </span>
   ) : null;
 

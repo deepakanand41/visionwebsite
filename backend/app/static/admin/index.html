@@ -6,18 +6,116 @@
   <title>Vision Admin Panel</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f0f4ff; color: #1a1a2e; }
-    .header { background: linear-gradient(135deg, #0A3D91, #1a5cb8); color: white; padding: 1.25rem 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
-    .header h1 { font-size: 1.25rem; }
-    .header span { font-size: 0.8rem; opacity: 0.8; }
-    .tabs { display: flex; gap: 0.5rem; padding: 1rem 2rem; background: white; border-bottom: 1px solid #e5e7eb; flex-wrap: wrap; }
-    .tab { padding: 0.6rem 1.25rem; border-radius: 999px; border: 2px solid #e5e7eb; background: white; cursor: pointer; font-size: 0.875rem; font-weight: 600; color: #4b5563; transition: all 0.2s; }
-    .tab.active { background: #0A3D91; color: white; border-color: #0A3D91; }
-    .tab .count { background: rgba(255,255,255,0.2); padding: 0.1rem 0.5rem; border-radius: 999px; font-size: 0.75rem; margin-left: 0.35rem; }
-    .tab.active .count { background: rgba(255,255,255,0.25); }
-    .content { padding: 1.5rem 2rem; max-width: 1500px; margin: 0 auto; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f4f6fb; color: #1a1a2e; min-height: 100vh; }
+    .admin-shell { display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar {
+      width: 260px;
+      flex-shrink: 0;
+      background: linear-gradient(180deg, #0c1f3f 0%, #0a1630 100%);
+      color: #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 50;
+      border-right: 1px solid rgba(255,255,255,0.06);
+    }
+    .sidebar-brand {
+      padding: 1.35rem 1.25rem 1.1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .sidebar-brand h1 { font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 0.2rem; }
+    .sidebar-brand span { font-size: 0.72rem; color: #94a3b8; line-height: 1.4; display: block; }
+    .sidebar-nav { flex: 1; overflow-y: auto; padding: 0.75rem 0.65rem 1.5rem; }
+    .nav-section {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #64748b;
+      padding: 1rem 0.75rem 0.4rem;
+    }
+    .tab {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      padding: 0.65rem 0.85rem;
+      margin-bottom: 0.2rem;
+      border: none;
+      border-radius: 10px;
+      background: transparent;
+      cursor: pointer;
+      font-size: 0.84rem;
+      font-weight: 500;
+      color: #cbd5e1;
+      text-align: left;
+      transition: all 0.18s ease;
+    }
+    .tab:hover { background: rgba(255,255,255,0.06); color: #fff; }
+    .tab.active {
+      background: linear-gradient(135deg, #0A3D91, #1a5cb8);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(10,61,145,0.35);
+    }
+    .tab .count {
+      background: rgba(255,255,255,0.12);
+      padding: 0.1rem 0.45rem;
+      border-radius: 999px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      min-width: 1.5rem;
+      text-align: center;
+    }
+    .tab.active .count { background: rgba(255,255,255,0.22); }
+    .sidebar-footer {
+      padding: 1rem 1.25rem;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      font-size: 0.7rem;
+      color: #64748b;
+    }
+
+    /* Main area */
+    .main-area {
+      flex: 1;
+      margin-left: 260px;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    .main-header {
+      background: #fff;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 1rem 1.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+    .main-header h2 { font-size: 1.15rem; font-weight: 700; color: #0f172a; }
+    .main-header p { font-size: 0.8rem; color: #64748b; margin-top: 0.15rem; }
+    .header-actions { display: flex; gap: 0.5rem; align-items: center; }
+    .menu-toggle {
+      display: none;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .content { padding: 1.5rem 1.75rem 2rem; flex: 1; }
     .panel { display: none; }
     .panel.active { display: block; }
+
     .filters { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem; align-items: center; background: white; padding: 1rem; border-radius: 12px; border: 1px solid #e5e7eb; }
     .filters input, .filters select { padding: 0.55rem 0.85rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 0.85rem; min-width: 180px; }
     .filters input { flex: 1; min-width: 220px; }
@@ -39,10 +137,10 @@
     .badge-pte { background: #ffedd5; color: #c2410c; }
     .badge-active { background: #d1fae5; color: #065f46; }
     .badge-inactive { background: #fee2e2; color: #991b1b; }
-    .btn { padding: 0.4rem 0.75rem; border-radius: 8px; border: none; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: all 0.2s; white-space: nowrap; }
+    .btn { padding: 0.45rem 0.85rem; border-radius: 8px; border: none; cursor: pointer; font-size: 0.78rem; font-weight: 600; transition: all 0.2s; white-space: nowrap; }
     .btn-primary { background: #0A3D91; color: white; }
     .btn-danger { background: #ef4444; color: white; }
-    .btn-secondary { background: #f3f4f6; color: #374151; }
+    .btn-secondary { background: #f3f4f6; color: #374151; border: 1px solid #e5e7eb; }
     .btn-sm { padding: 0.3rem 0.55rem; font-size: 0.7rem; }
     .btn:hover { opacity: 0.92; }
     .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.75rem; }
@@ -69,37 +167,71 @@
     .actions { display: flex; gap: 0.3rem; flex-wrap: wrap; }
     .media-thumb { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; border: 1px solid #e5e7eb; }
     .media-badge { display: inline-block; padding: 0.15rem 0.45rem; border-radius: 6px; font-size: 0.65rem; font-weight: 700; background: #eff6ff; color: #1d4ed8; text-transform: uppercase; }
+    .sidebar-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 45; }
+
+    @media (max-width: 900px) {
+      .sidebar { transform: translateX(-100%); transition: transform 0.25s ease; }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-backdrop.open { display: block; }
+      .main-area { margin-left: 0; }
+      .menu-toggle { display: inline-block; }
+    }
   </style>
 </head>
 <body>
-  <div class="header">
-    <div>
-      <h1>🎓 Vision Admin Panel</h1>
-      <span>Manage submissions, content, testimonials & more</span>
+  <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="closeSidebar()"></div>
+
+  <div class="admin-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <h1>🎓 Vision Admin</h1>
+        <span>Manage submissions, content & careers</span>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">Submissions</div>
+        <button class="tab active" data-tab="enquiries" data-title="Enquiries"><span>Enquiries</span><span class="count" id="count-enquiries">0</span></button>
+        <button class="tab" data-tab="demo" data-title="Demo Classes"><span>Demo Classes</span><span class="count" id="count-demo">0</span></button>
+        <button class="tab" data-tab="loans" data-title="Education Loans"><span>Education Loans</span><span class="count" id="count-loans">0</span></button>
+        <button class="tab" data-tab="referrals" data-title="Referrals"><span>Referrals</span><span class="count" id="count-referrals">0</span></button>
+        <button class="tab" data-tab="jobapps" data-title="Job Applications"><span>Job Applications</span><span class="count" id="count-jobapps">0</span></button>
+
+        <div class="nav-section">Content &amp; Marketing</div>
+        <button class="tab" data-tab="testimonials" data-title="Testimonials"><span>Testimonials</span><span class="count" id="count-testimonials">0</span></button>
+        <button class="tab" data-tab="news" data-title="News &amp; Articles"><span>News</span><span class="count" id="count-news">0</span></button>
+        <button class="tab" data-tab="blog" data-title="Blog Posts"><span>Blog</span><span class="count" id="count-blog">0</span></button>
+        <button class="tab" data-tab="offers" data-title="Student Offers"><span>Offers</span><span class="count" id="count-offers">0</span></button>
+        <button class="tab" data-tab="careers" data-title="Careers"><span>Careers</span><span class="count" id="count-careers">0</span></button>
+      </nav>
+      <div class="sidebar-footer">Vision International © Admin</div>
+    </aside>
+
+    <div class="main-area">
+      <header class="main-header">
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <button class="menu-toggle" type="button" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+          <div>
+            <h2 id="page-title">Enquiries</h2>
+            <p id="page-subtitle">Student enquiry submissions</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-secondary" onclick="loadAll()">↻ Refresh</button>
+        </div>
+      </header>
+
+      <div class="content">
+        <div id="panel-enquiries" class="panel active"></div>
+        <div id="panel-demo" class="panel"></div>
+        <div id="panel-loans" class="panel"></div>
+        <div id="panel-referrals" class="panel"></div>
+        <div id="panel-testimonials" class="panel"></div>
+        <div id="panel-news" class="panel"></div>
+        <div id="panel-blog" class="panel"></div>
+        <div id="panel-offers" class="panel"></div>
+        <div id="panel-careers" class="panel"></div>
+        <div id="panel-jobapps" class="panel"></div>
+      </div>
     </div>
-    <button class="btn btn-secondary" onclick="loadAll()">↻ Refresh All</button>
-  </div>
-
-  <div class="tabs">
-    <button class="tab active" data-tab="enquiries">Enquiries <span class="count" id="count-enquiries">0</span></button>
-    <button class="tab" data-tab="demo">Demo Classes <span class="count" id="count-demo">0</span></button>
-    <button class="tab" data-tab="loans">Education Loans <span class="count" id="count-loans">0</span></button>
-    <button class="tab" data-tab="referrals">Referrals <span class="count" id="count-referrals">0</span></button>
-    <button class="tab" data-tab="testimonials">Testimonials <span class="count" id="count-testimonials">0</span></button>
-    <button class="tab" data-tab="news">News <span class="count" id="count-news">0</span></button>
-    <button class="tab" data-tab="blog">Blog <span class="count" id="count-blog">0</span></button>
-    <button class="tab" data-tab="offers">Offers <span class="count" id="count-offers">0</span></button>
-  </div>
-
-  <div class="content">
-    <div id="panel-enquiries" class="panel active"></div>
-    <div id="panel-demo" class="panel"></div>
-    <div id="panel-loans" class="panel"></div>
-    <div id="panel-referrals" class="panel"></div>
-    <div id="panel-testimonials" class="panel"></div>
-    <div id="panel-news" class="panel"></div>
-    <div id="panel-blog" class="panel"></div>
-    <div id="panel-offers" class="panel"></div>
   </div>
 
   <!-- Status Update Modal -->
@@ -252,11 +384,66 @@
     </div>
   </div>
 
+  <!-- Career (Job) Modal -->
+  <div class="modal-overlay" id="career-modal">
+    <div class="modal modal-lg">
+      <h3 id="career-modal-title">Add Job Opening</h3>
+      <form id="career-form">
+        <input type="hidden" id="j-id" />
+        <div class="form-group"><label>Job Title *</label><input id="j-title" required placeholder="Study Abroad Counsellor" /></div>
+        <div class="form-row">
+          <div class="form-group"><label>Slug (optional)</label><input id="j-slug" placeholder="auto-from-title" /></div>
+          <div class="form-group"><label>Department / Type *</label>
+            <select id="j-type" required>
+              <option value="counselling">Counselling</option>
+              <option value="sales">Sales</option>
+              <option value="marketing">Marketing</option>
+              <option value="operations">Operations</option>
+              <option value="finance">Finance</option>
+              <option value="hr">Human Resources</option>
+              <option value="it">IT &amp; Technology</option>
+              <option value="test_prep">Test Prep</option>
+              <option value="visa">Visa &amp; Documentation</option>
+              <option value="management">Management</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Employment Type *</label>
+            <select id="j-employment" required>
+              <option value="full_time">Full Time</option>
+              <option value="part_time">Part Time</option>
+              <option value="contract">Contract</option>
+              <option value="internship">Internship</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Location *</label><input id="j-location" required placeholder="Karnal, Haryana" /></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Experience Required</label><input id="j-experience" placeholder="1–3 years" /></div>
+          <div class="form-group"><label>Salary Range</label><input id="j-salary" placeholder="As per industry standards" /></div>
+        </div>
+        <div class="form-group"><label>Job Description *</label><textarea id="j-description" rows="4" required></textarea></div>
+        <div class="form-group"><label>Requirements *</label><textarea id="j-requirements" rows="4" required placeholder="One requirement per line"></textarea></div>
+        <div class="form-group"><label>Responsibilities</label><textarea id="j-responsibilities" rows="3" placeholder="One responsibility per line"></textarea></div>
+        <div class="form-row">
+          <div class="form-group"><label>Sort Order</label><input id="j-sort" type="number" value="0" /></div>
+          <div class="form-group"><label>Status</label><select id="j-active"><option value="true">Active</option><option value="false">Inactive</option></select></div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeCareerModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
     const SECRET = window.location.pathname.replace('/admin/', '');
     const headers = { 'X-Admin-Secret': SECRET, 'Content-Type': 'application/json' };
 
-    let cache = { enquiries: [], demo: [], loans: [], referrals: [], testimonials: [], news: [], blog: [], offers: [] };
+    let cache = { enquiries: [], demo: [], loans: [], referrals: [], testimonials: [], news: [], blog: [], offers: [], careers: [], jobapps: [] };
     let statusOptions = { general: [], referral: [] };
     const filters = {
       enquiries: { search: '', status: '' },
@@ -267,6 +454,8 @@
       news: { search: '', is_published: '' },
       blog: { search: '', is_published: '' },
       offers: { search: '', offer_type: '', is_active: '' },
+      careers: { search: '', job_type: '', is_active: '' },
+      jobapps: { search: '', status: '', job_id: '' },
     };
 
     async function api(path, opts = {}) {
@@ -354,9 +543,13 @@
         status: document.getElementById('s-status').value,
         admin_notes: document.getElementById('s-notes').value || null,
       };
-      const paths = { enquiries: 'enquiries', demo: 'demo-classes', loans: 'education-loans', referrals: 'referrals' };
+      const paths = { enquiries: 'enquiries', demo: 'demo-classes', loans: 'education-loans', referrals: 'referrals', jobapps: 'job-applications' };
       try {
-        await api(`/${paths[type]}/${id}`, { method: 'PATCH', body: JSON.stringify(payload) });
+        const url = type === 'jobapps'
+          ? `/${paths[type]}/${id}/status`
+          : `/${paths[type]}/${id}`;
+        const method = type === 'jobapps' ? 'PUT' : 'PATCH';
+        await api(url, { method, body: JSON.stringify(payload) });
         toast('Status updated');
         closeStatusModal();
         await loadAll();
@@ -372,6 +565,9 @@
         if ((tabKey === 'news' || tabKey === 'blog') && f.is_published !== '' && String(r.is_published) !== f.is_published) return false;
         if (tabKey === 'offers' && f.offer_type && r.offer_type !== f.offer_type) return false;
         if (tabKey === 'offers' && f.is_active !== '' && String(r.is_active) !== f.is_active) return false;
+        if (tabKey === 'careers' && f.job_type && r.job_type !== f.job_type) return false;
+        if (tabKey === 'careers' && f.is_active !== '' && String(r.is_active) !== f.is_active) return false;
+        if (tabKey === 'jobapps' && f.job_id && String(r.job_id) !== f.job_id) return false;
         if (f.search) {
           const hay = JSON.stringify(r).toLowerCase();
           if (!hay.includes(f.search.toLowerCase())) return false;
@@ -513,6 +709,8 @@
       else if (tab === 'news') renderContent('news');
       else if (tab === 'blog') renderContent('blog');
       else if (tab === 'offers') renderOffers();
+      else if (tab === 'careers') renderCareers();
+      else if (tab === 'jobapps') renderJobApps();
       else renderTestimonials();
     }
 
@@ -556,25 +754,54 @@
 
     async function loadAll() {
       try {
-        const [statuses, enquiries, demo, loans, referrals, testimonials, news, blog, offers] = await Promise.all([
+        const [statuses, enquiries, demo, loans, referrals, testimonials, news, blog, offers, careers, jobapps] = await Promise.all([
           api('/statuses'), api('/enquiries'), api('/demo-classes'), api('/education-loans'), api('/referrals'), api('/testimonials'),
-          api('/content?content_type=news'), api('/content?content_type=blog'), api('/offers')
+          api('/content?content_type=news'), api('/content?content_type=blog'), api('/offers'),
+          api('/careers'), api('/job-applications')
         ]);
         statusOptions = statuses;
-        cache = { enquiries, demo, loans, referrals, testimonials, news, blog, offers };
+        cache = { enquiries, demo, loans, referrals, testimonials, news, blog, offers, careers, jobapps };
         renderEnquiries(); renderDemo(); renderLoans(); renderReferrals(); renderTestimonials();
-        renderContent('news'); renderContent('blog'); renderOffers();
+        renderContent('news'); renderContent('blog'); renderOffers(); renderCareers(); renderJobApps();
       } catch (e) { toast('Failed to load: ' + e.message, 'error'); }
     }
 
-    // Tabs
+    const PAGE_SUBTITLES = {
+      enquiries: 'Student enquiry submissions',
+      demo: 'IELTS & PTE demo class bookings',
+      loans: 'Education loan requests',
+      referrals: 'Refer & earn partner applications',
+      jobapps: 'Career applications with resumes',
+      testimonials: 'Success story testimonials',
+      news: 'News & articles content',
+      blog: 'Blog posts and guides',
+      offers: 'Student offers and promotions',
+      careers: 'Job openings and roles',
+    };
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('sidebar-backdrop').classList.toggle('open');
+    }
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('sidebar-backdrop').classList.remove('open');
+    }
+
+    function setActiveTab(tab) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      const key = tab.dataset.tab;
+      document.getElementById('panel-' + key).classList.add('active');
+      document.getElementById('page-title').textContent = tab.dataset.title || tab.textContent.trim();
+      document.getElementById('page-subtitle').textContent = PAGE_SUBTITLES[key] || '';
+      closeSidebar();
+    }
+
+    // Sidebar navigation
     document.querySelectorAll('.tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-        tab.classList.add('active');
-        document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
-      });
+      tab.addEventListener('click', () => setActiveTab(tab));
     });
 
     // Testimonial CRUD
@@ -1022,6 +1249,153 @@
     async function deleteOffer(id) {
       if (!confirm('Delete this offer?')) return;
       try { await api('/offers/' + id, { method: 'DELETE' }); toast('Deleted'); loadAll(); }
+      catch (err) { toast(err.message, 'error'); }
+    }
+
+    const JOB_TYPE_LABELS = {
+      counselling: 'Counselling', sales: 'Sales', marketing: 'Marketing', operations: 'Operations',
+      finance: 'Finance', hr: 'HR', it: 'IT', test_prep: 'Test Prep', visa: 'Visa',
+      management: 'Management', other: 'Other'
+    };
+    const EMPLOYMENT_LABELS = {
+      full_time: 'Full Time', part_time: 'Part Time', contract: 'Contract', internship: 'Internship'
+    };
+
+    function resumeSrc(url) {
+      if (!url) return '';
+      const match = url.match(/(?:resumes)\/[a-f0-9]+\.[a-z0-9]+$/i);
+      if (match) return '/api/media/' + match[0];
+      return url.startsWith('http') ? url : url;
+    }
+
+    function renderCareers() {
+      const data = applyClientFilter(cache.careers, 'careers');
+      document.getElementById('count-careers').textContent = cache.careers.length;
+      const panel = document.getElementById('panel-careers');
+      const typeFilter = `<select onchange="setFilter('careers','job_type',this.value)">
+        <option value="">All Departments</option>
+        ${Object.entries(JOB_TYPE_LABELS).map(([k,v]) => `<option value="${k}" ${filters.careers.job_type===k?'selected':''}>${v}</option>`).join('')}
+      </select>`;
+      const activeFilter = `<select onchange="setFilter('careers','is_active',this.value)">
+        <option value="">All</option>
+        <option value="true" ${filters.careers.is_active==='true'?'selected':''}>Active</option>
+        <option value="false" ${filters.careers.is_active==='false'?'selected':''}>Inactive</option>
+      </select>`;
+      const toolbar = `<div class="toolbar"><h2>Job Openings (${data.length})</h2>
+        <button class="btn btn-primary" onclick="openCareerModal()">+ Add Job</button></div>`;
+      if (!data.length) {
+        panel.innerHTML = toolbar + filterBar('careers', typeFilter + activeFilter) + '<div class="empty">No job openings found</div>';
+        return;
+      }
+      const rows = data.map(j => `<tr>
+        <td>${j.id}</td>
+        <td><strong>${j.title}</strong><br/><small>${j.location}</small></td>
+        <td>${JOB_TYPE_LABELS[j.job_type] || j.job_type}</td>
+        <td>${EMPLOYMENT_LABELS[j.employment_type] || j.employment_type}</td>
+        <td>${j.experience_required || '—'}</td>
+        <td><span class="badge ${j.is_active?'badge-active':'badge-inactive'}">${j.is_active?'Active':'Inactive'}</span></td>
+        <td>${j.sort_order}</td>
+        <td class="actions">
+          <button class="btn btn-secondary btn-sm" onclick="editCareer(${j.id})">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteCareer(${j.id})">Delete</button>
+        </td>
+      </tr>`).join('');
+      panel.innerHTML = toolbar + filterBar('careers', typeFilter + activeFilter) + `<div class="card"><table><thead><tr>
+        <th>ID</th><th>Title</th><th>Department</th><th>Employment</th><th>Experience</th><th>Status</th><th>Order</th><th>Actions</th>
+      </tr></thead><tbody>${rows}</tbody></table></div>`;
+    }
+
+    function openCareerModal(data = null) {
+      document.getElementById('career-modal-title').textContent = data ? 'Edit Job Opening' : 'Add Job Opening';
+      document.getElementById('j-id').value = data?.id || '';
+      document.getElementById('j-title').value = data?.title || '';
+      document.getElementById('j-slug').value = data?.slug || '';
+      document.getElementById('j-type').value = data?.job_type || 'counselling';
+      document.getElementById('j-employment').value = data?.employment_type || 'full_time';
+      document.getElementById('j-location').value = data?.location || '';
+      document.getElementById('j-experience').value = data?.experience_required || '';
+      document.getElementById('j-salary').value = data?.salary_range || '';
+      document.getElementById('j-description').value = data?.description || '';
+      document.getElementById('j-requirements').value = data?.requirements || '';
+      document.getElementById('j-responsibilities').value = data?.responsibilities || '';
+      document.getElementById('j-sort').value = data?.sort_order || 0;
+      document.getElementById('j-active').value = data?.is_active !== false ? 'true' : 'false';
+      document.getElementById('career-modal').classList.add('open');
+    }
+    function closeCareerModal() { document.getElementById('career-modal').classList.remove('open'); }
+    function editCareer(id) { const j = cache.careers.find(x => x.id === id); if (j) openCareerModal(j); }
+
+    document.getElementById('career-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('j-id').value;
+      const payload = {
+        title: document.getElementById('j-title').value,
+        slug: document.getElementById('j-slug').value || null,
+        job_type: document.getElementById('j-type').value,
+        employment_type: document.getElementById('j-employment').value,
+        location: document.getElementById('j-location').value,
+        experience_required: document.getElementById('j-experience').value || null,
+        salary_range: document.getElementById('j-salary').value || null,
+        description: document.getElementById('j-description').value,
+        requirements: document.getElementById('j-requirements').value,
+        responsibilities: document.getElementById('j-responsibilities').value || null,
+        sort_order: parseInt(document.getElementById('j-sort').value) || 0,
+        is_active: document.getElementById('j-active').value === 'true',
+      };
+      try {
+        if (id) await api('/careers/' + id, { method: 'PUT', body: JSON.stringify(payload) });
+        else await api('/careers', { method: 'POST', body: JSON.stringify(payload) });
+        toast(id ? 'Updated' : 'Created');
+        closeCareerModal();
+        loadAll();
+      } catch (err) { toast(err.message, 'error'); }
+    });
+
+    async function deleteCareer(id) {
+      if (!confirm('Delete this job opening?')) return;
+      try { await api('/careers/' + id, { method: 'DELETE' }); toast('Deleted'); loadAll(); }
+      catch (err) { toast(err.message, 'error'); }
+    }
+
+    function renderJobApps() {
+      const data = applyClientFilter(cache.jobapps, 'jobapps');
+      document.getElementById('count-jobapps').textContent = cache.jobapps.length;
+      const panel = document.getElementById('panel-jobapps');
+      const statusFilter = `<select onchange="setFilter('jobapps','status',this.value)">
+        <option value="">All Statuses</option>
+        ${statusOptions.general.map(s => `<option value="${s}" ${filters.jobapps.status===s?'selected':''}>${s.replace(/_/g,' ')}</option>`).join('')}
+      </select>`;
+      const jobFilter = `<select onchange="setFilter('jobapps','job_id',this.value)">
+        <option value="">All Jobs</option>
+        ${cache.careers.map(j => `<option value="${j.id}" ${filters.jobapps.job_id===String(j.id)?'selected':''}>${j.title}</option>`).join('')}
+      </select>`;
+      const toolbar = `<div class="toolbar"><h2>Job Applications (${data.length})</h2></div>`;
+      if (!data.length) {
+        panel.innerHTML = toolbar + filterBar('jobapps', statusFilter + jobFilter) + '<div class="empty">No applications yet</div>';
+        return;
+      }
+      const rows = data.map(a => `<tr>
+        <td>${a.id}</td>
+        <td><strong>${a.full_name}</strong><br/><small>${a.email}</small><br/><small>${a.phone}</small></td>
+        <td>${a.job_title}</td>
+        <td>${a.experience_years || '—'}</td>
+        <td>${a.current_city || '—'}</td>
+        <td><a href="${resumeSrc(a.resume_url)}" target="_blank" rel="noopener">${a.resume_filename || 'Resume'}</a></td>
+        <td>${statusBadge(a.status)}</td>
+        <td>${fmtDate(a.created_at)}</td>
+        <td class="actions">
+          <button class="btn btn-primary btn-sm" onclick="openStatusModal('jobapps',${a.id},'${a.status}','${(a.admin_notes||'').replace(/'/g,"\\'")}')">Update</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteJobApp(${a.id})">Delete</button>
+        </td>
+      </tr>`).join('');
+      panel.innerHTML = toolbar + filterBar('jobapps', statusFilter + jobFilter) + `<div class="card"><table><thead><tr>
+        <th>ID</th><th>Applicant</th><th>Job</th><th>Experience</th><th>City</th><th>Resume</th><th>Status</th><th>Applied</th><th>Actions</th>
+      </tr></thead><tbody>${rows}</tbody></table></div>`;
+    }
+
+    async function deleteJobApp(id) {
+      if (!confirm('Delete this application?')) return;
+      try { await api('/job-applications/' + id, { method: 'DELETE' }); toast('Deleted'); loadAll(); }
       catch (err) { toast(err.message, 'error'); }
     }
 

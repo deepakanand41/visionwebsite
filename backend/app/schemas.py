@@ -344,6 +344,126 @@ class ImageUploadResponse(BaseModel):
     message: str
 
 
+# ─── Careers ─────────────────────────────────────────────────────────────────────
+
+JOB_TYPES = (
+    "counselling",
+    "sales",
+    "marketing",
+    "operations",
+    "finance",
+    "hr",
+    "it",
+    "test_prep",
+    "visa",
+    "management",
+    "other",
+)
+
+EMPLOYMENT_TYPES = ("full_time", "part_time", "contract", "internship")
+
+
+class JobPostingCreate(BaseModel):
+    title: str = Field(..., min_length=3, max_length=200)
+    slug: Optional[str] = Field(None, max_length=220)
+    job_type: str = Field(
+        ...,
+        pattern="^(counselling|sales|marketing|operations|finance|hr|it|test_prep|visa|management|other)$",
+    )
+    employment_type: str = Field(default="full_time", pattern="^(full_time|part_time|contract|internship)$")
+    location: str = Field(..., min_length=2, max_length=150)
+    experience_required: Optional[str] = Field(None, max_length=100)
+    salary_range: Optional[str] = Field(None, max_length=100)
+    description: str = Field(..., min_length=20)
+    requirements: str = Field(..., min_length=10)
+    responsibilities: Optional[str] = None
+    is_active: bool = True
+    sort_order: int = 0
+
+
+class JobPostingUpdate(BaseModel):
+    title: Optional[str] = Field(None, min_length=3, max_length=200)
+    slug: Optional[str] = Field(None, max_length=220)
+    job_type: Optional[str] = Field(
+        None,
+        pattern="^(counselling|sales|marketing|operations|finance|hr|it|test_prep|visa|management|other)$",
+    )
+    employment_type: Optional[str] = Field(None, pattern="^(full_time|part_time|contract|internship)$")
+    location: Optional[str] = Field(None, min_length=2, max_length=150)
+    experience_required: Optional[str] = Field(None, max_length=100)
+    salary_range: Optional[str] = Field(None, max_length=100)
+    description: Optional[str] = Field(None, min_length=20)
+    requirements: Optional[str] = Field(None, min_length=10)
+    responsibilities: Optional[str] = None
+    is_active: Optional[bool] = None
+    sort_order: Optional[int] = None
+
+
+class JobPostingResponse(BaseModel):
+    id: int
+    title: str
+    slug: str
+    job_type: str
+    employment_type: str
+    location: str
+    experience_required: Optional[str]
+    salary_range: Optional[str]
+    description: str
+    requirements: str
+    responsibilities: Optional[str]
+    is_active: bool
+    sort_order: int
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class JobPostingPublicResponse(BaseModel):
+    id: int
+    title: str
+    slug: str
+    job_type: str
+    employment_type: str
+    location: str
+    experience_required: Optional[str]
+    salary_range: Optional[str]
+    description: str
+    requirements: str
+    responsibilities: Optional[str]
+    sort_order: int
+
+    model_config = {"from_attributes": True}
+
+
+class JobApplicationResponse(BaseModel):
+    id: int
+    job_id: int
+    job_title: str
+    full_name: str
+    email: str
+    phone: str
+    current_city: Optional[str]
+    current_role: Optional[str]
+    experience_years: Optional[str]
+    linkedin_url: Optional[str]
+    cover_message: Optional[str]
+    resume_url: str
+    resume_filename: Optional[str]
+    status: str
+    admin_notes: Optional[str]
+    status_updated_at: Optional[datetime]
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class ResumeUploadResponse(BaseModel):
+    resume_url: str
+    resume_filename: str
+    message: str
+
+
 # ─── Education Loan ────────────────────────────────────────────────────────────
 
 class EducationLoanCreate(BaseModel):

@@ -15,6 +15,7 @@ const NewsDetailPage = lazy(() => import('./pages/ContentHub').then((m) => ({ de
 const BlogListPage = lazy(() => import('./pages/ContentHub').then((m) => ({ default: m.BlogListPage })));
 const BlogDetailPage = lazy(() => import('./pages/ContentHub').then((m) => ({ default: m.BlogDetailPage })));
 const Offers = lazy(() => import('./pages/Offers'));
+const Careers = lazy(() => import('./pages/Careers'));
 
 function PageLoader() {
   return (
@@ -46,6 +47,7 @@ export default function App() {
             <Route path="/blog" element={<BlogListPage />} />
             <Route path="/blog/:slug" element={<BlogDetailPage />} />
             <Route path="/offers" element={<Offers />} />
+            <Route path="/careers" element={<Careers />} />
             <Route path="/sign-in" element={<SignIn />} />
             <Route path="/contact-us" element={<ContactUs />} />
           </Routes>

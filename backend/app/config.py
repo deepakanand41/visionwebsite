@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     local_upload_dir: str = "uploads"
     upload_max_bytes: int = 10 * 1024 * 1024
     upload_max_video_bytes: int = 40 * 1024 * 1024
+    upload_max_resume_bytes: int = 5 * 1024 * 1024
 
     aws_s3_bucket: str = ""
     aws_s3_region: str = "ap-south-1"

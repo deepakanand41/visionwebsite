@@ -10,10 +10,18 @@ ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif"}
 ALLOWED_VIDEO_TYPES = {"video/mp4", "video/webm", "video/quicktime"}
 ALLOWED_MEDIA_TYPES = ALLOWED_IMAGE_TYPES | ALLOWED_VIDEO_TYPES
 
+ALLOWED_RESUME_TYPES = {
+    "application/pdf",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+}
+ALLOWED_RESUME_EXTENSIONS = {".pdf", ".doc", ".docx"}
+
 TESTIMONIAL_PREFIX = "testimonials"
 OFFER_PREFIX = "offers"
 CONTENT_PREFIX = "content"
-MEDIA_PREFIXES = (TESTIMONIAL_PREFIX, OFFER_PREFIX, CONTENT_PREFIX)
+RESUME_PREFIX = "resumes"
+MEDIA_PREFIXES = (TESTIMONIAL_PREFIX, OFFER_PREFIX, CONTENT_PREFIX, RESUME_PREFIX)
 
 
 def _use_s3() -> bool:
@@ -69,6 +77,13 @@ def _extension(filename: str | None, media_type: str) -> str:
     if ext in {".jpg", ".jpeg", ".png", ".webp", ".gif", ".mp4", ".webm", ".mov"}:
         return ext
     return ".jpg" if media_type == "image" else ".mp4"
+
+
+def _resume_extension(filename: str | None) -> str:
+    ext = Path(filename or "").suffix.lower()
+    if ext in ALLOWED_RESUME_EXTENSIONS:
+        return ext
+    return ".pdf"
 
 
 class StorageService:
@@ -148,6 +163,28 @@ class StorageService:
             self._upload_local(key, content)
 
         return self.public_url(key)
+
+    def upload_resume(self, file: UploadFile, content: bytes) -> tuple[str, str]:
+        content_type = (file.content_type or "").split(";")[0].strip().lower()
+        ext = _resume_extension(file.filename)
+        if content_type not in ALLOWED_RESUME_TYPES and ext not in ALLOWED_RESUME_EXTENSIONS:
+            raise HTTPException(
+                status_code=400,
+                detail="Resume must be PDF or Word document (.pdf, .doc, .docx, max 5MB).",
+            )
+
+        max_bytes = settings.upload_max_resume_bytes
+        if len(content) > max_bytes:
+            max_mb = max_bytes // (1024 * 1024)
+            raise HTTPException(status_code=400, detail=f"Resume must be smaller than {max_mb}MB")
+
+        key = f"{RESUME_PREFIX}/{uuid.uuid4().hex}{ext}"
+        if _use_s3():
+            self._upload_s3(key, content, file.content_type or content_type)
+        else:
+            self._upload_local(key, content)
+
+        return self.public_url(key), file.filename or f"resume{ext}"
 
     def delete_media(self, media_url: str | None) -> None:
         key = self.resolve_key(media_url)

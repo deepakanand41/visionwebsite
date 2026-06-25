@@ -19,6 +19,7 @@ const navLinks = [
 const topBarLinks = [
   { label: 'News & Articles', to: '/news' },
   { label: 'Blog', to: '/blog' },
+  { label: 'Careers', to: '/careers' },
   { label: 'Contact Us', to: '/contact-us' },
 ];
 
@@ -224,7 +225,8 @@ export default function Navbar() {
   const isTopLinkActive = (path) =>
     location.pathname === path
     || (path === '/news' && location.pathname.startsWith('/news'))
-    || (path === '/blog' && location.pathname.startsWith('/blog'));
+    || (path === '/blog' && location.pathname.startsWith('/blog'))
+    || (path === '/careers' && location.pathname.startsWith('/careers'));
 
   return (
     <motion.header
