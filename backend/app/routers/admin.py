@@ -479,6 +479,17 @@ def delete_content_image(post_id: int, db: Session = Depends(get_db)):
     return MessageResponse(message="Cover image removed successfully")
 
 
+@router.post("/content/upload-media", response_model=MediaUploadResponse)
+async def upload_content_inline_media(file: UploadFile = File(...)):
+    content = await file.read()
+    media_type, media_url = storage_service.upload_content_media(file, content)
+    return MediaUploadResponse(
+        media_type=media_type,
+        media_url=media_url,
+        message="Media uploaded successfully",
+    )
+
+
 # ─── Offers CRUD ─────────────────────────────────────────────────────────────────
 
 def _unique_offer_slug(db: Session, base_slug: str, exclude_id: int | None = None) -> str:

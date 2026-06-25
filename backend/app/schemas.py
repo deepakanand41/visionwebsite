@@ -198,6 +198,11 @@ class MessageResponse(BaseModel):
 
 # ─── News & Blog ───────────────────────────────────────────────────────────────
 
+class FAQItem(BaseModel):
+    question: str = Field(..., min_length=3, max_length=300)
+    answer: str = Field(..., min_length=3)
+
+
 class ContentPostCreate(BaseModel):
     content_type: str = Field(..., pattern="^(news|blog)$")
     title: str = Field(..., min_length=3, max_length=250)
@@ -207,6 +212,9 @@ class ContentPostCreate(BaseModel):
     cover_image_url: Optional[str] = Field(None, max_length=500)
     author: str = Field(default="Vision Team", max_length=120)
     category: Optional[str] = Field(None, max_length=100)
+    meta_keywords: Optional[str] = Field(None, max_length=500)
+    faqs: Optional[list[FAQItem]] = None
+    show_toc: bool = True
     is_published: bool = False
     is_featured: bool = False
 
@@ -219,6 +227,9 @@ class ContentPostUpdate(BaseModel):
     cover_image_url: Optional[str] = Field(None, max_length=500)
     author: Optional[str] = Field(None, max_length=120)
     category: Optional[str] = Field(None, max_length=100)
+    meta_keywords: Optional[str] = Field(None, max_length=500)
+    faqs: Optional[list[FAQItem]] = None
+    show_toc: Optional[bool] = None
     is_published: Optional[bool] = None
     is_featured: Optional[bool] = None
 
@@ -233,6 +244,9 @@ class ContentPostResponse(BaseModel):
     cover_image_url: Optional[str]
     author: str
     category: Optional[str]
+    meta_keywords: Optional[str]
+    faqs: Optional[list[FAQItem]] = None
+    show_toc: bool
     is_published: bool
     is_featured: bool
     published_at: Optional[datetime]
@@ -252,6 +266,9 @@ class ContentPostPublicResponse(BaseModel):
     cover_image_url: Optional[str]
     author: str
     category: Optional[str]
+    meta_keywords: Optional[str]
+    faqs: Optional[list[FAQItem]] = None
+    show_toc: bool
     is_featured: bool
     published_at: Optional[datetime]
     created_at: datetime

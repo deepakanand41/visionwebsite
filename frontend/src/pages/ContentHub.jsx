@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { FiArrowLeft, FiCalendar, FiUser } from 'react-icons/fi';
 import { fetchNews, fetchNewsArticle, fetchBlog, fetchBlogPost } from '../services/api';
-import { ContentCard, ContentListHero, formatPostDate, renderBody } from '../components/ContentPages';
+import { ContentCard, ContentListHero, formatPostDate, ArticleContent, useArticleMeta } from '../components/ContentPages';
 import { HOME_THEME as T } from '../utils/constants';
 import { resolveMediaUrl } from '../utils/mediaUrl';
 
@@ -99,6 +99,8 @@ function ContentDetail({ type }) {
       .finally(() => setLoading(false));
   }, [slug, type]);
 
+  useArticleMeta(post);
+
   if (loading) {
     return <main className="min-h-screen flex items-center justify-center text-gray-500 pt-32">Loading...</main>;
   }
@@ -146,7 +148,7 @@ function ContentDetail({ type }) {
             {post.excerpt}
           </p>
         )}
-        <div className="prose prose-gray max-w-none">{renderBody(post.body)}</div>
+        <ArticleContent body={post.body} faqs={post.faqs} showToc={post.show_toc !== false} />
       </article>
     </main>
   );

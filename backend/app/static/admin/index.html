@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Vision Admin Panel</title>
+  <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f4f6fb; color: #1a1a2e; min-height: 100vh; }
@@ -150,6 +151,13 @@
     .modal-overlay.open { display: flex; }
     .modal { background: white; border-radius: 16px; padding: 1.5rem; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; }
     .modal.modal-lg { max-width: 680px; }
+    .modal.modal-xl { max-width: 920px; }
+    .ql-container { min-height: 220px; font-size: 0.9rem; }
+    .ql-editor { min-height: 220px; }
+    .faq-row { border: 1px solid #e5e7eb; border-radius: 10px; padding: 0.75rem; margin-bottom: 0.6rem; background: #f9fafb; }
+    .faq-row .form-group { margin-bottom: 0.5rem; }
+    .editor-toolbar-extra { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.5rem; }
+    .editor-toolbar-extra .btn { font-size: 0.72rem; }
     .modal h3 { margin-bottom: 1rem; color: #0A3D91; }
     .form-group { margin-bottom: 0.85rem; }
     .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: #374151; margin-bottom: 0.3rem; }
@@ -299,7 +307,7 @@
 
   <!-- Content (News / Blog) Modal -->
   <div class="modal-overlay" id="content-modal">
-    <div class="modal modal-lg">
+    <div class="modal modal-xl">
       <h3 id="content-modal-title">Add Post</h3>
       <form id="content-form">
         <input type="hidden" id="c-id" />
@@ -307,12 +315,32 @@
         <div class="form-group"><label>Title *</label><input id="c-title" required /></div>
         <div class="form-row">
           <div class="form-group"><label>Slug (optional)</label><input id="c-slug" placeholder="auto-from-title" /></div>
-          <div class="form-group"><label>Category</label><input id="c-category" placeholder="Visa Updates, Guides..." /></div>
+          <div class="form-group"><label>Category</label><input id="c-category" placeholder="Visa Updates, Events, Guides..." /></div>
         </div>
         <div class="form-group"><label>Excerpt</label><textarea id="c-excerpt" rows="2" placeholder="Short summary for listing cards"></textarea></div>
-        <div class="form-group"><label>Body *</label><textarea id="c-body" rows="10" required placeholder="Use **bold** for headings. Separate paragraphs with blank lines."></textarea></div>
+        <div class="form-group">
+          <label>SEO Keywords</label>
+          <input id="c-keywords" placeholder="study abroad, visa, IELTS (comma separated)" />
+        </div>
+        <div class="form-group">
+          <label>Article Body *</label>
+          <div class="editor-toolbar-extra">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="insertContentImage()">🖼 Insert Image</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="insertContentVideo()">🎬 Insert Video</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="insertContentLink()">🔗 Insert Link</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="insertContentCta()">📣 Insert CTA Block</button>
+          </div>
+          <div id="c-body-editor"></div>
+          <p style="font-size:0.72rem;color:#6b7280;margin-top:0.35rem;">Use toolbar for H1, H2, bold, lists, and links. Images support alt text for accessibility.</p>
+        </div>
+        <div class="form-group">
+          <label>FAQs</label>
+          <div id="c-faqs-list"></div>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="addFaqRow()">+ Add FAQ</button>
+        </div>
         <div class="form-row">
           <div class="form-group"><label>Author</label><input id="c-author" value="Vision Team" /></div>
+          <div class="form-group"><label>Table of Contents</label><select id="c-toc"><option value="true">Show TOC</option><option value="false">Hide TOC</option></select></div>
         </div>
         <div class="form-group">
           <label>Cover Image (max 10MB)</label>
@@ -439,6 +467,7 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
   <script>
     const SECRET = window.location.pathname.replace('/admin/', '');
     const headers = { 'X-Admin-Secret': SECRET, 'Content-Type': 'application/json' };
@@ -943,6 +972,132 @@
     }
 
     let pendingContentImageRemove = false;
+    let contentQuill = null;
+
+    function initContentQuill() {
+      if (contentQuill) return contentQuill;
+      contentQuill = new Quill('#c-body-editor', {
+        theme: 'snow',
+        modules: {
+          toolbar: [
+            [{ header: [1, 2, false] }],
+            ['bold', 'italic', 'underline'],
+            [{ list: 'ordered' }, { list: 'bullet' }],
+            ['link'],
+            ['clean'],
+          ],
+        },
+      });
+      return contentQuill;
+    }
+
+    function addFaqRow(question = '', answer = '') {
+      const list = document.getElementById('c-faqs-list');
+      const row = document.createElement('div');
+      row.className = 'faq-row';
+      row.innerHTML = `
+        <div class="form-group"><label>Question</label><input class="faq-q" value="${question.replace(/"/g, '&quot;')}" placeholder="FAQ question" /></div>
+        <div class="form-group"><label>Answer</label><textarea class="faq-a" rows="2" placeholder="FAQ answer">${answer}</textarea></div>
+        <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">Remove</button>
+      `;
+      list.appendChild(row);
+    }
+
+    function setFaqsInForm(faqs) {
+      const list = document.getElementById('c-faqs-list');
+      list.innerHTML = '';
+      (faqs || []).forEach(f => addFaqRow(f.question || '', f.answer || ''));
+    }
+
+    function getFaqsFromForm() {
+      const rows = [...document.querySelectorAll('#c-faqs-list .faq-row')];
+      const faqs = rows.map(row => ({
+        question: row.querySelector('.faq-q').value.trim(),
+        answer: row.querySelector('.faq-a').value.trim(),
+      })).filter(f => f.question && f.answer);
+      return faqs.length ? faqs : null;
+    }
+
+    async function uploadInlineContentMedia(file) {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await fetch('/api/admin/content/upload-media', {
+        method: 'POST',
+        headers: { 'X-Admin-Secret': SECRET },
+        body: fd,
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || res.statusText);
+      }
+      return res.json();
+    }
+
+    function insertHtmlAtCursor(html) {
+      const q = initContentQuill();
+      const range = q.getSelection(true);
+      q.clipboard.dangerouslyPasteHTML(range ? range.index : q.getLength(), html);
+    }
+
+    async function insertContentImage() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/jpeg,image/png,image/webp,image/gif';
+      input.onchange = async () => {
+        const file = input.files?.[0];
+        if (!file) return;
+        if (file.size > 10 * 1024 * 1024) { toast('Image must be smaller than 10MB', 'error'); return; }
+        const alt = prompt('Alt text for image (accessibility) *', '') || '';
+        const title = prompt('Image title / caption (optional)', '') || '';
+        try {
+          const result = await uploadInlineContentMedia(file);
+          const src = contentImageSrc(result.media_url);
+          const titleAttr = title ? ` title="${title.replace(/"/g, '&quot;')}"` : '';
+          insertHtmlAtCursor(`<p><img src="${src}" alt="${alt.replace(/"/g, '&quot;')}"${titleAttr} style="max-width:100%;border-radius:12px;" />${title ? `<em>${title}</em>` : ''}</p>`);
+        } catch (err) { toast(err.message, 'error'); }
+      };
+      input.click();
+    }
+
+    async function insertContentVideo() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'video/mp4,video/webm,video/quicktime';
+      input.onchange = async () => {
+        const file = input.files?.[0];
+        if (!file) return;
+        if (file.size > 40 * 1024 * 1024) { toast('Video must be smaller than 40MB', 'error'); return; }
+        const alt = prompt('Video description / alt text', 'Video content') || 'Video';
+        try {
+          const result = await uploadInlineContentMedia(file);
+          const src = contentImageSrc(result.media_url);
+          insertHtmlAtCursor(`<p><video src="${src}" controls playsinline preload="metadata" title="${alt.replace(/"/g, '&quot;')}" style="max-width:100%;border-radius:12px;"></video></p>`);
+        } catch (err) { toast(err.message, 'error'); }
+      };
+      input.click();
+    }
+
+    function insertContentLink() {
+      const url = prompt('Link URL (https:// or /page)', 'https://');
+      if (!url) return;
+      const text = prompt('Link text', 'Read more') || url;
+      const q = initContentQuill();
+      const range = q.getSelection(true);
+      if (range && range.length) {
+        q.format('link', url);
+      } else {
+        insertHtmlAtCursor(`<p><a href="${url.replace(/"/g, '&quot;')}" target="_blank" rel="noopener noreferrer">${text.replace(/</g, '&lt;')}</a></p>`);
+      }
+    }
+
+    function insertContentCta() {
+      const text = prompt('CTA message', 'Ready to start your study abroad journey?') || 'Ready to start your study abroad journey?';
+      const label = prompt('Button label', 'Book Free Counselling') || 'Book Free Counselling';
+      const link = prompt('Button link', '/contact-us') || '/contact-us';
+      insertHtmlAtCursor(
+        `<div class="article-cta"><p class="article-cta-text">${text.replace(/</g, '&lt;')}</p><a class="article-cta-link" href="${link.replace(/"/g, '&quot;')}">${label.replace(/</g, '&lt;')}</a></div>`
+      );
+    }
 
     function contentImageSrc(url) {
       if (!url) return '';
@@ -968,6 +1123,7 @@
     function openContentModal(type, data = null) {
       pendingContentImageRemove = false;
       document.getElementById('c-cover-file').value = '';
+      const q = initContentQuill();
       document.getElementById('content-modal-title').textContent = data ? 'Edit Post' : (type === 'news' ? 'Add Article' : 'Add Blog Post');
       document.getElementById('c-id').value = data?.id || '';
       document.getElementById('c-type').value = type;
@@ -975,11 +1131,14 @@
       document.getElementById('c-slug').value = data?.slug || '';
       document.getElementById('c-category').value = data?.category || '';
       document.getElementById('c-excerpt').value = data?.excerpt || '';
-      document.getElementById('c-body').value = data?.body || '';
+      document.getElementById('c-keywords').value = data?.meta_keywords || '';
+      document.getElementById('c-toc').value = data?.show_toc === false ? 'false' : 'true';
       document.getElementById('c-author').value = data?.author || 'Vision Team';
       document.getElementById('c-cover').value = data?.cover_image_url || '';
       document.getElementById('c-published').value = data?.is_published !== false ? 'true' : 'false';
       document.getElementById('c-featured').value = data?.is_featured ? 'true' : 'false';
+      setFaqsInForm(data?.faqs || []);
+      q.root.innerHTML = data?.body || '';
       renderContentImagePreview(data);
       document.getElementById('content-modal').classList.add('open');
     }
@@ -1030,15 +1189,23 @@
       const id = document.getElementById('c-id').value;
       const type = document.getElementById('c-type').value;
       const imageFile = document.getElementById('c-cover-file').files?.[0];
+      const bodyHtml = initContentQuill().root.innerHTML.trim();
+      if (!bodyHtml || bodyHtml === '<p><br></p>') {
+        toast('Article body is required', 'error');
+        return;
+      }
       const payload = {
         content_type: type,
         title: document.getElementById('c-title').value,
         slug: document.getElementById('c-slug').value || null,
         category: document.getElementById('c-category').value || null,
         excerpt: document.getElementById('c-excerpt').value || null,
-        body: document.getElementById('c-body').value,
+        body: bodyHtml,
         author: document.getElementById('c-author').value || 'Vision Team',
         cover_image_url: document.getElementById('c-cover').value || null,
+        meta_keywords: document.getElementById('c-keywords').value || null,
+        faqs: getFaqsFromForm(),
+        show_toc: document.getElementById('c-toc').value === 'true',
         is_published: document.getElementById('c-published').value === 'true',
         is_featured: document.getElementById('c-featured').value === 'true',
       };

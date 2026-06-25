@@ -150,6 +150,18 @@ class StorageService:
             raise HTTPException(status_code=400, detail="Offer image must be JPEG, PNG, WebP, or GIF (max 10MB).")
         return media_url
 
+    def upload_content_media(self, file: UploadFile, content: bytes) -> tuple[str, str]:
+        media_type = _validate_file(file, content)
+        ext = _extension(file.filename, media_type)
+        key = f"{CONTENT_PREFIX}/{uuid.uuid4().hex}{ext}"
+
+        if _use_s3():
+            self._upload_s3(key, content, file.content_type)
+        else:
+            self._upload_local(key, content)
+
+        return media_type, self.public_url(key)
+
     def upload_content_image(self, file: UploadFile, content: bytes) -> str:
         media_type = _validate_file(file, content)
         if media_type != "image":
