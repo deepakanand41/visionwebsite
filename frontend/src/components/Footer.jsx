@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { FaFacebookF, FaInstagram, FaLinkedinIn, FaYoutube } from 'react-icons/fa';
+import { FaFacebookF, FaInstagram, FaLinkedinIn, FaWhatsapp, FaYoutube } from 'react-icons/fa';
 import { FiMail, FiPhone, FiMapPin } from 'react-icons/fi';
 import { COMPANY, SOCIAL_LINKS } from '../utils/constants';
 
@@ -33,6 +33,7 @@ const footerLinks = {
 };
 
 const socials = [
+  { icon: FaWhatsapp, href: SOCIAL_LINKS.whatsapp, label: 'WhatsApp' },
   { icon: FaFacebookF, href: SOCIAL_LINKS.facebook, label: 'Facebook' },
   { icon: FaInstagram, href: SOCIAL_LINKS.instagram, label: 'Instagram' },
   { icon: FaYoutube, href: SOCIAL_LINKS.youtube, label: 'YouTube' },

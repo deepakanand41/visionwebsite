@@ -7,10 +7,11 @@ from sqlalchemy.orm import Session
 from app.auth import verify_admin_secret
 from app.constants import ALL_STATUSES, SUBMISSION_STATUSES
 from app.database import get_db
-from app.models import Enquiry, DemoClassBooking, ReferralApplication, EducationLoanRequest, Testimonial, ContentPost, Offer, JobPosting, JobApplication, Accreditation
+from app.models import Enquiry, DemoClassBooking, ExamBooking, ReferralApplication, EducationLoanRequest, Testimonial, ContentPost, Offer, JobPosting, JobApplication, Accreditation
 from app.schemas import (
     EnquiryResponse,
     DemoClassResponse,
+    ExamBookingResponse,
     ReferralResponse,
     EducationLoanResponse,
     TestimonialCreate,
@@ -69,6 +70,23 @@ def _apply_search_demo(query, search: str):
             DemoClassBooking.exam_type.ilike(term),
             DemoClassBooking.batch.ilike(term),
             DemoClassBooking.admin_notes.ilike(term),
+        )
+    )
+
+
+def _apply_search_exam_booking(query, search: str):
+    term = f"%{search.lower()}%"
+    return query.filter(
+        or_(
+            ExamBooking.first_name.ilike(term),
+            ExamBooking.last_name.ilike(term),
+            ExamBooking.email.ilike(term),
+            ExamBooking.phone.ilike(term),
+            ExamBooking.exam_type.ilike(term),
+            ExamBooking.exam_format.ilike(term),
+            ExamBooking.preferred_city.ilike(term),
+            ExamBooking.notes.ilike(term),
+            ExamBooking.admin_notes.ilike(term),
         )
     )
 
@@ -172,6 +190,38 @@ def update_demo_status(
     record = db.query(DemoClassBooking).filter(DemoClassBooking.id == booking_id).first()
     if not record:
         raise HTTPException(status_code=404, detail="Demo class booking not found")
+    _update_status(record, payload)
+    db.commit()
+    db.refresh(record)
+    return record
+
+
+@router.get("/exam-bookings", response_model=list[ExamBookingResponse])
+def list_exam_bookings(
+    status: str | None = Query(None),
+    search: str | None = Query(None),
+    exam_type: str | None = Query(None),
+    db: Session = Depends(get_db),
+):
+    query = db.query(ExamBooking)
+    if status:
+        query = query.filter(ExamBooking.status == status)
+    if exam_type:
+        query = query.filter(ExamBooking.exam_type == exam_type.lower())
+    if search:
+        query = _apply_search_exam_booking(query, search)
+    return query.order_by(ExamBooking.created_at.desc()).all()
+
+
+@router.patch("/exam-bookings/{booking_id}", response_model=ExamBookingResponse)
+def update_exam_booking_status(
+    booking_id: int,
+    payload: StatusUpdate,
+    db: Session = Depends(get_db),
+):
+    record = db.query(ExamBooking).filter(ExamBooking.id == booking_id).first()
+    if not record:
+        raise HTTPException(status_code=404, detail="Exam booking not found")
     _update_status(record, payload)
     db.commit()
     db.refresh(record)

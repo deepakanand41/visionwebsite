@@ -199,6 +199,7 @@
         <div class="nav-section">Submissions</div>
         <button class="tab active" data-tab="enquiries" data-title="Enquiries"><span>Enquiries</span><span class="count" id="count-enquiries">0</span></button>
         <button class="tab" data-tab="demo" data-title="Demo Classes"><span>Demo Classes</span><span class="count" id="count-demo">0</span></button>
+        <button class="tab" data-tab="exambooks" data-title="Exam Bookings"><span>Exam Book</span><span class="count" id="count-exambooks">0</span></button>
         <button class="tab" data-tab="loans" data-title="Education Loans"><span>Education Loans</span><span class="count" id="count-loans">0</span></button>
         <button class="tab" data-tab="referrals" data-title="Referrals"><span>Referrals</span><span class="count" id="count-referrals">0</span></button>
         <button class="tab" data-tab="jobapps" data-title="Job Applications"><span>Job Applications</span><span class="count" id="count-jobapps">0</span></button>
@@ -231,6 +232,7 @@
       <div class="content">
         <div id="panel-enquiries" class="panel active"></div>
         <div id="panel-demo" class="panel"></div>
+        <div id="panel-exambooks" class="panel"></div>
         <div id="panel-loans" class="panel"></div>
         <div id="panel-referrals" class="panel"></div>
         <div id="panel-testimonials" class="panel"></div>
@@ -501,11 +503,12 @@
     const SECRET = window.location.pathname.replace('/admin/', '');
     const headers = { 'X-Admin-Secret': SECRET, 'Content-Type': 'application/json' };
 
-    let cache = { enquiries: [], demo: [], loans: [], referrals: [], testimonials: [], accreditations: [], news: [], blog: [], offers: [], careers: [], jobapps: [] };
+    let cache = { enquiries: [], demo: [], exambooks: [], loans: [], referrals: [], testimonials: [], accreditations: [], news: [], blog: [], offers: [], careers: [], jobapps: [] };
     let statusOptions = { general: [], referral: [] };
     const filters = {
       enquiries: { search: '', status: '' },
       demo: { search: '', status: '', exam_type: '' },
+      exambooks: { search: '', status: '', exam_type: '' },
       loans: { search: '', status: '' },
       referrals: { search: '', status: '' },
       testimonials: { search: '', is_active: '' },
@@ -602,7 +605,7 @@
         status: document.getElementById('s-status').value,
         admin_notes: document.getElementById('s-notes').value || null,
       };
-      const paths = { enquiries: 'enquiries', demo: 'demo-classes', loans: 'education-loans', referrals: 'referrals', jobapps: 'job-applications' };
+      const paths = { enquiries: 'enquiries', demo: 'demo-classes', exambooks: 'exam-bookings', loans: 'education-loans', referrals: 'referrals', jobapps: 'job-applications' };
       try {
         const url = type === 'jobapps'
           ? `/${paths[type]}/${id}/status`
@@ -620,6 +623,7 @@
       return data.filter(r => {
         if (f.status && r.status !== f.status) return false;
         if (tabKey === 'demo' && f.exam_type && r.exam_type !== f.exam_type) return false;
+        if (tabKey === 'exambooks' && f.exam_type && r.exam_type !== f.exam_type) return false;
         if (tabKey === 'testimonials' && f.is_active !== '' && String(r.is_active) !== f.is_active) return false;
         if (tabKey === 'accreditations' && f.is_active !== '' && String(r.is_active) !== f.is_active) return false;
         if ((tabKey === 'news' || tabKey === 'blog') && f.is_published !== '' && String(r.is_published) !== f.is_published) return false;
@@ -680,6 +684,39 @@
       panel.innerHTML = filterBar('demo', examFilter) + renderStatPills(cache.demo,'demo') + `<div class="card"><table><thead><tr>
         <th>ID</th><th>Exam</th><th>Name / Email</th><th>Phone</th><th>Target</th>
         <th>Batch</th><th>Mode</th><th>Demo Date</th><th>Status</th><th>Notes</th><th>Submitted</th><th>Action</th>
+      </tr></thead><tbody>${rows}</tbody></table></div>`;
+    }
+
+    function renderExamBooks() {
+      const data = applyClientFilter(cache.exambooks, 'exambooks');
+      document.getElementById('count-exambooks').textContent = cache.exambooks.length;
+      const panel = document.getElementById('panel-exambooks');
+      const examFilter = `<select onchange="setFilter('exambooks','exam_type',this.value)">
+        <option value="">All Exams</option>
+        <option value="ielts" ${filters.exambooks.exam_type==='ielts'?'selected':''}>IELTS</option>
+        <option value="pte" ${filters.exambooks.exam_type==='pte'?'selected':''}>PTE</option>
+      </select>`;
+      if (!data.length) {
+        panel.innerHTML = filterBar('exambooks', examFilter) + renderStatPills(cache.exambooks, 'exambooks') + '<div class="empty">No exam booking requests found</div>';
+        return;
+      }
+      const rows = data.map(b => `<tr>
+        <td>${b.id}</td>
+        <td><span class="badge badge-${b.exam_type}">${b.exam_type.toUpperCase()}</span></td>
+        <td><strong>${b.first_name} ${b.last_name}</strong><br/><small>${b.email}</small></td>
+        <td>${b.phone}</td>
+        <td>${b.exam_format}</td>
+        <td>${b.exam_date}</td>
+        <td>${b.preferred_city}</td>
+        <td><span class="notes-preview" title="${(b.notes||'').replace(/"/g,'&quot;')}">${b.notes || '-'}</span></td>
+        <td>${statusBadge(b.status)}</td>
+        <td><span class="notes-preview" title="${b.admin_notes||''}">${b.admin_notes || '-'}</span></td>
+        <td>${fmtDate(b.created_at)}</td>
+        <td class="actions"><button class="btn btn-primary btn-sm" onclick="openStatusModal('exambooks',${b.id},'${b.status}','${(b.admin_notes||'').replace(/'/g,"\\'")}')">Update</button></td>
+      </tr>`).join('');
+      panel.innerHTML = filterBar('exambooks', examFilter) + renderStatPills(cache.exambooks, 'exambooks') + `<div class="card"><table><thead><tr>
+        <th>ID</th><th>Exam</th><th>Name / Email</th><th>Phone</th><th>Exam Type</th>
+        <th>Preferred Date</th><th>City</th><th>Notes</th><th>Status</th><th>Admin Notes</th><th>Submitted</th><th>Action</th>
       </tr></thead><tbody>${rows}</tbody></table></div>`;
     }
 
@@ -800,6 +837,7 @@
     function renderTab(tab) {
       if (tab === 'enquiries') renderEnquiries();
       else if (tab === 'demo') renderDemo();
+      else if (tab === 'exambooks') renderExamBooks();
       else if (tab === 'loans') renderLoans();
       else if (tab === 'referrals') renderReferrals();
       else if (tab === 'news') renderContent('news');
@@ -851,15 +889,15 @@
 
     async function loadAll() {
       try {
-        const [statuses, enquiries, demo, loans, referrals, testimonials, accreditations, news, blog, offers, careers, jobapps] = await Promise.all([
-          api('/statuses'), api('/enquiries'), api('/demo-classes'), api('/education-loans'), api('/referrals'), api('/testimonials'),
+        const [statuses, enquiries, demo, exambooks, loans, referrals, testimonials, accreditations, news, blog, offers, careers, jobapps] = await Promise.all([
+          api('/statuses'), api('/enquiries'), api('/demo-classes'), api('/exam-bookings'), api('/education-loans'), api('/referrals'), api('/testimonials'),
           api('/accreditations'),
           api('/content?content_type=news'), api('/content?content_type=blog'), api('/offers'),
           api('/careers'), api('/job-applications')
         ]);
         statusOptions = statuses;
-        cache = { enquiries, demo, loans, referrals, testimonials, accreditations, news, blog, offers, careers, jobapps };
-        renderEnquiries(); renderDemo(); renderLoans(); renderReferrals(); renderTestimonials(); renderAccreditations();
+        cache = { enquiries, demo, exambooks, loans, referrals, testimonials, accreditations, news, blog, offers, careers, jobapps };
+        renderEnquiries(); renderDemo(); renderExamBooks(); renderLoans(); renderReferrals(); renderTestimonials(); renderAccreditations();
         renderContent('news'); renderContent('blog'); renderOffers(); renderCareers(); renderJobApps();
       } catch (e) { toast('Failed to load: ' + e.message, 'error'); }
     }
@@ -867,6 +905,7 @@
     const PAGE_SUBTITLES = {
       enquiries: 'Student enquiry submissions',
       demo: 'IELTS & PTE demo class bookings',
+      exambooks: 'IELTS & PTE exam booking requests',
       loans: 'Education loan requests',
       referrals: 'Refer & earn partner applications',
       jobapps: 'Career applications with resumes',

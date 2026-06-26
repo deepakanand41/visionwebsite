@@ -44,6 +44,7 @@ export const SOCIAL_LINKS = {
   instagram: 'https://www.instagram.com/visioninternationalofficial/',
   linkedin: 'https://www.linkedin.com/company/85645932/',
   youtube: 'https://www.youtube.com/@visioninternationalofficial',
+  whatsapp: `https://wa.me/919143540000?text=${encodeURIComponent('Hi Vision International, I would like to enquire about study abroad.')}`,
 };
 
 export const BRANCHES = [

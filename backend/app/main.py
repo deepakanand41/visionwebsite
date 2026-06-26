@@ -13,7 +13,7 @@ from app.seed import seed_testimonials
 from app.seed_content import seed_content
 from app.seed_offers import seed_offers
 from app.seed_careers import seed_careers
-from app.routers import enquiry, demo_class, referral, testimonials, admin, education_loan, media, content, offers, careers, accreditations
+from app.routers import enquiry, demo_class, exam_booking, referral, testimonials, admin, education_loan, media, content, offers, careers, accreditations
 
 Base.metadata.create_all(bind=engine)
 run_migrations()
@@ -38,6 +38,7 @@ app.add_middleware(
 
 app.include_router(enquiry.router)
 app.include_router(demo_class.router)
+app.include_router(exam_booking.router)
 app.include_router(referral.router)
 app.include_router(education_loan.router)
 app.include_router(testimonials.router)

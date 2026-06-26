@@ -74,6 +74,43 @@ class DemoClassResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
+# ─── Exam Booking (IELTS / PTE) ────────────────────────────────────────────────
+
+class ExamBookingCreate(BaseModel):
+    examType: str = Field(..., pattern="^(ielts|pte)$")
+    firstName: str = Field(..., min_length=2, max_length=100)
+    lastName: str = Field(..., min_length=2, max_length=100)
+    email: EmailStr
+    phone: str = Field(..., min_length=8, max_length=20)
+    examFormat: str = Field(..., min_length=2, max_length=120)
+    examDate: str = Field(..., min_length=4, max_length=20)
+    preferredCity: str = Field(..., min_length=2, max_length=100)
+    notes: Optional[str] = None
+    acceptTerms: Optional[bool] = True
+    contactPermission: Optional[bool] = False
+
+
+class ExamBookingResponse(BaseModel):
+    id: int
+    exam_type: str
+    first_name: str
+    last_name: str
+    email: str
+    phone: str
+    exam_format: str
+    exam_date: str
+    preferred_city: str
+    notes: Optional[str]
+    accept_terms: bool
+    contact_permission: bool
+    status: str
+    admin_notes: Optional[str] = None
+    status_updated_at: Optional[datetime] = None
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
 # ─── Referral ──────────────────────────────────────────────────────────────────
 
 class ReferralCreate(BaseModel):

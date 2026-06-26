@@ -41,6 +41,23 @@ export const submitDemoClass = async (payload) => {
   return response.data;
 };
 
+export const submitExamBooking = async (payload) => {
+  const response = await api.post('/api/exam-booking', {
+    examType: payload.examType,
+    firstName: payload.firstName,
+    lastName: payload.lastName,
+    email: payload.email,
+    phone: payload.phone,
+    examFormat: payload.examFormat,
+    examDate: payload.examDate,
+    preferredCity: payload.preferredCity,
+    notes: payload.notes || null,
+    acceptTerms: payload.acceptTerms,
+    contactPermission: payload.contactPermission,
+  });
+  return response.data;
+};
+
 export const submitReferral = async (payload) => {
   const response = await api.post('/api/referral', payload);
   return response.data;

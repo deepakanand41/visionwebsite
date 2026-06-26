@@ -1,10 +1,20 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaQuoteLeft, FaGraduationCap } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { ServiceHero } from '../components/PageLayouts';
 import StoryMedia from '../components/StoryMedia';
 import { useTestimonials } from '../hooks/useTestimonials';
+import { allDestinations, storyMatchesDestination } from '../utils/destinationData';
+
+const countryFilters = [
+  { value: 'All', label: 'All', flag: null },
+  ...allDestinations.map((d) => ({
+    value: d.name,
+    label: d.name,
+    flag: d.flag,
+  })),
+];
 
 const stats = [
   { value: '15,000+', label: 'Students Placed' },
@@ -27,10 +37,12 @@ export default function SuccessStories() {
   const { testimonials: stories, loading } = useTestimonials();
   const [filter, setFilter] = useState('All');
 
-  const destinations = ['All', ...new Set(stories.map((s) => s.destination?.replace(/[^\w\s]/g, '').trim().split(' ')[0] || s.destination))];
-  const filtered = filter === 'All'
-    ? stories
-    : stories.filter((s) => s.destination?.includes(filter));
+  const filtered = useMemo(
+    () => (filter === 'All'
+      ? stories
+      : stories.filter((s) => storyMatchesDestination(s.destination, filter))),
+    [stories, filter],
+  );
 
   if (loading) {
     return (
@@ -61,81 +73,92 @@ export default function SuccessStories() {
         </div>
       </section>
 
-      <section className="py-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 flex flex-wrap gap-2 justify-center">
-          {destinations.map((d) => (
-            <button
-              key={d}
-              onClick={() => setFilter(d)}
-              className="px-4 py-2 rounded-full text-sm font-medium transition-all"
-              style={{
-                background: filter === d ? '#A50000' : 'white',
-                color: filter === d ? 'white' : '#4b5563',
-                border: filter === d ? 'none' : '1px solid #e5e7eb',
-              }}
-            >
-              {d}
-            </button>
-          ))}
+      <section className="py-8 bg-gray-50 border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <p className="text-center text-sm text-gray-500 mb-4">Filter by study destination</p>
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-2.5">
+            {countryFilters.map(({ value, label, flag }) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setFilter(value)}
+                className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap shrink-0"
+                style={{
+                  background: filter === value ? '#A50000' : 'white',
+                  color: filter === value ? 'white' : '#4b5563',
+                  border: filter === value ? 'none' : '1px solid #e5e7eb',
+                }}
+              >
+                {flag && <span aria-hidden="true">{flag}</span>}
+                <span>{label}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </section>
 
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AnimatePresence mode="popLayout">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filtered.map((story, i) => {
-                const hasMedia = story.mediaUrl && story.mediaType;
-                const isVideo = story.mediaType === 'video';
-                return (
-                  <motion.div
-                    key={story.id || story.name}
-                    layout
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ delay: i * 0.05 }}
-                    className={`bg-white rounded-2xl border border-gray-100 flex flex-col overflow-hidden ${hasMedia ? '' : 'p-6'}`}
-                    style={{ boxShadow: '0 4px 20px rgba(165,0,0,0.07)' }}
-                  >
-                    {hasMedia && (
-                      <StoryMedia
-                        mediaType={story.mediaType}
-                        mediaUrl={story.mediaUrl}
-                        variant={isVideo ? 'reel' : 'default'}
-                        className={isVideo ? '' : 'aspect-[16/10] w-full'}
-                        alt={`${story.name} success story`}
-                      />
-                    )}
+          {filtered.length === 0 ? (
+            <p className="text-center text-gray-500 py-12">
+              No success stories for {filter} yet. Check back soon or view all stories.
+            </p>
+          ) : (
+            <AnimatePresence mode="popLayout">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filtered.map((story, i) => {
+                  const hasMedia = story.mediaUrl && story.mediaType;
+                  const isVideo = story.mediaType === 'video';
+                  return (
+                    <motion.div
+                      key={story.id || story.name}
+                      layout
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ delay: i * 0.05 }}
+                      className={`bg-white rounded-2xl border border-gray-100 flex flex-col overflow-hidden ${hasMedia ? '' : 'p-6'}`}
+                      style={{ boxShadow: '0 4px 20px rgba(165,0,0,0.07)' }}
+                    >
+                      {hasMedia && (
+                        <StoryMedia
+                          mediaType={story.mediaType}
+                          mediaUrl={story.mediaUrl}
+                          variant={isVideo ? 'reel' : 'default'}
+                          className={isVideo ? '' : 'aspect-[16/10] w-full'}
+                          alt={`${story.name} success story`}
+                        />
+                      )}
 
-                    <div className={hasMedia ? 'p-6 flex flex-col flex-1' : 'flex flex-col flex-1'}>
-                      <FaQuoteLeft className="text-2xl mb-3" style={{ color: 'rgba(165,0,0,0.12)' }} />
-                      <p className="text-gray-600 text-sm leading-relaxed flex-1 mb-4">"{story.review}"</p>
+                      <div className={hasMedia ? 'p-6 flex flex-col flex-1' : 'flex flex-col flex-1'}>
+                        <FaQuoteLeft className="text-2xl mb-3" style={{ color: 'rgba(165,0,0,0.12)' }} />
+                        <p className="text-gray-600 text-sm leading-relaxed flex-1 mb-4">"{story.review}"</p>
 
-                      <div className="px-3 py-1.5 rounded-full text-xs font-semibold mb-4 self-start" style={{ background: 'rgba(122,0,0,0.1)', color: '#7A0000' }}>
-                        ✓ {story.highlight || 'Success Story'}
-                      </div>
-
-                      <StarRating rating={story.rating} />
-
-                      <div className="mt-3 flex items-center gap-3 pt-3 border-t border-gray-100">
-                        <div className="w-11 h-11 rounded-full flex items-center justify-center font-bold text-sm shrink-0" style={{ background: story.avatarColor, color: '#333' }}>
-                          {story.initial}
+                        <div className="px-3 py-1.5 rounded-full text-xs font-semibold mb-4 self-start" style={{ background: 'rgba(122,0,0,0.1)', color: '#7A0000' }}>
+                          ✓ {story.highlight || 'Success Story'}
                         </div>
-                        <div>
-                          <div className="font-semibold text-gray-800 text-sm">{story.name}</div>
-                          <div className="text-xs text-gray-500">{story.course}</div>
-                          <div className="text-xs font-medium mt-0.5 flex items-center gap-1" style={{ color: '#A50000' }}>
-                            <FaGraduationCap size={10} /> {story.university} · {story.destination}
+
+                        <StarRating rating={story.rating} />
+
+                        <div className="mt-3 flex items-center gap-3 pt-3 border-t border-gray-100">
+                          <div className="w-11 h-11 rounded-full flex items-center justify-center font-bold text-sm shrink-0" style={{ background: story.avatarColor, color: '#333' }}>
+                            {story.initial}
+                          </div>
+                          <div>
+                            <div className="font-semibold text-gray-800 text-sm">{story.name}</div>
+                            <div className="text-xs text-gray-500">{story.course}</div>
+                            <div className="text-xs font-medium mt-0.5 flex items-center gap-1" style={{ color: '#A50000' }}>
+                              <FaGraduationCap size={10} /> {story.university} · {story.destination}
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </AnimatePresence>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </AnimatePresence>
+          )}
         </div>
       </section>
 

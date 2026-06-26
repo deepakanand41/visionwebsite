@@ -50,6 +50,27 @@ class DemoClassBooking(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 
+class ExamBooking(Base):
+    __tablename__ = "exam_bookings"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    exam_type: Mapped[str] = mapped_column(String(10), index=True)  # ielts | pte
+    first_name: Mapped[str] = mapped_column(String(100))
+    last_name: Mapped[str] = mapped_column(String(100))
+    email: Mapped[str] = mapped_column(String(255), index=True)
+    phone: Mapped[str] = mapped_column(String(20))
+    exam_format: Mapped[str] = mapped_column(String(120))
+    exam_date: Mapped[str] = mapped_column(String(20))
+    preferred_city: Mapped[str] = mapped_column(String(100))
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    accept_terms: Mapped[bool] = mapped_column(Boolean, default=True)
+    contact_permission: Mapped[bool] = mapped_column(Boolean, default=False)
+    status: Mapped[str] = mapped_column(String(30), default="pending", index=True)
+    admin_notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    status_updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
 class ReferralApplication(Base):
     __tablename__ = "referral_applications"
 

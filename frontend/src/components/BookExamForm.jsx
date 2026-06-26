@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FiUser, FiMail, FiPhone, FiSend, FiLoader } from 'react-icons/fi';
-import { submitEnquiry } from '../services/api';
+import { submitExamBooking } from '../services/api';
 import { HOME_THEME as T } from '../utils/constants';
 
 const examCities = [
@@ -44,18 +44,16 @@ export default function BookExamForm({ examType }) {
   const onSubmit = async (data) => {
     const toastId = toast.loading('Submitting your enquiry...');
     try {
-      const result = await submitEnquiry({
+      const result = await submitExamBooking({
+        examType,
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
         phone: data.phone,
-        destination: `${examLabel} Exam Booking`,
-        studyLevel: data.notes
-          ? `${data.examFormat} | Notes: ${data.notes}`
-          : data.examFormat,
-        intake: data.examDate,
-        counsellingMode: data.preferredCity,
-        fundingSource: 'Self-Funded',
+        examFormat: data.examFormat,
+        examDate: data.examDate,
+        preferredCity: data.preferredCity,
+        notes: data.notes || null,
         acceptTerms: data.acceptTerms,
         contactPermission: data.contactPermission,
       });

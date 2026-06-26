@@ -44,6 +44,35 @@ export function getDestinationNameBySlug(slug) {
   return found?.name ?? null;
 }
 
+/** Strip emoji / punctuation for loose destination matching in filters. */
+export function normalizeDestinationText(value) {
+  if (!value) return '';
+  return value
+    .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, ' ')
+    .replace(/[^\w\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+}
+
+const DESTINATION_ALIASES = {
+  'united kingdom': ['uk', 'britain', 'great britain', 'england'],
+  'united states': ['usa', 'us', 'america'],
+  'new zealand': ['nz'],
+};
+
+/** Match a testimonial destination string to a study destination country name. */
+export function storyMatchesDestination(storyDestination, countryName) {
+  if (!storyDestination || !countryName) return false;
+  const haystack = normalizeDestinationText(storyDestination);
+  const needle = normalizeDestinationText(countryName);
+  if (!haystack || !needle) return false;
+  if (haystack.includes(needle)) return true;
+
+  const aliases = DESTINATION_ALIASES[needle] || [];
+  return aliases.some((alias) => haystack.includes(alias));
+}
+
 function createDestination({ slug, name, flag, accentColor, heroSubtitle, stats }) {
   return {
     slug,
