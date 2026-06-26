@@ -133,4 +133,31 @@ export const submitJobApplication = async (formData) => {
   return response.data;
 };
 
+export const fetchTouristVisaCountries = async () => {
+  const response = await api.get('/api/tourist-visa');
+  return response.data;
+};
+
+export const fetchTouristVisaCountry = async (slug) => {
+  const response = await api.get(`/api/tourist-visa/${slug}`);
+  return response.data;
+};
+
+export const submitTouristVisaEnquiry = async (payload) => {
+  const response = await api.post('/api/tourist-visa/enquiry', {
+    countrySlug: payload.countrySlug,
+    countryName: payload.countryName,
+    firstName: payload.firstName,
+    lastName: payload.lastName,
+    email: payload.email,
+    phone: payload.phone,
+    travelDate: payload.travelDate,
+    purpose: payload.purpose,
+    message: payload.message,
+    acceptTerms: payload.acceptTerms,
+    contactPermission: payload.contactPermission,
+  });
+  return response.data;
+};
+
 export default api;

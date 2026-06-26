@@ -200,6 +200,46 @@ class Accreditation(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
 
 
+class TouristVisaCountry(Base):
+    __tablename__ = "tourist_visa_countries"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    country_slug: Mapped[str] = mapped_column(String(80), unique=True, index=True)
+    country_name: Mapped[str] = mapped_column(String(120))
+    flag: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    hero_title: Mapped[str | None] = mapped_column(String(250), nullable=True)
+    hero_subtitle: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    hero_image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    visa_process: Mapped[str | None] = mapped_column(Text, nullable=True)
+    visa_eligibility: Mapped[str | None] = mapped_column(Text, nullable=True)
+    faqs: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, index=True)
+    sort_order: Mapped[int] = mapped_column(Integer, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
+
+
+class TouristVisaEnquiry(Base):
+    __tablename__ = "tourist_visa_enquiries"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    country_slug: Mapped[str] = mapped_column(String(80), index=True)
+    country_name: Mapped[str] = mapped_column(String(120))
+    first_name: Mapped[str] = mapped_column(String(100))
+    last_name: Mapped[str] = mapped_column(String(100))
+    email: Mapped[str] = mapped_column(String(255), index=True)
+    phone: Mapped[str] = mapped_column(String(20))
+    travel_date: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    purpose: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    accept_terms: Mapped[bool] = mapped_column(Boolean, default=True)
+    contact_permission: Mapped[bool] = mapped_column(Boolean, default=False)
+    status: Mapped[str] = mapped_column(String(30), default="pending", index=True)
+    admin_notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    status_updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
 class JobPosting(Base):
     __tablename__ = "job_postings"
 

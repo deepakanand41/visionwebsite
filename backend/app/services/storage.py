@@ -21,8 +21,9 @@ TESTIMONIAL_PREFIX = "testimonials"
 OFFER_PREFIX = "offers"
 CONTENT_PREFIX = "content"
 ACCREDITATION_PREFIX = "accreditations"
+TOURIST_VISA_PREFIX = "tourist-visa"
 RESUME_PREFIX = "resumes"
-MEDIA_PREFIXES = (TESTIMONIAL_PREFIX, OFFER_PREFIX, CONTENT_PREFIX, ACCREDITATION_PREFIX, RESUME_PREFIX)
+MEDIA_PREFIXES = (TESTIMONIAL_PREFIX, OFFER_PREFIX, CONTENT_PREFIX, ACCREDITATION_PREFIX, TOURIST_VISA_PREFIX, RESUME_PREFIX)
 
 ACCREDITATION_IMAGE_TYPES = {"image/jpeg", "image/png"}
 
@@ -171,6 +172,20 @@ class StorageService:
             raise HTTPException(status_code=400, detail="Cover image must be JPEG, PNG, WebP, or GIF (max 10MB).")
         ext = _extension(file.filename, media_type)
         key = f"{CONTENT_PREFIX}/{uuid.uuid4().hex}{ext}"
+
+        if _use_s3():
+            self._upload_s3(key, content, file.content_type)
+        else:
+            self._upload_local(key, content)
+
+        return self.public_url(key)
+
+    def upload_tourist_visa_image(self, file: UploadFile, content: bytes) -> str:
+        media_type = _validate_file(file, content)
+        if media_type != "image":
+            raise HTTPException(status_code=400, detail="Hero image must be JPEG, PNG, WebP, or GIF (max 10MB).")
+        ext = _extension(file.filename, media_type)
+        key = f"{TOURIST_VISA_PREFIX}/{uuid.uuid4().hex}{ext}"
 
         if _use_s3():
             self._upload_s3(key, content, file.content_type)

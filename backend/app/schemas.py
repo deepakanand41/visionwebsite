@@ -111,6 +111,90 @@ class ExamBookingResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
+# ─── Tourist Visa ──────────────────────────────────────────────────────────────
+
+class TouristVisaEnquiryCreate(BaseModel):
+    countrySlug: str = Field(..., min_length=2, max_length=80)
+    countryName: str = Field(..., min_length=2, max_length=120)
+    firstName: str = Field(..., min_length=2, max_length=100)
+    lastName: str = Field(..., min_length=2, max_length=100)
+    email: EmailStr
+    phone: str = Field(..., min_length=8, max_length=20)
+    travelDate: Optional[str] = Field(None, max_length=20)
+    purpose: Optional[str] = Field(None, max_length=200)
+    message: Optional[str] = None
+    acceptTerms: Optional[bool] = True
+    contactPermission: Optional[bool] = False
+
+
+class TouristVisaEnquiryResponse(BaseModel):
+    id: int
+    country_slug: str
+    country_name: str
+    first_name: str
+    last_name: str
+    email: str
+    phone: str
+    travel_date: Optional[str]
+    purpose: Optional[str]
+    message: Optional[str]
+    accept_terms: bool
+    contact_permission: bool
+    status: str
+    admin_notes: Optional[str] = None
+    status_updated_at: Optional[datetime] = None
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class TouristVisaCountryCreate(BaseModel):
+    country_slug: str = Field(..., min_length=2, max_length=80)
+    country_name: str = Field(..., min_length=2, max_length=120)
+    flag: Optional[str] = Field(None, max_length=10)
+    hero_title: Optional[str] = Field(None, max_length=250)
+    hero_subtitle: Optional[str] = Field(None, max_length=500)
+    hero_image_url: Optional[str] = Field(None, max_length=500)
+    visa_process: Optional[str] = None
+    visa_eligibility: Optional[str] = None
+    faqs: Optional[list] = None
+    is_active: bool = True
+    sort_order: int = 0
+
+
+class TouristVisaCountryUpdate(BaseModel):
+    country_slug: Optional[str] = Field(None, min_length=2, max_length=80)
+    country_name: Optional[str] = Field(None, min_length=2, max_length=120)
+    flag: Optional[str] = Field(None, max_length=10)
+    hero_title: Optional[str] = Field(None, max_length=250)
+    hero_subtitle: Optional[str] = Field(None, max_length=500)
+    hero_image_url: Optional[str] = Field(None, max_length=500)
+    visa_process: Optional[str] = None
+    visa_eligibility: Optional[str] = None
+    faqs: Optional[list] = None
+    is_active: Optional[bool] = None
+    sort_order: Optional[int] = None
+
+
+class TouristVisaCountryResponse(BaseModel):
+    id: int
+    country_slug: str
+    country_name: str
+    flag: Optional[str]
+    hero_title: Optional[str]
+    hero_subtitle: Optional[str]
+    hero_image_url: Optional[str]
+    visa_process: Optional[str]
+    visa_eligibility: Optional[str]
+    faqs: Optional[list]
+    is_active: bool
+    sort_order: int
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
 # ─── Referral ──────────────────────────────────────────────────────────────────
 
 class ReferralCreate(BaseModel):

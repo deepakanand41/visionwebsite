@@ -17,6 +17,7 @@ const BlogDetailPage = lazy(() => import('./pages/ContentHub').then((m) => ({ de
 const Offers = lazy(() => import('./pages/Offers'));
 const Careers = lazy(() => import('./pages/Careers'));
 const BookExam = lazy(() => import('./pages/BookExam'));
+const TouristVisaDetail = lazy(() => import('./pages/TouristVisaDetail'));
 
 function PageLoader() {
   return (
@@ -37,6 +38,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/study-abroad/:slug" element={<DestinationDetail />} />
+            <Route path="/tourist-visa/:slug" element={<TouristVisaDetail />} />
             <Route path="/ielts-training" element={<IELTSPTETraining exam="ielts" />} />
             <Route path="/pte-training" element={<IELTSPTETraining exam="pte" />} />
             <Route path="/book-ielts-exam" element={<BookExam exam="ielts" />} />

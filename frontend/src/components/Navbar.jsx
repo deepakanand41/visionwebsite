@@ -45,14 +45,14 @@ function TestPrepMenuItem({ link, pathname, onClick, className = '' }) {
   );
 }
 
-function destPath(slug) {
-  return `/study-abroad/${slug}`;
+function countryPath(slug, basePath = '/study-abroad') {
+  return `${basePath}/${slug}`;
 }
 
-function DestLink({ dest, active, onClick, className = '' }) {
+function DestLink({ dest, active, onClick, className = '', basePath = '/study-abroad' }) {
   return (
     <Link
-      to={destPath(dest.slug)}
+      to={countryPath(dest.slug, basePath)}
       onClick={onClick}
       className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${className} ${
         active
@@ -66,7 +66,7 @@ function DestLink({ dest, active, onClick, className = '' }) {
   );
 }
 
-function DestGroupFlyout({ label, open, onOpen, onClose, active, items, pathname, onNavigate }) {
+function DestGroupFlyout({ label, open, onOpen, onClose, active, items, pathname, onNavigate, basePath = '/study-abroad' }) {
   return (
     <div
       className="relative border-t border-gray-100"
@@ -99,8 +99,9 @@ function DestGroupFlyout({ label, open, onOpen, onClose, active, items, pathname
                 <DestLink
                   key={d.slug}
                   dest={d}
-                  active={pathname === destPath(d.slug)}
+                  active={pathname === countryPath(d.slug, basePath)}
                   onClick={onNavigate}
+                  basePath={basePath}
                 />
               ))}
             </div>
@@ -120,14 +121,23 @@ export default function Navbar() {
   const [mobileEuropeOpen, setMobileEuropeOpen] = useState(false);
   const [mobileOtherOpen, setMobileOtherOpen] = useState(false);
   const [testPrepOpen, setTestPrepOpen] = useState(false);
+  const [visaOpen, setVisaOpen] = useState(false);
+  const [visaEuropeOpen, setVisaEuropeOpen] = useState(false);
+  const [visaOtherOpen, setVisaOtherOpen] = useState(false);
+  const [mobileVisaEuropeOpen, setMobileVisaEuropeOpen] = useState(false);
+  const [mobileVisaOtherOpen, setMobileVisaOtherOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const visaDropdownRef = useRef(null);
   const testPrepRef = useRef(null);
   const location = useLocation();
 
   const europeSlugs = europeDestinations.map((d) => d.slug);
   const otherSlugs = otherDestinations.map((d) => d.slug);
-  const isEuropeActive = europeSlugs.some((s) => location.pathname === destPath(s));
-  const isOtherActive = otherSlugs.some((s) => location.pathname === destPath(s));
+  const isEuropeActive = europeSlugs.some((s) => location.pathname === countryPath(s));
+  const isOtherActive = otherSlugs.some((s) => location.pathname === countryPath(s));
+  const isVisaActive = location.pathname.startsWith('/tourist-visa');
+  const isVisaEuropeActive = europeSlugs.some((s) => location.pathname === countryPath(s, '/tourist-visa'));
+  const isVisaOtherActive = otherSlugs.some((s) => location.pathname === countryPath(s, '/tourist-visa'));
   const isTestPrepActive = testPrepLinks.some((link) => link.to && location.pathname === link.to);
 
   useEffect(() => {
@@ -143,6 +153,11 @@ export default function Navbar() {
     setOtherOpen(false);
     setMobileEuropeOpen(false);
     setMobileOtherOpen(false);
+    setVisaOpen(false);
+    setVisaEuropeOpen(false);
+    setVisaOtherOpen(false);
+    setMobileVisaEuropeOpen(false);
+    setMobileVisaOtherOpen(false);
     setTestPrepOpen(false);
   }, [location.pathname]);
 
@@ -155,7 +170,15 @@ export default function Navbar() {
       setOtherOpen(true);
       setMobileOtherOpen(true);
     }
-  }, [isEuropeActive, isOtherActive]);
+    if (isVisaEuropeActive) {
+      setVisaEuropeOpen(true);
+      setMobileVisaEuropeOpen(true);
+    }
+    if (isVisaOtherActive) {
+      setVisaOtherOpen(true);
+      setMobileVisaOtherOpen(true);
+    }
+  }, [isEuropeActive, isOtherActive, isVisaEuropeActive, isVisaOtherActive]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -163,6 +186,11 @@ export default function Navbar() {
         setDestOpen(false);
         setEuropeOpen(false);
         setOtherOpen(false);
+      }
+      if (visaDropdownRef.current && !visaDropdownRef.current.contains(e.target)) {
+        setVisaOpen(false);
+        setVisaEuropeOpen(false);
+        setVisaOtherOpen(false);
       }
       if (testPrepRef.current && !testPrepRef.current.contains(e.target)) {
         setTestPrepOpen(false);
@@ -180,6 +208,25 @@ export default function Navbar() {
     setEuropeOpen(false);
     setOtherOpen(false);
   };
+
+  const closeVisaDropdown = () => {
+    setVisaOpen(false);
+    setVisaEuropeOpen(false);
+    setVisaOtherOpen(false);
+  };
+
+  const openVisaEuropeMenu = () => {
+    setVisaEuropeOpen(true);
+    setVisaOtherOpen(false);
+  };
+
+  const openVisaOtherMenu = () => {
+    setVisaOtherOpen(true);
+    setVisaEuropeOpen(false);
+  };
+
+  const closeVisaEuropeMenu = () => setVisaEuropeOpen(false);
+  const closeVisaOtherMenu = () => setVisaOtherOpen(false);
 
   const openEuropeMenu = () => {
     setEuropeOpen(true);
@@ -293,7 +340,7 @@ export default function Navbar() {
                         <DestLink
                           key={d.slug}
                           dest={d}
-                          active={location.pathname === destPath(d.slug)}
+                          active={location.pathname === countryPath(d.slug)}
                           onClick={closeDestDropdown}
                         />
                       ))}
@@ -316,6 +363,63 @@ export default function Navbar() {
                         items={otherDestinations}
                         pathname={location.pathname}
                         onNavigate={closeDestDropdown}
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              <div className="relative" ref={visaDropdownRef}>
+                <button
+                  onClick={() => setVisaOpen(!visaOpen)}
+                  className={`flex items-center gap-1 px-3 py-2 text-sm rounded-lg transition-colors ${
+                    isVisaActive
+                      ? 'font-semibold text-[#A50000] bg-red-50'
+                      : 'font-medium text-gray-700 hover:text-red-800 hover:bg-red-50'
+                  }`}
+                >
+                  Tourist Visa
+                  <FiChevronDown className={`transition-transform duration-200 ${visaOpen ? 'rotate-180' : ''}`} />
+                </button>
+                <AnimatePresence>
+                  {visaOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8, scale: 0.97 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.97 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute top-full left-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-visible z-50"
+                    >
+                      {mainDestinations.map((d) => (
+                        <DestLink
+                          key={d.slug}
+                          dest={d}
+                          active={location.pathname === countryPath(d.slug, '/tourist-visa')}
+                          onClick={closeVisaDropdown}
+                          basePath="/tourist-visa"
+                        />
+                      ))}
+                      <DestGroupFlyout
+                        label="Europe"
+                        open={visaEuropeOpen}
+                        onOpen={openVisaEuropeMenu}
+                        onClose={closeVisaEuropeMenu}
+                        active={isVisaEuropeActive}
+                        items={europeDestinations}
+                        pathname={location.pathname}
+                        onNavigate={closeVisaDropdown}
+                        basePath="/tourist-visa"
+                      />
+                      <DestGroupFlyout
+                        label="Other Destinations"
+                        open={visaOtherOpen}
+                        onOpen={openVisaOtherMenu}
+                        onClose={closeVisaOtherMenu}
+                        active={isVisaOtherActive}
+                        items={otherDestinations}
+                        pathname={location.pathname}
+                        onNavigate={closeVisaDropdown}
+                        basePath="/tourist-visa"
                       />
                     </motion.div>
                   )}
@@ -435,7 +539,7 @@ export default function Navbar() {
                 <DestLink
                   key={d.slug}
                   dest={d}
-                  active={location.pathname === destPath(d.slug)}
+                  active={location.pathname === countryPath(d.slug)}
                   onClick={() => setMobileOpen(false)}
                 />
               ))}
@@ -463,7 +567,7 @@ export default function Navbar() {
                         <DestLink
                           key={d.slug}
                           dest={d}
-                          active={location.pathname === destPath(d.slug)}
+                          active={location.pathname === countryPath(d.slug)}
                           onClick={() => setMobileOpen(false)}
                           className="pl-8"
                         />
@@ -496,9 +600,91 @@ export default function Navbar() {
                         <DestLink
                           key={d.slug}
                           dest={d}
-                          active={location.pathname === destPath(d.slug)}
+                          active={location.pathname === countryPath(d.slug)}
                           onClick={() => setMobileOpen(false)}
                           className="pl-8"
+                        />
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              <div className={`font-medium text-sm px-3 py-2 ${isVisaActive ? 'text-[#A50000] font-semibold' : 'text-gray-500'}`}>
+                Tourist Visa
+              </div>
+
+              {mainDestinations.map((d) => (
+                <DestLink
+                  key={`visa-${d.slug}`}
+                  dest={d}
+                  active={location.pathname === countryPath(d.slug, '/tourist-visa')}
+                  onClick={() => setMobileOpen(false)}
+                  basePath="/tourist-visa"
+                />
+              ))}
+
+              <div className="pt-1">
+                <button
+                  type="button"
+                  onClick={() => setMobileVisaEuropeOpen(!mobileVisaEuropeOpen)}
+                  className={`w-full flex items-center justify-between px-4 py-2.5 text-sm font-semibold rounded-lg ${
+                    isVisaEuropeActive ? 'text-[#A50000] bg-red-50' : 'text-gray-800 hover:bg-red-50'
+                  }`}
+                >
+                  Europe
+                  <FiChevronRight className={`transition-transform ${mobileVisaEuropeOpen ? 'rotate-90' : ''}`} size={16} />
+                </button>
+                <AnimatePresence>
+                  {mobileVisaEuropeOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden"
+                    >
+                      {europeDestinations.map((d) => (
+                        <DestLink
+                          key={`visa-${d.slug}`}
+                          dest={d}
+                          active={location.pathname === countryPath(d.slug, '/tourist-visa')}
+                          onClick={() => setMobileOpen(false)}
+                          className="pl-8"
+                          basePath="/tourist-visa"
+                        />
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setMobileVisaOtherOpen(!mobileVisaOtherOpen)}
+                  className={`w-full flex items-center justify-between px-4 py-2.5 text-sm font-semibold rounded-lg ${
+                    isVisaOtherActive ? 'text-[#A50000] bg-red-50' : 'text-gray-800 hover:bg-red-50'
+                  }`}
+                >
+                  Other Destinations
+                  <FiChevronRight className={`transition-transform ${mobileVisaOtherOpen ? 'rotate-90' : ''}`} size={16} />
+                </button>
+                <AnimatePresence>
+                  {mobileVisaOtherOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden"
+                    >
+                      {otherDestinations.map((d) => (
+                        <DestLink
+                          key={`visa-${d.slug}`}
+                          dest={d}
+                          active={location.pathname === countryPath(d.slug, '/tourist-visa')}
+                          onClick={() => setMobileOpen(false)}
+                          className="pl-8"
+                          basePath="/tourist-visa"
                         />
                       ))}
                     </motion.div>

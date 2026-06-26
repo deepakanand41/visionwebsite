@@ -200,6 +200,7 @@
         <button class="tab active" data-tab="enquiries" data-title="Enquiries"><span>Enquiries</span><span class="count" id="count-enquiries">0</span></button>
         <button class="tab" data-tab="demo" data-title="Demo Classes"><span>Demo Classes</span><span class="count" id="count-demo">0</span></button>
         <button class="tab" data-tab="exambooks" data-title="Exam Bookings"><span>Exam Book</span><span class="count" id="count-exambooks">0</span></button>
+        <button class="tab" data-tab="visaenquiries" data-title="Visa Enquiries"><span>Visa Enquiries</span><span class="count" id="count-visaenquiries">0</span></button>
         <button class="tab" data-tab="loans" data-title="Education Loans"><span>Education Loans</span><span class="count" id="count-loans">0</span></button>
         <button class="tab" data-tab="referrals" data-title="Referrals"><span>Referrals</span><span class="count" id="count-referrals">0</span></button>
         <button class="tab" data-tab="jobapps" data-title="Job Applications"><span>Job Applications</span><span class="count" id="count-jobapps">0</span></button>
@@ -207,6 +208,7 @@
         <div class="nav-section">Content &amp; Marketing</div>
         <button class="tab" data-tab="testimonials" data-title="Testimonials"><span>Testimonials</span><span class="count" id="count-testimonials">0</span></button>
         <button class="tab" data-tab="accreditations" data-title="Accreditations"><span>Accreditations</span><span class="count" id="count-accreditations">0</span></button>
+        <button class="tab" data-tab="touristvisa" data-title="Tourist Visa"><span>Tourist Visa</span><span class="count" id="count-touristvisa">0</span></button>
         <button class="tab" data-tab="news" data-title="News &amp; Articles"><span>News</span><span class="count" id="count-news">0</span></button>
         <button class="tab" data-tab="blog" data-title="Blog Posts"><span>Blog</span><span class="count" id="count-blog">0</span></button>
         <button class="tab" data-tab="offers" data-title="Student Offers"><span>Offers</span><span class="count" id="count-offers">0</span></button>
@@ -233,10 +235,12 @@
         <div id="panel-enquiries" class="panel active"></div>
         <div id="panel-demo" class="panel"></div>
         <div id="panel-exambooks" class="panel"></div>
+        <div id="panel-visaenquiries" class="panel"></div>
         <div id="panel-loans" class="panel"></div>
         <div id="panel-referrals" class="panel"></div>
         <div id="panel-testimonials" class="panel"></div>
         <div id="panel-accreditations" class="panel"></div>
+        <div id="panel-touristvisa" class="panel"></div>
         <div id="panel-news" class="panel"></div>
         <div id="panel-blog" class="panel"></div>
         <div id="panel-offers" class="panel"></div>
@@ -330,6 +334,45 @@
         </div>
         <div class="form-actions">
           <button type="button" class="btn btn-secondary" onclick="closeAccreditationModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Tourist Visa Country Modal -->
+  <div class="modal-overlay" id="tourist-visa-modal">
+    <div class="modal modal-xl">
+      <h3 id="tv-modal-title">Edit Tourist Visa Country</h3>
+      <form id="tourist-visa-form">
+        <input type="hidden" id="tv-id" />
+        <div class="form-row">
+          <div class="form-group"><label>Country Slug *</label><input id="tv-slug" required placeholder="canada" /></div>
+          <div class="form-group"><label>Country Name *</label><input id="tv-name" required placeholder="Canada" /></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Flag Emoji</label><input id="tv-flag" placeholder="🇨🇦" maxlength="4" /></div>
+          <div class="form-group"><label>Sort Order</label><input id="tv-sort" type="number" value="0" /></div>
+          <div class="form-group"><label>Status</label><select id="tv-active"><option value="true">Active</option><option value="false">Inactive</option></select></div>
+        </div>
+        <div class="form-group"><label>Hero Title</label><input id="tv-hero-title" placeholder="Tourist Visa for Canada" /></div>
+        <div class="form-group"><label>Hero Subtitle</label><textarea id="tv-hero-subtitle" rows="2"></textarea></div>
+        <div class="form-group">
+          <label>Hero Image (JPEG, PNG, WebP, GIF — max 10MB)</label>
+          <input id="tv-hero-file" type="file" accept="image/jpeg,image/png,image/webp,image/gif" />
+          <div id="tv-hero-preview" style="margin-top:0.75rem;display:none;"></div>
+          <button type="button" id="tv-hero-remove" class="btn btn-danger btn-sm" style="margin-top:0.5rem;display:none;" onclick="removeTouristVisaHero()">Remove image</button>
+          <input type="hidden" id="tv-hero-url" />
+        </div>
+        <div class="form-group"><label>Visa Process (HTML supported)</label><textarea id="tv-process" rows="6"></textarea></div>
+        <div class="form-group"><label>Visa Eligibility (HTML supported)</label><textarea id="tv-eligibility" rows="6"></textarea></div>
+        <div class="form-group">
+          <label>FAQs</label>
+          <div id="tv-faqs-list"></div>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="addTvFaqRow()">+ Add FAQ</button>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeTouristVisaModal()">Cancel</button>
           <button type="submit" class="btn btn-primary">Save</button>
         </div>
       </form>
@@ -503,16 +546,18 @@
     const SECRET = window.location.pathname.replace('/admin/', '');
     const headers = { 'X-Admin-Secret': SECRET, 'Content-Type': 'application/json' };
 
-    let cache = { enquiries: [], demo: [], exambooks: [], loans: [], referrals: [], testimonials: [], accreditations: [], news: [], blog: [], offers: [], careers: [], jobapps: [] };
+    let cache = { enquiries: [], demo: [], exambooks: [], visaenquiries: [], loans: [], referrals: [], testimonials: [], accreditations: [], touristvisa: [], news: [], blog: [], offers: [], careers: [], jobapps: [] };
     let statusOptions = { general: [], referral: [] };
     const filters = {
       enquiries: { search: '', status: '' },
       demo: { search: '', status: '', exam_type: '' },
       exambooks: { search: '', status: '', exam_type: '' },
+      visaenquiries: { search: '', status: '', country_slug: '' },
       loans: { search: '', status: '' },
       referrals: { search: '', status: '' },
       testimonials: { search: '', is_active: '' },
       accreditations: { search: '', is_active: '' },
+      touristvisa: { search: '', is_active: '' },
       news: { search: '', is_published: '' },
       blog: { search: '', is_published: '' },
       offers: { search: '', offer_type: '', is_active: '' },
@@ -605,7 +650,7 @@
         status: document.getElementById('s-status').value,
         admin_notes: document.getElementById('s-notes').value || null,
       };
-      const paths = { enquiries: 'enquiries', demo: 'demo-classes', exambooks: 'exam-bookings', loans: 'education-loans', referrals: 'referrals', jobapps: 'job-applications' };
+      const paths = { enquiries: 'enquiries', demo: 'demo-classes', exambooks: 'exam-bookings', visaenquiries: 'tourist-visa-enquiries', loans: 'education-loans', referrals: 'referrals', jobapps: 'job-applications' };
       try {
         const url = type === 'jobapps'
           ? `/${paths[type]}/${id}/status`
@@ -624,8 +669,10 @@
         if (f.status && r.status !== f.status) return false;
         if (tabKey === 'demo' && f.exam_type && r.exam_type !== f.exam_type) return false;
         if (tabKey === 'exambooks' && f.exam_type && r.exam_type !== f.exam_type) return false;
+        if (tabKey === 'visaenquiries' && f.country_slug && r.country_slug !== f.country_slug) return false;
         if (tabKey === 'testimonials' && f.is_active !== '' && String(r.is_active) !== f.is_active) return false;
         if (tabKey === 'accreditations' && f.is_active !== '' && String(r.is_active) !== f.is_active) return false;
+        if (tabKey === 'touristvisa' && f.is_active !== '' && String(r.is_active) !== f.is_active) return false;
         if ((tabKey === 'news' || tabKey === 'blog') && f.is_published !== '' && String(r.is_published) !== f.is_published) return false;
         if (tabKey === 'offers' && f.offer_type && r.offer_type !== f.offer_type) return false;
         if (tabKey === 'offers' && f.is_active !== '' && String(r.is_active) !== f.is_active) return false;
@@ -717,6 +764,38 @@
       panel.innerHTML = filterBar('exambooks', examFilter) + renderStatPills(cache.exambooks, 'exambooks') + `<div class="card"><table><thead><tr>
         <th>ID</th><th>Exam</th><th>Name / Email</th><th>Phone</th><th>Exam Type</th>
         <th>Preferred Date</th><th>City</th><th>Notes</th><th>Status</th><th>Admin Notes</th><th>Submitted</th><th>Action</th>
+      </tr></thead><tbody>${rows}</tbody></table></div>`;
+    }
+
+    function renderVisaEnquiries() {
+      const data = applyClientFilter(cache.visaenquiries, 'visaenquiries');
+      document.getElementById('count-visaenquiries').textContent = cache.visaenquiries.length;
+      const panel = document.getElementById('panel-visaenquiries');
+      const countries = [...new Set(cache.visaenquiries.map(v => v.country_slug))].sort();
+      const countryFilter = `<select onchange="setFilter('visaenquiries','country_slug',this.value)">
+        <option value="">All Countries</option>
+        ${countries.map(c => `<option value="${c}" ${filters.visaenquiries.country_slug===c?'selected':''}>${c}</option>`).join('')}
+      </select>`;
+      if (!data.length) {
+        panel.innerHTML = filterBar('visaenquiries', countryFilter) + renderStatPills(cache.visaenquiries, 'visaenquiries') + '<div class="empty">No visa enquiries found</div>';
+        return;
+      }
+      const rows = data.map(v => `<tr>
+        <td>${v.id}</td>
+        <td>${v.country_name}<br/><small>${v.country_slug}</small></td>
+        <td><strong>${v.first_name} ${v.last_name}</strong><br/><small>${v.email}</small></td>
+        <td>${v.phone}</td>
+        <td>${v.travel_date || '—'}</td>
+        <td>${v.purpose || '—'}</td>
+        <td><span class="notes-preview" title="${(v.message||'').replace(/"/g,'&quot;')}">${v.message || '—'}</span></td>
+        <td>${statusBadge(v.status)}</td>
+        <td><span class="notes-preview" title="${v.admin_notes||''}">${v.admin_notes || '-'}</span></td>
+        <td>${fmtDate(v.created_at)}</td>
+        <td class="actions"><button class="btn btn-primary btn-sm" onclick="openStatusModal('visaenquiries',${v.id},'${v.status}','${(v.admin_notes||'').replace(/'/g,"\\'")}')">Update</button></td>
+      </tr>`).join('');
+      panel.innerHTML = filterBar('visaenquiries', countryFilter) + renderStatPills(cache.visaenquiries, 'visaenquiries') + `<div class="card"><table><thead><tr>
+        <th>ID</th><th>Country</th><th>Name / Email</th><th>Phone</th><th>Travel Date</th>
+        <th>Purpose</th><th>Message</th><th>Status</th><th>Notes</th><th>Submitted</th><th>Action</th>
       </tr></thead><tbody>${rows}</tbody></table></div>`;
     }
 
@@ -834,10 +913,46 @@
       </tr></thead><tbody>${rows}</tbody></table></div>`;
     }
 
+    function renderTouristVisa() {
+      const data = applyClientFilter(cache.touristvisa, 'touristvisa');
+      document.getElementById('count-touristvisa').textContent = cache.touristvisa.length;
+      const panel = document.getElementById('panel-touristvisa');
+      const activeFilter = `<select onchange="setFilter('touristvisa','is_active',this.value)">
+        <option value="">All</option>
+        <option value="true" ${filters.touristvisa.is_active==='true'?'selected':''}>Active</option>
+        <option value="false" ${filters.touristvisa.is_active==='false'?'selected':''}>Inactive</option>
+      </select>`;
+      const toolbar = `<div class="toolbar"><h2>Tourist Visa Countries (${data.length})</h2>
+        <button class="btn btn-primary" onclick="openTouristVisaModal()">+ Add Country</button></div>`;
+      if (!data.length) {
+        panel.innerHTML = toolbar + filterBar('touristvisa', activeFilter) + '<div class="empty">No tourist visa countries found</div>';
+        return;
+      }
+      const rows = data.map(c => {
+        const img = c.hero_image_url ? `<img class="media-thumb" src="${touristVisaImageSrc(c.hero_image_url)}" alt="" />` : '—';
+        return `<tr>
+          <td>${c.id}</td>
+          <td>${img}</td>
+          <td><strong>${c.flag || ''} ${c.country_name}</strong><br/><small>/tourist-visa/${c.country_slug}</small></td>
+          <td>${c.hero_title || '—'}</td>
+          <td><span class="badge ${c.is_active?'badge-active':'badge-inactive'}">${c.is_active?'Active':'Inactive'}</span></td>
+          <td>${c.sort_order}</td>
+          <td class="actions">
+            <button class="btn btn-primary btn-sm" onclick="editTouristVisa(${c.id})">Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteTouristVisa(${c.id})">Delete</button>
+          </td>
+        </tr>`;
+      }).join('');
+      panel.innerHTML = toolbar + filterBar('touristvisa', activeFilter) + `<div class="card"><table><thead><tr>
+        <th>ID</th><th>Hero Image</th><th>Country</th><th>Hero Title</th><th>Status</th><th>Order</th><th>Actions</th>
+      </tr></thead><tbody>${rows}</tbody></table></div>`;
+    }
+
     function renderTab(tab) {
       if (tab === 'enquiries') renderEnquiries();
       else if (tab === 'demo') renderDemo();
       else if (tab === 'exambooks') renderExamBooks();
+      else if (tab === 'visaenquiries') renderVisaEnquiries();
       else if (tab === 'loans') renderLoans();
       else if (tab === 'referrals') renderReferrals();
       else if (tab === 'news') renderContent('news');
@@ -846,6 +961,7 @@
       else if (tab === 'careers') renderCareers();
       else if (tab === 'jobapps') renderJobApps();
       else if (tab === 'accreditations') renderAccreditations();
+      else if (tab === 'touristvisa') renderTouristVisa();
       else renderTestimonials();
     }
 
@@ -889,15 +1005,15 @@
 
     async function loadAll() {
       try {
-        const [statuses, enquiries, demo, exambooks, loans, referrals, testimonials, accreditations, news, blog, offers, careers, jobapps] = await Promise.all([
-          api('/statuses'), api('/enquiries'), api('/demo-classes'), api('/exam-bookings'), api('/education-loans'), api('/referrals'), api('/testimonials'),
-          api('/accreditations'),
+        const [statuses, enquiries, demo, exambooks, visaenquiries, loans, referrals, testimonials, accreditations, touristvisa, news, blog, offers, careers, jobapps] = await Promise.all([
+          api('/statuses'), api('/enquiries'), api('/demo-classes'), api('/exam-bookings'), api('/tourist-visa-enquiries'), api('/education-loans'), api('/referrals'), api('/testimonials'),
+          api('/accreditations'), api('/tourist-visa-countries'),
           api('/content?content_type=news'), api('/content?content_type=blog'), api('/offers'),
           api('/careers'), api('/job-applications')
         ]);
         statusOptions = statuses;
-        cache = { enquiries, demo, exambooks, loans, referrals, testimonials, accreditations, news, blog, offers, careers, jobapps };
-        renderEnquiries(); renderDemo(); renderExamBooks(); renderLoans(); renderReferrals(); renderTestimonials(); renderAccreditations();
+        cache = { enquiries, demo, exambooks, visaenquiries, loans, referrals, testimonials, accreditations, touristvisa, news, blog, offers, careers, jobapps };
+        renderEnquiries(); renderDemo(); renderExamBooks(); renderVisaEnquiries(); renderLoans(); renderReferrals(); renderTestimonials(); renderAccreditations(); renderTouristVisa();
         renderContent('news'); renderContent('blog'); renderOffers(); renderCareers(); renderJobApps();
       } catch (e) { toast('Failed to load: ' + e.message, 'error'); }
     }
@@ -906,11 +1022,13 @@
       enquiries: 'Student enquiry submissions',
       demo: 'IELTS & PTE demo class bookings',
       exambooks: 'IELTS & PTE exam booking requests',
+      visaenquiries: 'Tourist visa enquiry submissions',
       loans: 'Education loan requests',
       referrals: 'Refer & earn partner applications',
       jobapps: 'Career applications with resumes',
       testimonials: 'Success story testimonials',
       accreditations: 'Accreditation & certification logos',
+      touristvisa: 'Tourist visa content by country',
       news: 'News & articles content',
       blog: 'Blog posts and guides',
       offers: 'Student offers and promotions',
@@ -1199,6 +1317,158 @@
     async function deleteAccreditation(id) {
       if (!confirm('Delete this accreditation?')) return;
       try { await api('/accreditations/' + id, { method: 'DELETE' }); toast('Deleted'); loadAll(); }
+      catch (err) { toast(err.message, 'error'); }
+    }
+
+    let pendingTouristVisaHeroRemove = false;
+
+    function touristVisaImageSrc(url) {
+      if (!url) return '';
+      const match = url.match(/(?:testimonials|offers|content|accreditations|tourist-visa)\/[a-f0-9]+\.[a-z0-9]+$/i);
+      if (match) return '/api/media/' + match[0];
+      return url.startsWith('http') ? url : url;
+    }
+
+    function renderTouristVisaHeroPreview(data) {
+      const preview = document.getElementById('tv-hero-preview');
+      const removeBtn = document.getElementById('tv-hero-remove');
+      if (!data?.hero_image_url) {
+        preview.style.display = 'none';
+        preview.innerHTML = '';
+        removeBtn.style.display = 'none';
+        return;
+      }
+      preview.style.display = 'block';
+      removeBtn.style.display = 'inline-block';
+      preview.innerHTML = `<img src="${touristVisaImageSrc(data.hero_image_url)}" alt="Preview" style="width:100%;max-height:180px;object-fit:cover;border-radius:8px;" />`;
+    }
+
+    function addTvFaqRow(question = '', answer = '') {
+      const list = document.getElementById('tv-faqs-list');
+      const row = document.createElement('div');
+      row.className = 'faq-row';
+      row.innerHTML = `
+        <div class="form-group"><label>Question</label><input class="tv-faq-q" value="${question.replace(/"/g, '&quot;')}" placeholder="FAQ question" /></div>
+        <div class="form-group"><label>Answer</label><textarea class="tv-faq-a" rows="2" placeholder="FAQ answer">${answer}</textarea></div>
+        <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.faq-row').remove()">Remove</button>`;
+      list.appendChild(row);
+    }
+
+    function setTvFaqsInForm(faqs) {
+      const list = document.getElementById('tv-faqs-list');
+      list.innerHTML = '';
+      (faqs || []).forEach(f => addTvFaqRow(f.question || '', f.answer || ''));
+    }
+
+    function getTvFaqsFromForm() {
+      const rows = [...document.querySelectorAll('#tv-faqs-list .faq-row')];
+      const faqs = rows.map(row => ({
+        question: row.querySelector('.tv-faq-q').value.trim(),
+        answer: row.querySelector('.tv-faq-a').value.trim(),
+      })).filter(f => f.question && f.answer);
+      return faqs.length ? faqs : null;
+    }
+
+    function openTouristVisaModal(data = null) {
+      pendingTouristVisaHeroRemove = false;
+      document.getElementById('tv-hero-file').value = '';
+      document.getElementById('tv-modal-title').textContent = data ? 'Edit Tourist Visa Country' : 'Add Tourist Visa Country';
+      document.getElementById('tv-id').value = data?.id || '';
+      document.getElementById('tv-slug').value = data?.country_slug || '';
+      document.getElementById('tv-name').value = data?.country_name || '';
+      document.getElementById('tv-flag').value = data?.flag || '';
+      document.getElementById('tv-sort').value = data?.sort_order ?? 0;
+      document.getElementById('tv-active').value = data?.is_active !== false ? 'true' : 'false';
+      document.getElementById('tv-hero-title').value = data?.hero_title || '';
+      document.getElementById('tv-hero-subtitle').value = data?.hero_subtitle || '';
+      document.getElementById('tv-process').value = data?.visa_process || '';
+      document.getElementById('tv-eligibility').value = data?.visa_eligibility || '';
+      document.getElementById('tv-hero-url').value = data?.hero_image_url || '';
+      setTvFaqsInForm(data?.faqs || []);
+      renderTouristVisaHeroPreview(data);
+      document.getElementById('tourist-visa-modal').classList.add('open');
+    }
+    function closeTouristVisaModal() { document.getElementById('tourist-visa-modal').classList.remove('open'); }
+    function editTouristVisa(id) {
+      const item = cache.touristvisa.find(x => x.id === id);
+      if (item) openTouristVisaModal(item);
+    }
+
+    document.getElementById('tv-hero-file').addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      pendingTouristVisaHeroRemove = false;
+      if (!file) return;
+      if (file.size > 10 * 1024 * 1024) { toast('Image must be smaller than 10MB', 'error'); e.target.value = ''; return; }
+      const url = URL.createObjectURL(file);
+      const preview = document.getElementById('tv-hero-preview');
+      preview.style.display = 'block';
+      document.getElementById('tv-hero-remove').style.display = 'inline-block';
+      preview.innerHTML = `<img src="${url}" alt="Preview" style="width:100%;max-height:180px;object-fit:cover;border-radius:8px;" />`;
+    });
+
+    function removeTouristVisaHero() {
+      pendingTouristVisaHeroRemove = true;
+      document.getElementById('tv-hero-file').value = '';
+      document.getElementById('tv-hero-url').value = '';
+      document.getElementById('tv-hero-preview').style.display = 'none';
+      document.getElementById('tv-hero-preview').innerHTML = '';
+      document.getElementById('tv-hero-remove').style.display = 'none';
+    }
+
+    async function uploadTouristVisaHero(countryId, file) {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await fetch('/api/admin/tourist-visa-countries/' + countryId + '/hero-image', {
+        method: 'POST',
+        headers: { 'X-Admin-Secret': SECRET },
+        body: fd,
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || res.statusText);
+      }
+      return res.json();
+    }
+
+    document.getElementById('tourist-visa-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('tv-id').value;
+      const heroFile = document.getElementById('tv-hero-file').files?.[0];
+      const payload = {
+        country_slug: document.getElementById('tv-slug').value.trim(),
+        country_name: document.getElementById('tv-name').value.trim(),
+        flag: document.getElementById('tv-flag').value.trim() || null,
+        hero_title: document.getElementById('tv-hero-title').value.trim() || null,
+        hero_subtitle: document.getElementById('tv-hero-subtitle').value.trim() || null,
+        visa_process: document.getElementById('tv-process').value.trim() || null,
+        visa_eligibility: document.getElementById('tv-eligibility').value.trim() || null,
+        faqs: getTvFaqsFromForm(),
+        is_active: document.getElementById('tv-active').value === 'true',
+        sort_order: Number(document.getElementById('tv-sort').value) || 0,
+      };
+      try {
+        let countryId = id;
+        if (id) {
+          await api('/tourist-visa-countries/' + id, { method: 'PUT', body: JSON.stringify(payload) });
+        } else {
+          const created = await api('/tourist-visa-countries', { method: 'POST', body: JSON.stringify(payload) });
+          countryId = created.id;
+        }
+        if (pendingTouristVisaHeroRemove && countryId) {
+          await api('/tourist-visa-countries/' + countryId + '/hero-image', { method: 'DELETE' });
+        }
+        if (heroFile && countryId) {
+          await uploadTouristVisaHero(countryId, heroFile);
+        }
+        toast(id ? 'Updated' : 'Created');
+        closeTouristVisaModal();
+        loadAll();
+      } catch (err) { toast(err.message, 'error'); }
+    });
+
+    async function deleteTouristVisa(id) {
+      if (!confirm('Delete this tourist visa country?')) return;
+      try { await api('/tourist-visa-countries/' + id, { method: 'DELETE' }); toast('Deleted'); loadAll(); }
       catch (err) { toast(err.message, 'error'); }
     }
 

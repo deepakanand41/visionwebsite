@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from app.auth import verify_admin_secret
 from app.constants import ALL_STATUSES, SUBMISSION_STATUSES
 from app.database import get_db
-from app.models import Enquiry, DemoClassBooking, ExamBooking, ReferralApplication, EducationLoanRequest, Testimonial, ContentPost, Offer, JobPosting, JobApplication, Accreditation
+from app.models import Enquiry, DemoClassBooking, ExamBooking, ReferralApplication, EducationLoanRequest, Testimonial, ContentPost, Offer, JobPosting, JobApplication, Accreditation, TouristVisaCountry, TouristVisaEnquiry
 from app.schemas import (
     EnquiryResponse,
     DemoClassResponse,
@@ -34,6 +34,10 @@ from app.schemas import (
     AccreditationCreate,
     AccreditationUpdate,
     AccreditationResponse,
+    TouristVisaCountryCreate,
+    TouristVisaCountryUpdate,
+    TouristVisaCountryResponse,
+    TouristVisaEnquiryResponse,
 )
 from app.services.storage import storage_service
 from app.utils.slugify import slugify
@@ -910,3 +914,160 @@ def delete_accreditation_image(accreditation_id: int, db: Session = Depends(get_
     accreditation.image_url = None
     db.commit()
     return MessageResponse(message="Accreditation image removed")
+
+
+# ─── Tourist Visa Countries CRUD ───────────────────────────────────────────────
+
+def _apply_search_visa_enquiry(query, search: str):
+    term = f"%{search.lower()}%"
+    return query.filter(
+        or_(
+            TouristVisaEnquiry.first_name.ilike(term),
+            TouristVisaEnquiry.last_name.ilike(term),
+            TouristVisaEnquiry.email.ilike(term),
+            TouristVisaEnquiry.phone.ilike(term),
+            TouristVisaEnquiry.country_name.ilike(term),
+            TouristVisaEnquiry.country_slug.ilike(term),
+            TouristVisaEnquiry.purpose.ilike(term),
+            TouristVisaEnquiry.message.ilike(term),
+            TouristVisaEnquiry.admin_notes.ilike(term),
+        )
+    )
+
+
+@router.get("/tourist-visa-countries", response_model=list[TouristVisaCountryResponse])
+def admin_list_tourist_visa_countries(
+    is_active: bool | None = Query(None),
+    search: str | None = Query(None),
+    db: Session = Depends(get_db),
+):
+    query = db.query(TouristVisaCountry)
+    if is_active is not None:
+        query = query.filter(TouristVisaCountry.is_active == is_active)
+    if search:
+        term = f"%{search.lower()}%"
+        query = query.filter(
+            or_(
+                TouristVisaCountry.country_name.ilike(term),
+                TouristVisaCountry.country_slug.ilike(term),
+                TouristVisaCountry.hero_title.ilike(term),
+            )
+        )
+    return query.order_by(TouristVisaCountry.sort_order.asc(), TouristVisaCountry.country_name.asc()).all()
+
+
+@router.post("/tourist-visa-countries", response_model=TouristVisaCountryResponse, status_code=201)
+def create_tourist_visa_country(payload: TouristVisaCountryCreate, db: Session = Depends(get_db)):
+    existing = db.query(TouristVisaCountry).filter(TouristVisaCountry.country_slug == payload.country_slug).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Country slug already exists")
+    country = TouristVisaCountry(**payload.model_dump())
+    db.add(country)
+    db.commit()
+    db.refresh(country)
+    return country
+
+
+@router.put("/tourist-visa-countries/{country_id}", response_model=TouristVisaCountryResponse)
+def update_tourist_visa_country(
+    country_id: int,
+    payload: TouristVisaCountryUpdate,
+    db: Session = Depends(get_db),
+):
+    country = db.query(TouristVisaCountry).filter(TouristVisaCountry.id == country_id).first()
+    if not country:
+        raise HTTPException(status_code=404, detail="Tourist visa country not found")
+
+    if payload.country_slug and payload.country_slug != country.country_slug:
+        clash = db.query(TouristVisaCountry).filter(TouristVisaCountry.country_slug == payload.country_slug).first()
+        if clash:
+            raise HTTPException(status_code=400, detail="Country slug already exists")
+
+    for field, value in payload.model_dump(exclude_unset=True).items():
+        setattr(country, field, value)
+
+    db.commit()
+    db.refresh(country)
+    return country
+
+
+@router.delete("/tourist-visa-countries/{country_id}", response_model=MessageResponse)
+def delete_tourist_visa_country(country_id: int, db: Session = Depends(get_db)):
+    country = db.query(TouristVisaCountry).filter(TouristVisaCountry.id == country_id).first()
+    if not country:
+        raise HTTPException(status_code=404, detail="Tourist visa country not found")
+    if country.hero_image_url:
+        storage_service.delete_media(country.hero_image_url)
+    db.delete(country)
+    db.commit()
+    return MessageResponse(message="Tourist visa country deleted successfully")
+
+
+@router.post("/tourist-visa-countries/{country_id}/hero-image", response_model=ImageUploadResponse)
+async def upload_tourist_visa_hero_image(
+    country_id: int,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+):
+    country = db.query(TouristVisaCountry).filter(TouristVisaCountry.id == country_id).first()
+    if not country:
+        raise HTTPException(status_code=404, detail="Tourist visa country not found")
+
+    content = await file.read()
+    image_url = storage_service.upload_tourist_visa_image(file, content)
+
+    if country.hero_image_url:
+        storage_service.delete_media(country.hero_image_url)
+
+    country.hero_image_url = image_url
+    db.commit()
+    db.refresh(country)
+    return ImageUploadResponse(image_url=image_url, message="Hero image uploaded")
+
+
+@router.delete("/tourist-visa-countries/{country_id}/hero-image", response_model=MessageResponse)
+def delete_tourist_visa_hero_image(country_id: int, db: Session = Depends(get_db)):
+    country = db.query(TouristVisaCountry).filter(TouristVisaCountry.id == country_id).first()
+    if not country:
+        raise HTTPException(status_code=404, detail="Tourist visa country not found")
+    if not country.hero_image_url:
+        raise HTTPException(status_code=404, detail="No hero image on this country")
+
+    storage_service.delete_media(country.hero_image_url)
+    country.hero_image_url = None
+    db.commit()
+    return MessageResponse(message="Hero image removed")
+
+
+# ─── Tourist Visa Enquiries ────────────────────────────────────────────────────
+
+@router.get("/tourist-visa-enquiries", response_model=list[TouristVisaEnquiryResponse])
+def list_tourist_visa_enquiries(
+    status: str | None = Query(None),
+    search: str | None = Query(None),
+    country_slug: str | None = Query(None),
+    db: Session = Depends(get_db),
+):
+    query = db.query(TouristVisaEnquiry)
+    if status:
+        query = query.filter(TouristVisaEnquiry.status == status)
+    if country_slug:
+        query = query.filter(TouristVisaEnquiry.country_slug == country_slug)
+    if search:
+        query = _apply_search_visa_enquiry(query, search)
+    return query.order_by(TouristVisaEnquiry.created_at.desc()).all()
+
+
+@router.patch("/tourist-visa-enquiries/{enquiry_id}", response_model=TouristVisaEnquiryResponse)
+def update_tourist_visa_enquiry_status(
+    enquiry_id: int,
+    payload: StatusUpdate,
+    db: Session = Depends(get_db),
+):
+    record = db.query(TouristVisaEnquiry).filter(TouristVisaEnquiry.id == enquiry_id).first()
+    if not record:
+        raise HTTPException(status_code=404, detail="Tourist visa enquiry not found")
+    _update_status(record, payload)
+    db.commit()
+    db.refresh(record)
+    return record
