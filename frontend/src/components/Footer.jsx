@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { FaFacebookF, FaInstagram, FaLinkedinIn, FaWhatsapp, FaYoutube } from 'react-icons/fa';
 import { FiMail, FiPhone, FiMapPin } from 'react-icons/fi';
-import { COMPANY, SOCIAL_LINKS } from '../utils/constants';
+import { COMPANY, SOCIAL_LINKS, LEGAL_LINKS } from '../utils/constants';
 
 const footerLinks = {
   Company: [
@@ -13,6 +13,8 @@ const footerLinks = {
     { label: 'Success Stories', to: '/success-stories' },
     { label: 'Refer & Earn', to: '/refer-and-earn' },
     { label: 'Contact Us', to: '/contact-us' },
+    { label: 'Privacy Policy', to: LEGAL_LINKS.privacy },
+    { label: 'Terms & Conditions', to: LEGAL_LINKS.terms },
   ],
   Services: [
     { label: 'Study Abroad Counselling', to: '/contact-us' },
@@ -111,6 +113,15 @@ export default function Footer() {
           <p className="text-sm text-gray-300">
             © {new Date().getFullYear()} Vision International Education Consultants. All rights reserved.
           </p>
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm">
+            <Link to={LEGAL_LINKS.privacy} className="text-gray-300 hover:text-white transition-colors">
+              Privacy Policy
+            </Link>
+            <span className="text-gray-600 hidden sm:inline">|</span>
+            <Link to={LEGAL_LINKS.terms} className="text-gray-300 hover:text-white transition-colors">
+              Terms &amp; Conditions
+            </Link>
+          </div>
           <div className="flex items-center gap-3">
             {socials.map(({ icon: Icon, href, label }) => (
               <a

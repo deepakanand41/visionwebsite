@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import ExamBooking
 from app.schemas import ExamBookingCreate, MessageResponse
+from app.services.email_service import notify_form_submission
 
 router = APIRouter(prefix="/api", tags=["Exam Booking"])
 
@@ -27,6 +28,21 @@ def book_exam(payload: ExamBookingCreate, db: Session = Depends(get_db)):
     db.commit()
 
     label = payload.examType.upper()
+    notify_form_submission(
+        f"{label} Exam Booking",
+        {
+            "Name": f"{payload.firstName} {payload.lastName}",
+            "Email": payload.email,
+            "Phone": payload.phone,
+            "Exam Type": label,
+            "Exam Format": payload.examFormat,
+            "Preferred Date": payload.examDate,
+            "Preferred City": payload.preferredCity,
+            "Notes": payload.notes,
+            "Contact Permission": payload.contactPermission,
+        },
+        submitter_email=str(payload.email),
+    )
     return MessageResponse(
         message=f"Your {label} exam booking enquiry has been submitted! Our team will contact you within 24 hours."
     )

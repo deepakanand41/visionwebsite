@@ -14,23 +14,7 @@ import {
 } from 'react-icons/fi';
 import { fetchCareers, submitJobApplication } from '../services/api';
 import { HOME_THEME as T } from '../utils/constants';
-
-const JOB_TYPES = [
-  { id: 'all', label: 'All Roles' },
-  { id: 'counselling', label: 'Counselling' },
-  { id: 'sales', label: 'Sales' },
-  { id: 'marketing', label: 'Marketing' },
-  { id: 'operations', label: 'Operations' },
-  { id: 'test_prep', label: 'Test Prep' },
-  { id: 'visa', label: 'Visa' },
-  { id: 'it', label: 'IT' },
-  { id: 'hr', label: 'HR' },
-  { id: 'finance', label: 'Finance' },
-  { id: 'management', label: 'Management' },
-  { id: 'other', label: 'Other' },
-];
-
-const TYPE_LABELS = Object.fromEntries(JOB_TYPES.filter((t) => t.id !== 'all').map((t) => [t.id, t.label]));
+import { JOB_TYPE_FILTERS, jobTypeLabel } from '../utils/jobDesignations';
 
 const EMPLOYMENT_LABELS = {
   full_time: 'Full Time',
@@ -197,7 +181,7 @@ function JobCard({ job, onApply, onExpand, expanded }) {
         <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
           <div>
             <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold mb-3" style={{ background: T.redSoft, color: T.red }}>
-              {TYPE_LABELS[job.job_type] || job.job_type}
+              {jobTypeLabel(job.job_type)}
             </span>
             <h3 className="text-xl sm:text-2xl font-bold text-gray-900">{job.title}</h3>
           </div>
@@ -345,7 +329,7 @@ export default function Careers() {
 
       <section className="py-8 bg-gray-50 border-b border-gray-100 sticky top-16 lg:top-[7rem] z-30">
         <div className="max-w-7xl mx-auto px-4 flex flex-wrap gap-2 justify-center">
-          {JOB_TYPES.map((t) => (
+          {JOB_TYPE_FILTERS.map((t) => (
             <button
               key={t.id}
               type="button"

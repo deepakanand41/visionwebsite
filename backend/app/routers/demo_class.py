@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import DemoClassBooking
 from app.schemas import DemoClassCreate, MessageResponse
+from app.services.email_service import notify_form_submission
 
 router = APIRouter(prefix="/api", tags=["Demo Class"])
 
@@ -23,6 +24,21 @@ def book_demo_class(payload: DemoClassCreate, db: Session = Depends(get_db)):
     )
     db.add(booking)
     db.commit()
+    notify_form_submission(
+        f"{payload.examType.upper()} Demo Class Booking",
+        {
+            "Name": payload.fullName,
+            "Email": payload.email,
+            "Phone": payload.phone,
+            "Exam Type": payload.examType.upper(),
+            "Target Score": payload.targetScore,
+            "Batch": payload.batch,
+            "Mode": payload.mode,
+            "Demo Date": payload.demoDate,
+            "Message": payload.message,
+        },
+        submitter_email=str(payload.email),
+    )
     return MessageResponse(
         message=f"Your {payload.examType.upper()} demo class has been booked! We'll contact you within 24 hours."
     )

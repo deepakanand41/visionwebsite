@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import Enquiry
 from app.schemas import EnquiryCreate, EnquiryResponse, MessageResponse
+from app.services.email_service import notify_form_submission
 
 router = APIRouter(prefix="/api", tags=["Enquiry"])
 
@@ -25,6 +26,21 @@ def submit_enquiry(payload: EnquiryCreate, db: Session = Depends(get_db)):
     )
     db.add(enquiry)
     db.commit()
+    notify_form_submission(
+        "Study Abroad Enquiry",
+        {
+            "Name": f"{payload.firstName} {payload.lastName}",
+            "Email": payload.email,
+            "Phone": payload.phone,
+            "Destination": payload.destination,
+            "Study Level": payload.studyLevel,
+            "Intake": payload.intake,
+            "Counselling Mode": payload.counsellingMode,
+            "Funding Source": payload.fundingSource,
+            "Contact Permission": payload.contactPermission,
+        },
+        submitter_email=str(payload.email),
+    )
     return MessageResponse(
         message="Enquiry submitted successfully. Our counsellor will contact you within 24 hours."
     )

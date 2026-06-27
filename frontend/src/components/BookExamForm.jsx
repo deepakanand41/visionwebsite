@@ -3,6 +3,7 @@ import toast from 'react-hot-toast';
 import { FiUser, FiMail, FiPhone, FiSend, FiLoader } from 'react-icons/fi';
 import { submitExamBooking } from '../services/api';
 import { HOME_THEME as T } from '../utils/constants';
+import { TermsPrivacyLinks } from './TermsPrivacyLinks';
 
 const examCities = [
   'Karnal', 'Delhi', 'Chandigarh', 'Ambala', 'Panipat', 'Kurukshetra', 'Online / Any City', 'Other',
@@ -198,7 +199,7 @@ export default function BookExamForm({ examType }) {
               className="mt-0.5 accent-red-700"
             />
             <span className="text-sm text-gray-600">
-              I agree to the Terms &amp; Conditions and Privacy Policy
+              I agree to the <TermsPrivacyLinks />
               <span className="text-red-500"> *</span>
             </span>
           </label>

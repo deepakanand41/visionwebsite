@@ -18,6 +18,8 @@ const Offers = lazy(() => import('./pages/Offers'));
 const Careers = lazy(() => import('./pages/Careers'));
 const BookExam = lazy(() => import('./pages/BookExam'));
 const TouristVisaDetail = lazy(() => import('./pages/TouristVisaDetail'));
+const TermsAndConditions = lazy(() => import('./pages/TermsAndConditions'));
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 
 function PageLoader() {
   return (
@@ -55,6 +57,8 @@ export default function App() {
             <Route path="/careers" element={<Careers />} />
             <Route path="/sign-in" element={<SignIn />} />
             <Route path="/contact-us" element={<ContactUs />} />
+            <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           </Routes>
         </Suspense>
       </MainLayout>

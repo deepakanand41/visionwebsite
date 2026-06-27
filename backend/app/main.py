@@ -7,6 +7,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
 from app.services.storage import storage_service
+from app.services.email_service import smtp_is_configured
 from app.database import Base, engine
 from app.migrate import run_migrations
 from app.seed import seed_testimonials
@@ -69,6 +70,9 @@ def health_check():
         "s3_bucket": bucket or None,
         "upload_max_image_mb": settings.upload_max_bytes // (1024 * 1024),
         "upload_max_video_mb": settings.upload_max_video_bytes // (1024 * 1024),
+        "smtp_enabled": settings.smtp_enabled,
+        "smtp_configured": smtp_is_configured(),
+        "smtp_host": settings.smtp_host if settings.smtp_enabled else None,
     }
 
 

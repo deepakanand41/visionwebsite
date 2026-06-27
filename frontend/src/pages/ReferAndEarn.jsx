@@ -3,6 +3,7 @@ import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { submitReferral } from '../services/api';
+import { TermsLink } from '../components/TermsPrivacyLinks';
 import {
   FiUser, FiMail, FiPhone, FiMapPin, FiSend, FiLoader,
   FiCheck, FiDollarSign, FiUsers, FiGift, FiAward
@@ -829,9 +830,7 @@ export default function ReferAndEarn() {
                         text: (
                           <>
                             I agree to Vision International's{' '}
-                            <a href="#" className="underline" style={{ color: '#A50000' }}>
-                              Referral Associate Terms & Conditions
-                            </a>.
+                            <TermsLink label="Referral Associate Terms & Conditions" />.
                           </>
                         ),
                         required: true,

@@ -3,11 +3,18 @@ from pydantic import EmailStr
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.job_designations import JOB_DESIGNATIONS
 from app.models import JobApplication, JobPosting
 from app.schemas import JobPostingPublicResponse, MessageResponse
+from app.services.email_service import notify_form_submission
 from app.services.storage import storage_service
 
 router = APIRouter(prefix="/api", tags=["Careers"])
+
+
+@router.get("/careers/designations")
+def list_job_designations():
+    return [{"id": slug, "label": label} for slug, label in JOB_DESIGNATIONS.items()]
 
 
 @router.get("/careers", response_model=list[JobPostingPublicResponse])
@@ -70,6 +77,24 @@ async def apply_for_job(
     )
     db.add(application)
     db.commit()
+
+    notify_form_submission(
+        f"Job Application — {job.title}",
+        {
+            "Job Title": job.title,
+            "Name": full_name.strip(),
+            "Email": str(email).strip().lower(),
+            "Phone": phone.strip(),
+            "Current City": current_city,
+            "Current Role": current_role,
+            "Experience": experience_years,
+            "LinkedIn": linkedin_url,
+            "Cover Message": cover_message,
+            "Resume File": resume_filename,
+            "Resume URL": resume_url,
+        },
+        submitter_email=str(email).strip().lower(),
+    )
 
     return MessageResponse(
         message="Your application has been submitted successfully. Our HR team will review it and contact you soon."

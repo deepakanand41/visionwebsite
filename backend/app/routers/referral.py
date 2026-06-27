@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import ReferralApplication
 from app.schemas import ReferralCreate, MessageResponse
+from app.services.email_service import notify_form_submission
 
 router = APIRouter(prefix="/api", tags=["Referral"])
 
@@ -32,6 +33,29 @@ def submit_referral(payload: ReferralCreate, db: Session = Depends(get_db)):
     )
     db.add(application)
     db.commit()
+    notify_form_submission(
+        "Refer & Earn Application",
+        {
+            "Name": payload.fullName,
+            "Email": payload.email,
+            "Mobile": payload.mobile,
+            "WhatsApp": payload.whatsapp,
+            "Date of Birth": payload.dob,
+            "City": payload.city,
+            "State": payload.state,
+            "Country": payload.country,
+            "Occupation": payload.occupation,
+            "Organization": payload.organization,
+            "Experience": payload.experience,
+            "Referral Methods": ", ".join(payload.referralMethods or []),
+            "Monthly Referrals": payload.monthlyReferrals,
+            "Account Holder": payload.accountHolder,
+            "Bank Name": payload.bankName,
+            "UPI ID": payload.upiId,
+            "Contact Permission": payload.decContact,
+        },
+        submitter_email=str(payload.email),
+    )
     return MessageResponse(
         message="Application submitted successfully! Our team will contact you within 24-48 hours."
     )

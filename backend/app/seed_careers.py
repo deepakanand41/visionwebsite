@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 
 from app.database import SessionLocal
+from app.job_designations import JOB_DESIGNATIONS
 from app.models import JobPosting
 
 
@@ -86,13 +87,59 @@ SAMPLE_JOBS = [
 ]
 
 
+def _designation_job_template(slug: str, label: str, sort_order: int) -> dict:
+    return {
+        "title": label,
+        "slug": slug,
+        "job_type": slug,
+        "employment_type": "full_time",
+        "location": "Karnal, Haryana",
+        "experience_required": "As per role",
+        "salary_range": "As per industry standards",
+        "description": (
+            f"Vision International Educational Consultants is hiring a {label}. "
+            f"Join our team and contribute to helping students achieve their study abroad and visa goals."
+        ),
+        "requirements": (
+            "Relevant experience in the role or education sector\n"
+            "Strong communication and interpersonal skills\n"
+            "Professional attitude with team collaboration\n"
+            "Willingness to work from Karnal office (unless otherwise agreed)"
+        ),
+        "responsibilities": (
+            f"Perform duties aligned with the {label} role\n"
+            "Coordinate with internal teams as required\n"
+            "Maintain quality standards and follow company processes\n"
+            "Support Vision International's growth and student success mission"
+        ),
+        "sort_order": sort_order,
+        "is_active": True,
+    }
+
+
+DESIGNATION_JOBS = [
+    _designation_job_template(slug, label, idx + 10)
+    for idx, (slug, label) in enumerate(JOB_DESIGNATIONS.items())
+]
+
+
 def seed_careers():
     db: Session = SessionLocal()
     try:
-        if db.query(JobPosting).count() > 0:
-            return
-        for item in SAMPLE_JOBS:
-            db.add(JobPosting(**item, is_active=True))
-        db.commit()
+        added = 0
+        if db.query(JobPosting).count() == 0:
+            for item in SAMPLE_JOBS:
+                db.add(JobPosting(**item, is_active=True))
+            added += len(SAMPLE_JOBS)
+
+        existing_slugs = {row.slug for row in db.query(JobPosting.slug).all()}
+        for item in DESIGNATION_JOBS:
+            if item["slug"] in existing_slugs:
+                continue
+            db.add(JobPosting(**item))
+            added += 1
+
+        if added:
+            db.commit()
     finally:
         db.close()

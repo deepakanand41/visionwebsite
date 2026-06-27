@@ -39,6 +39,11 @@ export const HOME_THEME = {
   shadowMd: 'rgba(165,0,0,0.12)',
 };
 
+export const LEGAL_LINKS = {
+  terms: '/terms-and-conditions',
+  privacy: '/privacy-policy',
+};
+
 export const SOCIAL_LINKS = {
   facebook: 'https://www.facebook.com/vieckarnal',
   instagram: 'https://www.instagram.com/visioninternationalofficial/',

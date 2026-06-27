@@ -8,6 +8,7 @@ from app.schemas import (
     TouristVisaCountryResponse,
     TouristVisaEnquiryCreate,
 )
+from app.services.email_service import notify_form_submission
 
 router = APIRouter(prefix="/api", tags=["Tourist Visa"])
 
@@ -51,6 +52,21 @@ def submit_tourist_visa_enquiry(payload: TouristVisaEnquiryCreate, db: Session =
     )
     db.add(enquiry)
     db.commit()
+
+    notify_form_submission(
+        f"Tourist Visa Enquiry — {payload.countryName}",
+        {
+            "Name": f"{payload.firstName} {payload.lastName}",
+            "Email": payload.email,
+            "Phone": payload.phone,
+            "Country": payload.countryName,
+            "Travel Date": payload.travelDate,
+            "Purpose": payload.purpose,
+            "Message": payload.message,
+            "Contact Permission": payload.contactPermission,
+        },
+        submitter_email=str(payload.email),
+    )
 
     return MessageResponse(
         message=f"Your tourist visa enquiry for {payload.countryName} has been submitted! Our team will contact you within 24 hours."

@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 _BACKEND_DIR = Path(__file__).resolve().parent.parent
@@ -30,6 +31,44 @@ class Settings(BaseSettings):
     aws_s3_public_base_url: str = ""
     aws_access_key_id: str = ""
     aws_secret_access_key: str = ""
+
+    # Zoho SMTP — set SMTP_ENABLED=true and credentials in .env
+    smtp_enabled: bool = False
+    smtp_host: str = "smtp.zoho.com"
+    smtp_port: int = 587
+    smtp_security: str = "tls"  # tls (port 587) | ssl (port 465)
+    smtp_username: str = ""
+    smtp_password: str = ""
+    smtp_from_email: str = ""
+    smtp_from_name: str = "Vision International"
+    smtp_notify_to: str = ""  # comma-separated recipient emails
+    smtp_ssl_verify: bool = True  # set false only for local debugging if certs fail
+
+    @field_validator(
+        "smtp_host",
+        "smtp_security",
+        "smtp_username",
+        "smtp_password",
+        "smtp_from_email",
+        "smtp_from_name",
+        "smtp_notify_to",
+        mode="before",
+    )
+    @classmethod
+    def _strip_smtp_fields(cls, value):
+        if isinstance(value, str):
+            return value.strip()
+        return value
+
+    @model_validator(mode="after")
+    def _normalize_smtp(self):
+        if self.smtp_enabled and not self.smtp_from_email and self.smtp_username:
+            self.smtp_from_email = self.smtp_username
+        return self
+
+    @property
+    def notify_recipients(self) -> list[str]:
+        return [e.strip() for e in self.smtp_notify_to.split(",") if e.strip()]
 
     @property
     def cors_origin_list(self) -> list[str]:

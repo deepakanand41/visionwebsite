@@ -6,6 +6,7 @@ import { FiUser, FiMail, FiPhone, FiSend, FiLoader } from 'react-icons/fi';
 import { FaCheckCircle, FaGlobeAmericas, FaGraduationCap } from 'react-icons/fa';
 import { submitEnquiry } from '../services/api';
 import { HOME_THEME as T } from '../utils/constants';
+import { TermsPrivacyLinks } from './TermsPrivacyLinks';
 import { destinationFormGroups } from '../utils/destinationData';
 
 const studyLevels = [
@@ -258,10 +259,7 @@ export function EnquiryFormCard({
               className="mt-0.5 accent-red-700"
             />
             <span className="text-sm text-gray-600">
-              I agree to the{' '}
-              <a href="#" className="underline" style={{ color: T.red }}>Terms & Conditions</a>
-              {' '}and{' '}
-              <a href="#" className="underline" style={{ color: T.red }}>Privacy Policy</a>
+              I agree to the <TermsPrivacyLinks />
               <span className="text-red-500"> *</span>
             </span>
           </label>

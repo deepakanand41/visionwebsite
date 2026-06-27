@@ -1,7 +1,9 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator
+
+from app.job_designations import is_valid_job_type
 
 
 # ─── Enquiry ───────────────────────────────────────────────────────────────────
@@ -512,30 +514,19 @@ class ImageUploadResponse(BaseModel):
 
 # ─── Careers ─────────────────────────────────────────────────────────────────────
 
-JOB_TYPES = (
-    "counselling",
-    "sales",
-    "marketing",
-    "operations",
-    "finance",
-    "hr",
-    "it",
-    "test_prep",
-    "visa",
-    "management",
-    "other",
-)
-
 EMPLOYMENT_TYPES = ("full_time", "part_time", "contract", "internship")
+
+
+def _validate_job_type_value(v: str) -> str:
+    if not is_valid_job_type(v):
+        raise ValueError("Invalid job designation")
+    return v
 
 
 class JobPostingCreate(BaseModel):
     title: str = Field(..., min_length=3, max_length=200)
     slug: Optional[str] = Field(None, max_length=220)
-    job_type: str = Field(
-        ...,
-        pattern="^(counselling|sales|marketing|operations|finance|hr|it|test_prep|visa|management|other)$",
-    )
+    job_type: str = Field(..., min_length=2, max_length=50)
     employment_type: str = Field(default="full_time", pattern="^(full_time|part_time|contract|internship)$")
     location: str = Field(..., min_length=2, max_length=150)
     experience_required: Optional[str] = Field(None, max_length=100)
@@ -546,14 +537,16 @@ class JobPostingCreate(BaseModel):
     is_active: bool = True
     sort_order: int = 0
 
+    @field_validator("job_type")
+    @classmethod
+    def validate_job_type(cls, v: str) -> str:
+        return _validate_job_type_value(v)
+
 
 class JobPostingUpdate(BaseModel):
     title: Optional[str] = Field(None, min_length=3, max_length=200)
     slug: Optional[str] = Field(None, max_length=220)
-    job_type: Optional[str] = Field(
-        None,
-        pattern="^(counselling|sales|marketing|operations|finance|hr|it|test_prep|visa|management|other)$",
-    )
+    job_type: Optional[str] = Field(None, min_length=2, max_length=50)
     employment_type: Optional[str] = Field(None, pattern="^(full_time|part_time|contract|internship)$")
     location: Optional[str] = Field(None, min_length=2, max_length=150)
     experience_required: Optional[str] = Field(None, max_length=100)
@@ -563,6 +556,13 @@ class JobPostingUpdate(BaseModel):
     responsibilities: Optional[str] = None
     is_active: Optional[bool] = None
     sort_order: Optional[int] = None
+
+    @field_validator("job_type")
+    @classmethod
+    def validate_job_type(cls, v: str | None) -> str | None:
+        if v is None:
+            return v
+        return _validate_job_type_value(v)
 
 
 class JobPostingResponse(BaseModel):

@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FiUser, FiMail, FiPhone, FiSend, FiLoader, FiCalendar } from 'react-icons/fi';
 import { submitTouristVisaEnquiry } from '../services/api';
+import { TermsPrivacyLinks } from './TermsPrivacyLinks';
 
 function Field({ label, required, error, children }) {
   return (
@@ -129,7 +130,7 @@ export default function TouristVisaEnquiryForm({ countrySlug, countryName }) {
 
         <label className="flex items-start gap-2 text-sm text-gray-600 cursor-pointer">
           <input type="checkbox" {...register('acceptTerms', { required: 'You must accept the terms' })} className="mt-0.5 accent-red-700" />
-          <span>I agree to the terms and privacy policy *</span>
+          <span>I agree to the <TermsPrivacyLinks /> *</span>
         </label>
         {errors.acceptTerms && <p className="text-red-500 text-xs">{errors.acceptTerms.message}</p>}
 
