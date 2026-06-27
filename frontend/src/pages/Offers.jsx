@@ -147,7 +147,7 @@ export default function Offers() {
         </div>
       </section>
 
-      <section className="py-8 bg-white border-b border-gray-100 sticky top-16 lg:top-[7.75rem] z-30">
+      <section className="py-8 bg-white border-b border-gray-100 sticky top-[4.25rem] lg:top-[6.5rem] z-30">
         <div className="max-w-7xl mx-auto px-4 flex flex-wrap gap-2 justify-center">
           {OFFER_TYPES.map((t) => (
             <button

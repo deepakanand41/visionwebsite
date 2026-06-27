@@ -26,8 +26,8 @@ const topBarLinks = [
 const testPrepLinks = [
   { label: 'IELTS Coaching', to: '/ielts-training' },
   { label: 'PTE Coaching', to: '/pte-training' },
-  { label: 'Book IELTS Exam', to: '/book-ielts-exam' },
-  { label: 'Book PTE Exam', to: '/book-pte-exam' },
+  { label: 'Book IELTS Test', to: '/book-ielts-exam' },
+  { label: 'Book PTE Exam', href: 'https://ptebazaar.com/' },
 ];
 
 function TestPrepMenuItem({ link, pathname, onClick, className = '' }) {
@@ -37,6 +37,20 @@ function TestPrepMenuItem({ link, pathname, onClick, className = '' }) {
       ? 'font-semibold text-[#A50000] bg-red-50'
       : 'text-gray-700 hover:bg-red-50 hover:text-red-800'
   }`;
+
+  if (link.href) {
+    return (
+      <a
+        href={link.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={onClick}
+        className={itemClass}
+      >
+        {link.label}
+      </a>
+    );
+  }
 
   return (
     <Link to={link.to} onClick={onClick} className={itemClass}>
@@ -196,9 +210,35 @@ export default function Navbar() {
         setTestPrepOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
   }, []);
+
+  const toggleDestDropdown = () => {
+    setVisaOpen(false);
+    setVisaEuropeOpen(false);
+    setVisaOtherOpen(false);
+    setTestPrepOpen(false);
+    setDestOpen((open) => !open);
+  };
+
+  const toggleVisaDropdown = () => {
+    setDestOpen(false);
+    setEuropeOpen(false);
+    setOtherOpen(false);
+    setTestPrepOpen(false);
+    setVisaOpen((open) => !open);
+  };
+
+  const toggleTestPrepDropdown = () => {
+    setDestOpen(false);
+    setEuropeOpen(false);
+    setOtherOpen(false);
+    setVisaOpen(false);
+    setVisaEuropeOpen(false);
+    setVisaOtherOpen(false);
+    setTestPrepOpen((open) => !open);
+  };
 
   const isActive = (path) => location.pathname === path;
   const isDestinationsActive = location.pathname.startsWith('/study-abroad');
@@ -242,7 +282,14 @@ export default function Navbar() {
   const closeOtherMenu = () => setOtherOpen(false);
 
   const linkClass = (active) =>
-    `flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg transition-colors whitespace-nowrap ${
+    `flex items-center gap-1 px-2.5 xl:px-3 py-2 text-sm rounded-lg transition-colors whitespace-nowrap shrink-0 ${
+      active
+        ? 'font-semibold text-[#A50000] bg-red-50'
+        : 'font-medium text-gray-700 hover:text-red-800 hover:bg-red-50'
+    }`;
+
+  const dropdownBtnClass = (active) =>
+    `flex items-center gap-1 px-2.5 xl:px-3 py-2 text-sm rounded-lg transition-colors whitespace-nowrap shrink-0 ${
       active
         ? 'font-semibold text-[#A50000] bg-red-50'
         : 'font-medium text-gray-700 hover:text-red-800 hover:bg-red-50'
@@ -270,72 +317,74 @@ export default function Navbar() {
         scrolled ? 'shadow-lg' : ''
       }`}
     >
-      {/* Desktop: logo spans both rows; dark bg only on top-tab row */}
-      <div className="hidden lg:block max-w-7xl mx-auto">
-        <div className="grid grid-cols-[minmax(200px,240px)_1fr]">
-          <Link
-            to="/"
-            className="row-span-2 flex items-center justify-center px-5 py-3 bg-white"
+      {/* Desktop: logo spans top + main rows; nav stays on one line */}
+      <div className="hidden lg:grid grid-cols-[auto_1fr] w-full overflow-visible">
+        <Link
+          to="/"
+          className="row-span-2 flex items-center bg-white shrink-0 px-2 xl:px-3 2xl:px-4 py-0"
+        >
+          <Logo className="h-[5.75rem] xl:h-[6.25rem] 2xl:h-[6.5rem] w-auto max-w-[175px] xl:max-w-[200px] 2xl:max-w-[210px]" />
+        </Link>
+
+        <div className="flex items-center justify-end h-9 bg-white pr-4 lg:pr-6 xl:pr-10 2xl:pr-12">
+          <div
+            className="inline-flex items-center gap-1 h-full px-4 text-white text-xs"
+            style={{ background: '#111111' }}
           >
-            <Logo className="h-[5.25rem] w-auto max-w-[210px]" />
-          </Link>
-
-          <div className="flex items-center justify-end h-9 px-6 bg-white">
-            <div
-              className="inline-flex items-center gap-1 h-full px-4 text-white text-xs"
-              style={{ background: '#111111' }}
-            >
-              {topBarLinks.map((link, i) => (
-                <span key={link.to} className="flex items-center">
-                  {i > 0 && <span className="mx-2 text-white/25">|</span>}
-                  <Link
-                    to={link.to}
-                    className={`px-2 py-1 rounded transition-colors hover:text-white ${
-                      isTopLinkActive(link.to) ? 'text-white font-semibold' : 'text-white/75'
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                </span>
-              ))}
-              <span className="mx-2 text-white/25">|</span>
-              <Link
-                to="/sign-in"
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-colors ${
-                  isActive('/sign-in')
-                    ? 'border-white/40 bg-white/10 text-white font-semibold'
-                    : 'border-white/20 text-white/90 hover:bg-white/10'
-                }`}
-              >
-                <FiUser size={14} />
-                Sign in
-              </Link>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between gap-3 px-4 pt-2 pb-2 bg-white min-h-[3.75rem]">
-            <nav className="flex items-center gap-1 flex-1 min-w-0">
-              <div className="relative" ref={dropdownRef}>
-                <button
-                  onClick={() => setDestOpen(!destOpen)}
-                  className={`flex items-center gap-1 px-3 py-2 text-sm rounded-lg transition-colors ${
-                    isDestinationsActive
-                      ? 'font-semibold text-[#A50000] bg-red-50'
-                      : 'font-medium text-gray-700 hover:text-red-800 hover:bg-red-50'
+            {topBarLinks.map((link, i) => (
+              <span key={link.to} className="flex items-center whitespace-nowrap">
+                {i > 0 && <span className="mx-2 text-white/25">|</span>}
+                <Link
+                  to={link.to}
+                  className={`px-2 py-1 rounded transition-colors hover:text-white whitespace-nowrap ${
+                    isTopLinkActive(link.to) ? 'text-white font-semibold' : 'text-white/75'
                   }`}
                 >
-                  Study Destinations
-                  <FiChevronDown className={`transition-transform duration-200 ${destOpen ? 'rotate-180' : ''}`} />
-                </button>
-                <AnimatePresence>
-                  {destOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 8, scale: 0.97 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 8, scale: 0.97 }}
-                      transition={{ duration: 0.15 }}
-                      className="absolute top-full left-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-visible z-50"
-                    >
+                  {link.label}
+                </Link>
+              </span>
+            ))}
+            <span className="mx-2 text-white/25">|</span>
+            <Link
+              to="/sign-in"
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-colors whitespace-nowrap ${
+                isActive('/sign-in')
+                  ? 'border-white/40 bg-white/10 text-white font-semibold'
+                  : 'border-white/20 text-white/90 hover:bg-white/10'
+              }`}
+            >
+              <FiUser size={14} />
+              Sign in
+            </Link>
+          </div>
+        </div>
+
+        <div className="relative z-20 flex items-center gap-2 xl:gap-4 pr-4 lg:pr-6 xl:pr-10 2xl:pr-12 py-0 bg-white min-h-[3.25rem] overflow-visible">
+          <nav className="flex flex-1 items-center gap-0.5 xl:gap-1 min-w-0 flex-nowrap overflow-visible">
+            <div className="relative shrink-0" ref={dropdownRef}>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleDestDropdown();
+                }}
+                className={dropdownBtnClass(isDestinationsActive)}
+                aria-expanded={destOpen}
+                aria-haspopup="true"
+              >
+                Study Destinations
+                <FiChevronDown className={`shrink-0 transition-transform duration-200 ${destOpen ? 'rotate-180' : ''}`} />
+              </button>
+              <AnimatePresence>
+                {destOpen && (
+                  <motion.div
+                    key="dest-dropdown"
+                    initial={{ opacity: 0, y: 8, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.97 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute top-full left-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-visible z-[60]"
+                  >
                       {mainDestinations.map((d) => (
                         <DestLink
                           key={d.slug}
@@ -369,27 +418,30 @@ export default function Navbar() {
                 </AnimatePresence>
               </div>
 
-              <div className="relative" ref={visaDropdownRef}>
-                <button
-                  onClick={() => setVisaOpen(!visaOpen)}
-                  className={`flex items-center gap-1 px-3 py-2 text-sm rounded-lg transition-colors ${
-                    isVisaActive
-                      ? 'font-semibold text-[#A50000] bg-red-50'
-                      : 'font-medium text-gray-700 hover:text-red-800 hover:bg-red-50'
-                  }`}
-                >
-                  Tourist Visa
-                  <FiChevronDown className={`transition-transform duration-200 ${visaOpen ? 'rotate-180' : ''}`} />
-                </button>
-                <AnimatePresence>
-                  {visaOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 8, scale: 0.97 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 8, scale: 0.97 }}
-                      transition={{ duration: 0.15 }}
-                      className="absolute top-full left-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-visible z-50"
-                    >
+            <div className="relative shrink-0" ref={visaDropdownRef}>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleVisaDropdown();
+                }}
+                className={dropdownBtnClass(isVisaActive)}
+                aria-expanded={visaOpen}
+                aria-haspopup="true"
+              >
+                Tourist Visa
+                <FiChevronDown className={`shrink-0 transition-transform duration-200 ${visaOpen ? 'rotate-180' : ''}`} />
+              </button>
+              <AnimatePresence>
+                {visaOpen && (
+                  <motion.div
+                    key="visa-dropdown"
+                    initial={{ opacity: 0, y: 8, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.97 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute top-full left-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-visible z-[60]"
+                  >
                       {mainDestinations.map((d) => (
                         <DestLink
                           key={d.slug}
@@ -426,27 +478,30 @@ export default function Navbar() {
                 </AnimatePresence>
               </div>
 
-              <div className="relative" ref={testPrepRef}>
-                <button
-                  onClick={() => setTestPrepOpen(!testPrepOpen)}
-                  className={`flex items-center gap-1 px-3 py-2 text-sm rounded-lg transition-colors ${
-                    isTestPrepActive
-                      ? 'font-semibold text-[#A50000] bg-red-50'
-                      : 'font-medium text-gray-700 hover:text-red-800 hover:bg-red-50'
-                  }`}
-                >
-                  Test Preparation
-                  <FiChevronDown className={`transition-transform duration-200 ${testPrepOpen ? 'rotate-180' : ''}`} />
-                </button>
-                <AnimatePresence>
-                  {testPrepOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 8, scale: 0.97 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 8, scale: 0.97 }}
-                      transition={{ duration: 0.15 }}
-                      className="absolute top-full left-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50"
-                    >
+            <div className="relative shrink-0" ref={testPrepRef}>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleTestPrepDropdown();
+                }}
+                className={dropdownBtnClass(isTestPrepActive)}
+                aria-expanded={testPrepOpen}
+                aria-haspopup="true"
+              >
+                Test Preparation
+                <FiChevronDown className={`shrink-0 transition-transform duration-200 ${testPrepOpen ? 'rotate-180' : ''}`} />
+              </button>
+              <AnimatePresence>
+                {testPrepOpen && (
+                  <motion.div
+                    key="testprep-dropdown"
+                    initial={{ opacity: 0, y: 8, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.97 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute top-full left-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-[60]"
+                  >
                       {testPrepLinks.map((link) => (
                         <TestPrepMenuItem
                           key={link.to || link.href}
@@ -460,24 +515,23 @@ export default function Navbar() {
                 </AnimatePresence>
               </div>
 
-              {navLinks.map((link) => {
-                const active = isActive(link.to);
-                return (
-                  <Link key={link.label} to={link.to} className={linkClass(active)}>
-                    {link.label}
-                  </Link>
-                );
-              })}
-            </nav>
+            {navLinks.map((link) => {
+              const active = isActive(link.to);
+              return (
+                <Link key={link.label} to={link.to} className={linkClass(active)}>
+                  {link.label}
+                </Link>
+              );
+            })}
+          </nav>
 
-            <Link
-              to="/contact-us"
-              className="shrink-0 px-5 py-2.5 text-sm font-semibold text-white rounded-xl transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5"
-              style={{ background: 'linear-gradient(135deg, #A50000, #7A0000)' }}
-            >
-              Book Free Counselling
-            </Link>
-          </div>
+          <Link
+            to="/contact-us"
+            className="shrink-0 whitespace-nowrap px-4 xl:px-5 py-2.5 text-sm font-semibold text-white rounded-xl transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5"
+            style={{ background: 'linear-gradient(135deg, #A50000, #7A0000)' }}
+          >
+            Book Free Counselling
+          </Link>
         </div>
       </div>
 
@@ -485,7 +539,7 @@ export default function Navbar() {
       <div className="lg:hidden bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between py-3">
           <Link to="/" className="flex items-center shrink-0">
-            <Logo className="h-14 w-auto" />
+            <Logo className="h-12 w-auto" />
           </Link>
           <button
             onClick={() => setMobileOpen(!mobileOpen)}

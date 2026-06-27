@@ -7,9 +7,9 @@ import { HOME_THEME as T } from '../utils/constants';
 const examContent = {
   ielts: {
     title: 'IELTS',
-    highlight: 'Exam Booking',
+    highlight: 'Test Booking',
     subtitle:
-      'Book your IELTS exam with expert guidance on test type, dates, centres, and preparation — all in one place.',
+      'Book your IELTS test with expert guidance on test type, dates, centres, and preparation — all in one place.',
     aboutTitle: 'About the IELTS Exam',
     aboutText:
       'IELTS (International English Language Testing System) is accepted by 11,000+ organisations worldwide. Choose Academic for university admissions or General Training for migration and work visas.',
@@ -83,7 +83,7 @@ export default function BookExam({ exam = 'ielts' }) {
         title={content.title}
         highlight={content.highlight}
         subtitle={content.subtitle}
-        features={['Exam Registration Help', 'Centre & Date Guidance', 'Expert Counselling', 'Coaching Available']}
+        features={['Test Registration Help', 'Centre & Date Guidance', 'Expert Counselling', 'Coaching Available']}
       />
 
       <section className="py-14" style={{ background: T.gradientLight }}>

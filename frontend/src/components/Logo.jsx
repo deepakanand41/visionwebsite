@@ -3,7 +3,7 @@ export default function Logo({ className = 'h-[3.3rem] w-auto', alt = 'Vision In
     <img
       src="/logo.png"
       alt={alt}
-      className={`object-contain ${className}`}
+      className={`object-contain object-left ${className}`}
       draggable={false}
     />
   );

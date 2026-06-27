@@ -24,6 +24,7 @@ function Field({ label, required, error, children }) {
 export default function BookExamForm({ examType }) {
   const isIelts = examType === 'ielts';
   const examLabel = isIelts ? 'IELTS' : 'PTE';
+  const bookingTitle = isIelts ? 'Book IELTS Test' : `Book ${examLabel} Exam`;
 
   const {
     register,
@@ -58,7 +59,7 @@ export default function BookExamForm({ examType }) {
         acceptTerms: data.acceptTerms,
         contactPermission: data.contactPermission,
       });
-      toast.success(result.message || `Your ${examLabel} exam enquiry has been submitted!`, {
+      toast.success(result.message || `Your ${isIelts ? 'IELTS test' : `${examLabel} exam`} enquiry has been submitted!`, {
         id: toastId,
         duration: 5000,
       });
@@ -75,9 +76,9 @@ export default function BookExamForm({ examType }) {
       style={{ boxShadow: '0 8px 40px rgba(165,0,0,0.1)' }}
     >
       <div className="mb-6">
-        <h3 className="text-xl font-bold text-gray-800">Book {examLabel} Exam</h3>
+        <h3 className="text-xl font-bold text-gray-800">{bookingTitle}</h3>
         <p className="text-sm text-gray-500 mt-1">
-          Share your details and our team will help you with exam registration, slot selection, and preparation guidance.
+          Share your details and our team will help you with test registration, slot selection, and preparation guidance.
         </p>
       </div>
 
@@ -222,7 +223,7 @@ export default function BookExamForm({ examType }) {
           {isSubmitting ? (
             <><FiLoader className="animate-spin" /> Submitting...</>
           ) : (
-            <><FiSend /> Enquire to Book Exam</>
+            <><FiSend /> {isIelts ? 'Enquire to Book Test' : 'Enquire to Book Exam'}</>
           )}
         </button>
       </form>

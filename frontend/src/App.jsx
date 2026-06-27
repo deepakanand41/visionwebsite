@@ -44,7 +44,6 @@ export default function App() {
             <Route path="/ielts-training" element={<IELTSPTETraining exam="ielts" />} />
             <Route path="/pte-training" element={<IELTSPTETraining exam="pte" />} />
             <Route path="/book-ielts-exam" element={<BookExam exam="ielts" />} />
-            <Route path="/book-pte-exam" element={<BookExam exam="pte" />} />
             <Route path="/ielts-pte-training" element={<Navigate to="/ielts-training" replace />} />
             <Route path="/education-loans" element={<EducationLoans />} />
             <Route path="/refer-and-earn" element={<ReferAndEarn />} />

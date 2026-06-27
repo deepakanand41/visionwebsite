@@ -24,10 +24,29 @@ const EMPLOYMENT_LABELS = {
 };
 
 const PERKS = [
-  { icon: FiTrendingUp, title: 'Career Growth', desc: 'Structured learning paths and promotion opportunities across branches.' },
-  { icon: FiUsers, title: 'Collaborative Culture', desc: 'Work with passionate counsellors, trainers, and operations experts.' },
-  { icon: FiHeart, title: 'Meaningful Impact', desc: 'Help students achieve life-changing study abroad dreams every day.' },
+  { icon: FiTrendingUp, title: 'Career Growth', desc: 'Structured learning paths and promotion opportunities.' },
+  { icon: FiUsers, title: 'Collaborative Culture', desc: 'Work with passionate counsellors and operations experts.' },
+  { icon: FiHeart, title: 'Meaningful Impact', desc: 'Help students achieve life-changing study abroad dreams.' },
 ];
+
+function HeroPerkCards() {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3 gap-3">
+      {PERKS.map((perk) => (
+        <div
+          key={perk.title}
+          className="rounded-xl p-3.5 border border-white/10 bg-white/5 backdrop-blur-sm"
+        >
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center mb-2.5 bg-white/10">
+            <perk.icon className="text-white" size={16} />
+          </div>
+          <h3 className="text-sm font-bold text-white mb-1">{perk.title}</h3>
+          <p className="text-[11px] sm:text-xs text-gray-300 leading-snug">{perk.desc}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 function parseLines(text) {
   if (!text) return [];
@@ -168,6 +187,52 @@ function ApplyModal({ job, onClose }) {
   );
 }
 
+function JobFilterSidebar({ filter, onFilterChange, jobCount }) {
+  return (
+    <aside className="lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:overflow-x-hidden lg:pr-2 scrollbar-thin">
+      <div className="bg-white rounded-2xl border border-gray-100 p-4 lg:p-3 shadow-sm">
+        <div className="flex items-center justify-between gap-2 mb-3 px-1">
+          <h2 className="text-sm font-bold text-gray-900">Filter by Role</h2>
+          {filter !== 'all' && (
+            <button
+              type="button"
+              onClick={() => onFilterChange('all')}
+              className="text-[10px] font-semibold uppercase tracking-wide shrink-0"
+              style={{ color: T.red }}
+            >
+              Clear
+            </button>
+          )}
+        </div>
+        <nav className="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-x-visible pb-1 lg:pb-0 scrollbar-hide">
+          {JOB_TYPE_FILTERS.map((t) => {
+            const active = filter === t.id;
+            return (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => onFilterChange(t.id)}
+                title={t.label}
+                className={`shrink-0 lg:shrink lg:w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap lg:whitespace-normal lg:leading-snug ${
+                  active ? 'text-white shadow-sm' : 'text-gray-600 hover:bg-red-50 hover:text-red-800 bg-transparent'
+                }`}
+                style={active ? { background: T.red } : undefined}
+              >
+                {t.label}
+              </button>
+            );
+          })}
+        </nav>
+      </div>
+      {!jobCount && filter !== 'all' && (
+        <p className="hidden lg:block mt-3 px-1 text-[11px] text-gray-500 leading-relaxed">
+          No openings for this role right now.
+        </p>
+      )}
+    </aside>
+  );
+}
+
 function JobCard({ job, onApply, onExpand, expanded }) {
   const requirements = parseLines(job.requirements).slice(0, 4);
 
@@ -295,78 +360,69 @@ export default function Careers() {
 
   return (
     <main>
-      <section className="pt-32 lg:pt-36 pb-14 text-white" style={{ background: T.gradientHero }}>
+      <section className="pt-32 lg:pt-36 pb-12 lg:pb-14 text-white" style={{ background: T.gradientHero }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-4 border border-white/15" style={{ background: 'rgba(255,255,255,0.08)' }}>
-              <FiBriefcase /> Careers at Vision
-            </div>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
-              Build Your Career While <span style={{ color: T.red }}>Shaping Futures</span>
-            </h1>
-            <p className="text-gray-300 text-lg leading-relaxed">
-              Join Vision International Educational Consultants and work with a team dedicated to guiding students toward world-class education abroad.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-12 bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-3 gap-6">
-            {PERKS.map((perk) => (
-              <div key={perk.title} className="rounded-2xl p-6 border border-gray-100" style={{ boxShadow: '0 4px 20px rgba(165,0,0,0.05)' }}>
-                <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-4" style={{ background: T.redSoft }}>
-                  <perk.icon style={{ color: T.red }} size={20} />
-                </div>
-                <h3 className="font-bold text-gray-900 mb-2">{perk.title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{perk.desc}</p>
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-10 xl:gap-12 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-4 border border-white/15" style={{ background: 'rgba(255,255,255,0.08)' }}>
+                <FiBriefcase /> Careers at Vision
               </div>
-            ))}
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
+                Build Your Career While <span style={{ color: T.red }}>Shaping Futures</span>
+              </h1>
+              <p className="text-gray-300 text-lg leading-relaxed">
+                Join Vision International Educational Consultants and work with a team dedicated to guiding students toward world-class education abroad.
+              </p>
+            </div>
+            <HeroPerkCards />
           </div>
         </div>
       </section>
 
-      <section className="py-8 bg-gray-50 border-b border-gray-100 sticky top-16 lg:top-[7rem] z-30">
-        <div className="max-w-7xl mx-auto px-4 flex flex-wrap gap-2 justify-center">
-          {JOB_TYPE_FILTERS.map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              onClick={() => setFilter(t.id)}
-              className="px-4 py-2 rounded-full text-sm font-medium transition-all"
-              style={{
-                background: filter === t.id ? T.red : 'white',
-                color: filter === t.id ? 'white' : '#4b5563',
-                border: filter === t.id ? 'none' : '1px solid #e5e7eb',
-              }}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
-      </section>
+      <section className="py-12 lg:py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="lg:grid lg:grid-cols-[minmax(200px,240px)_1fr] xl:grid-cols-[minmax(220px,260px)_1fr] gap-6 lg:gap-8 items-start">
+            <JobFilterSidebar
+              filter={filter}
+              onFilterChange={setFilter}
+              jobCount={jobs.length}
+            />
 
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-          {loading ? (
-            <p className="text-center text-gray-500 py-20">Loading openings...</p>
-          ) : !jobs.length ? (
-            <div className="text-center py-20 bg-white rounded-3xl border border-gray-100">
-              <FiBriefcase className="mx-auto mb-4 text-gray-300" size={40} />
-              <p className="text-gray-500">No openings in this category right now. Check back soon or send your resume to our HR team.</p>
+            <div className="min-w-0 space-y-5">
+              <div className="flex items-center justify-between gap-3 pb-1">
+                <p className="text-sm text-gray-500">
+                  {loading ? 'Loading openings…' : (
+                    <>
+                      <span className="font-semibold text-gray-800">{jobs.length}</span>
+                      {' '}{jobs.length === 1 ? 'opening' : 'openings'}
+                      {filter !== 'all' && (
+                        <span> · {jobTypeLabel(filter)}</span>
+                      )}
+                    </>
+                  )}
+                </p>
+              </div>
+
+              {loading ? (
+                <p className="text-center text-gray-500 py-16 bg-white rounded-3xl border border-gray-100">Loading openings...</p>
+              ) : !jobs.length ? (
+                <div className="text-center py-16 bg-white rounded-3xl border border-gray-100">
+                  <FiBriefcase className="mx-auto mb-4 text-gray-300" size={40} />
+                  <p className="text-gray-500 px-4">No openings in this category right now. Check back soon or send your resume to our HR team.</p>
+                </div>
+              ) : (
+                jobs.map((job) => (
+                  <JobCard
+                    key={job.id}
+                    job={job}
+                    expanded={expandedId === job.id}
+                    onExpand={(id) => setExpandedId((prev) => (prev === id ? null : id))}
+                    onApply={setApplyJob}
+                  />
+                ))
+              )}
             </div>
-          ) : (
-            jobs.map((job) => (
-              <JobCard
-                key={job.id}
-                job={job}
-                expanded={expandedId === job.id}
-                onExpand={(id) => setExpandedId((prev) => (prev === id ? null : id))}
-                onApply={setApplyJob}
-              />
-            ))
-          )}
+          </div>
         </div>
       </section>
 

@@ -158,7 +158,7 @@ export function PageHero({
 
 export function TabNavigation({ tabs, activeTab, onTabClick }) {
   return (
-    <div className="sticky top-[5rem] lg:top-[7.75rem] z-40 bg-white shadow-sm">
+    <div className="sticky top-[4.25rem] lg:top-[6.5rem] z-40 bg-white shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex gap-1 overflow-x-auto scrollbar-hide py-1">
           {tabs.map((tab) => (
