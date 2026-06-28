@@ -1,7 +1,7 @@
 export const mainDestinations = [
+  { slug: 'united-kingdom', name: 'United Kingdom', flag: '🇬🇧', flagCode: 'gb' },
   { slug: 'canada', name: 'Canada', flag: '🇨🇦', flagCode: 'ca' },
   { slug: 'australia', name: 'Australia', flag: '🇦🇺', flagCode: 'au' },
-  { slug: 'united-kingdom', name: 'United Kingdom', flag: '🇬🇧', flagCode: 'gb' },
   { slug: 'united-states', name: 'United States', flag: '🇺🇸', flagCode: 'us' },
   { slug: 'new-zealand', name: 'New Zealand', flag: '🇳🇿', flagCode: 'nz' },
 ];

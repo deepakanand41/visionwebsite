@@ -2,9 +2,9 @@ from app.database import SessionLocal
 from app.models import TouristVisaCountry
 
 SEED_COUNTRIES = [
-    {"country_slug": "canada", "country_name": "Canada", "flag": "🇨🇦", "sort_order": 1},
-    {"country_slug": "australia", "country_name": "Australia", "flag": "🇦🇺", "sort_order": 2},
-    {"country_slug": "united-kingdom", "country_name": "United Kingdom", "flag": "🇬🇧", "sort_order": 3},
+    {"country_slug": "united-kingdom", "country_name": "United Kingdom", "flag": "🇬🇧", "sort_order": 1},
+    {"country_slug": "canada", "country_name": "Canada", "flag": "🇨🇦", "sort_order": 2},
+    {"country_slug": "australia", "country_name": "Australia", "flag": "🇦🇺", "sort_order": 3},
     {"country_slug": "united-states", "country_name": "United States", "flag": "🇺🇸", "sort_order": 4},
     {"country_slug": "new-zealand", "country_name": "New Zealand", "flag": "🇳🇿", "sort_order": 5},
     {"country_slug": "france", "country_name": "France", "flag": "🇫🇷", "sort_order": 6},
@@ -73,15 +73,23 @@ def _default_content(name: str) -> dict:
 def seed_tourist_visa():
     db = SessionLocal()
     try:
-        existing = {row.country_slug for row in db.query(TouristVisaCountry.country_slug).all()}
+        existing_rows = {
+            row.country_slug: row
+            for row in db.query(TouristVisaCountry).all()
+        }
         added = 0
+        updated = 0
         for item in SEED_COUNTRIES:
-            if item["country_slug"] in existing:
+            row = existing_rows.get(item["country_slug"])
+            if row:
+                if row.sort_order != item["sort_order"]:
+                    row.sort_order = item["sort_order"]
+                    updated += 1
                 continue
             defaults = _default_content(item["country_name"])
             db.add(TouristVisaCountry(**item, **defaults))
             added += 1
-        if added:
+        if added or updated:
             db.commit()
     finally:
         db.close()

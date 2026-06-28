@@ -24,9 +24,9 @@ const footerLinks = {
     { label: 'Visa Assistance', to: '/contact-us' },
   ],
   Destinations: [
+    { label: '🇬🇧 United Kingdom', to: '/study-abroad/united-kingdom' },
     { label: '🇨🇦 Canada', to: '/study-abroad/canada' },
     { label: '🇦🇺 Australia', to: '/study-abroad/australia' },
-    { label: '🇬🇧 United Kingdom', to: '/study-abroad/united-kingdom' },
     { label: '🇺🇸 United States', to: '/study-abroad/united-states' },
     { label: '🇳🇿 New Zealand', to: '/study-abroad/new-zealand' },
     { label: '🇫🇷 France', to: '/study-abroad/france' },
@@ -34,13 +34,18 @@ const footerLinks = {
   ],
 };
 
-const socials = [
-  { icon: FaWhatsapp, href: SOCIAL_LINKS.whatsapp, label: 'WhatsApp' },
+const brandSocials = [
   { icon: FaFacebookF, href: SOCIAL_LINKS.facebook, label: 'Facebook' },
   { icon: FaInstagram, href: SOCIAL_LINKS.instagram, label: 'Instagram' },
   { icon: FaYoutube, href: SOCIAL_LINKS.youtube, label: 'YouTube' },
   { icon: FaLinkedinIn, href: SOCIAL_LINKS.linkedin, label: 'LinkedIn' },
 ];
+
+const whatsappSocial = {
+  icon: FaWhatsapp,
+  href: SOCIAL_LINKS.whatsapp,
+  label: 'WhatsApp',
+};
 
 export default function Footer() {
   return (
@@ -123,7 +128,7 @@ export default function Footer() {
             </Link>
           </div>
           <div className="flex items-center gap-3">
-            {socials.map(({ icon: Icon, href, label }) => (
+            {brandSocials.map(({ icon: Icon, href, label }) => (
               <a
                 key={label}
                 href={href}
@@ -135,6 +140,17 @@ export default function Footer() {
                 <Icon size={14} />
               </a>
             ))}
+            <span className="w-1.5 shrink-0" aria-hidden="true" />
+            <a
+              href={whatsappSocial.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={whatsappSocial.label}
+              className="w-9 h-9 rounded-lg flex items-center justify-center text-white transition-all hover:scale-105"
+              style={{ background: 'linear-gradient(135deg, #25D366, #128C7E)' }}
+            >
+              <FaWhatsapp size={16} />
+            </a>
           </div>
         </div>
       </div>
